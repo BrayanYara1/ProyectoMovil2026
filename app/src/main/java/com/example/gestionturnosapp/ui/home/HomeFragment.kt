@@ -64,10 +64,23 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_estudiosFragment)
         }
 
+        binding.cardUrgencias.setOnClickListener {
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Llamada de Emergencia")
+                .setMessage("¿Deseas llamar a la línea de emergencias 123 (Colombia)?")
+                .setPositiveButton("Llamar") { _, _ ->
+                    val intent = android.content.Intent(android.content.Intent.ACTION_DIAL)
+                    intent.data = android.net.Uri.parse("tel:123")
+                    startActivity(intent)
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
+
         binding.cardUrgencias.setOnLongClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
             val intent = android.content.Intent(android.content.Intent.ACTION_DIAL)
-            intent.data = android.net.Uri.parse("tel:911")
+            intent.data = android.net.Uri.parse("tel:123")
             startActivity(intent)
             true
         }
