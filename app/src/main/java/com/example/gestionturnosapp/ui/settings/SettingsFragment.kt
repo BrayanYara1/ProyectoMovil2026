@@ -72,6 +72,20 @@ class SettingsFragment : Fragment() {
                 .setNegativeButton(getString(R.string.btn_cancel), null)
                 .show()
         }
+
+        // AYUDA
+        binding.btnHelp.setOnClickListener {
+            val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
+                data = android.net.Uri.parse("mailto:")
+                putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("soporte@saludactiva.com"))
+                putExtra(android.content.Intent.EXTRA_SUBJECT, "Ayuda SaludActiva - Usuario: ${UserManager.usuarioActual?.nombre}")
+            }
+            try {
+                startActivity(intent)
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "No hay app de correo instalada", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onDestroyView() {

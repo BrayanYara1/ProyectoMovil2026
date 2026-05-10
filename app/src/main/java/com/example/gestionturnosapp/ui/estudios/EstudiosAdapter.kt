@@ -10,18 +10,23 @@ import coil.load
 import com.example.gestionturnosapp.data.EstudioMedico
 import com.example.gestionturnosapp.databinding.ItemEstudioBinding
 
-class EstudiosAdapter : ListAdapter<EstudioMedico, EstudiosAdapter.ViewHolder>(DiffCallback()) {
+class EstudiosAdapter(
+    private val onDeleteClick: (EstudioMedico) -> Unit
+) : ListAdapter<EstudioMedico, EstudiosAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemEstudioBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+        return ViewHolder(binding, onDeleteClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class ViewHolder(private val binding: ItemEstudioBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(
+        private val binding: ItemEstudioBinding,
+        private val onDeleteClick: (EstudioMedico) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(estudio: EstudioMedico) {
             binding.apply {
                 tvEstudioTitulo.text = estudio.titulo
@@ -34,6 +39,11 @@ class EstudiosAdapter : ListAdapter<EstudioMedico, EstudiosAdapter.ViewHolder>(D
                     ivEstudioAdjunto.load(estudio.urlDocumento)
                 } else {
                     ivEstudioAdjunto.visibility = View.GONE
+                }
+
+                root.setOnLongClickListener {
+                    onDeleteClick(estudio)
+                    true
                 }
             }
         }

@@ -41,4 +41,11 @@ class MedicamentoRepository {
             throw Exception(parseError(response))
         }
     }
+
+    suspend fun eliminarMedicamento(id: String) {
+        val response = apiService.eliminarMedicamento(id)
+        if (!response.isSuccessful) {
+            throw Exception(parseError(response))
+        }
+    }
 }

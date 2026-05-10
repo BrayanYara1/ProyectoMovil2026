@@ -35,10 +35,16 @@ interface ApiService {
     @POST("api/medicamentos")
     suspend fun agregarMedicamento(@Body med: Medicamento): Response<Medicamento>
 
+    @DELETE("api/medicamentos/{id}")
+    suspend fun eliminarMedicamento(@Path("id") id: String): Response<Unit>
+
     // NUEVO: Estudios Médicos
     @GET("api/estudios")
     suspend fun getEstudios(): Response<List<EstudioMedico>>
 
     @POST("api/estudios")
     suspend fun agregarEstudio(@Body estudio: EstudioMedico): Response<EstudioMedico>
+
+    @DELETE("api/estudios/{id}")
+    suspend fun eliminarEstudio(@Path("id") id: String): Response<Unit>
 }

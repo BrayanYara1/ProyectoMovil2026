@@ -38,7 +38,16 @@ class MedicamentosFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = MedicamentosAdapter()
+        adapter = MedicamentosAdapter { med ->
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Eliminar Medicamento")
+                .setMessage("¿Deseas eliminar ${med.nombre} de tu lista?")
+                .setPositiveButton("Eliminar") { _, _ ->
+                    viewModel.eliminarMedicamento(med.id)
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
         binding.rvMedicamentos.layoutManager = LinearLayoutManager(context)
         binding.rvMedicamentos.adapter = adapter
     }

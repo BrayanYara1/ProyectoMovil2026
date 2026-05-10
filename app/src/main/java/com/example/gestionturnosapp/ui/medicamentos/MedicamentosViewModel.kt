@@ -71,4 +71,18 @@ class MedicamentosViewModel : ViewModel() {
     fun resetOperationState() {
         _operationResource.value = Resource.Idle
     }
+
+    fun eliminarMedicamento(id: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                repository.eliminarMedicamento(id)
+                loadMedicamentos()
+            } catch (e: Exception) {
+                _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error al eliminar")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }

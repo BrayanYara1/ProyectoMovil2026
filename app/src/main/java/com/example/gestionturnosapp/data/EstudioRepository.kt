@@ -42,6 +42,13 @@ class EstudioRepository {
         }
     }
 
+    suspend fun eliminarEstudio(id: String) {
+        val response = apiService.eliminarEstudio(id)
+        if (!response.isSuccessful) {
+            throw Exception(parseError(response))
+        }
+    }
+
     suspend fun agregarEstudioConDetalle(estudio: EstudioMedico): retrofit2.Response<EstudioMedico> {
         return apiService.agregarEstudio(estudio)
     }

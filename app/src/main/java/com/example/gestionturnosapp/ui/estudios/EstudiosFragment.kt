@@ -65,7 +65,16 @@ class EstudiosFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = EstudiosAdapter()
+        adapter = EstudiosAdapter { estudio ->
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Eliminar Estudio")
+                .setMessage("¿Deseas eliminar el registro: ${estudio.titulo}?")
+                .setPositiveButton("Eliminar") { _, _ ->
+                    viewModel.eliminarEstudio(estudio.id)
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+        }
         binding.rvEstudios.layoutManager = LinearLayoutManager(context)
         binding.rvEstudios.adapter = adapter
     }

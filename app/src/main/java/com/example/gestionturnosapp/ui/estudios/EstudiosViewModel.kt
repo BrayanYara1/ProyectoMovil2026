@@ -96,4 +96,16 @@ class EstudiosViewModel : ViewModel() {
             }
         }
     }
+
+    fun eliminarEstudio(id: String) {
+        viewModelScope.launch {
+            _estudiosResource.value = Resource.Loading
+            try {
+                repository.eliminarEstudio(id)
+                loadEstudios()
+            } catch (e: Exception) {
+                _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al eliminar")
+            }
+        }
+    }
 }
