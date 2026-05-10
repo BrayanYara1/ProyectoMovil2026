@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <!-- Círculo de fondo sutil -->
+    <path
+        android:fillColor="#1AFFFFFF"
+        android:pathData="M50,50m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0" />
+
+    <!-- Logotipo Care-Pulse Minimalista -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M50,35.39c-2.31,-2.45 -5.83,-3.39 -8.84,-2.23c-4.43,1.71 -6.44,6.77 -4.49,11.13c1.33,2.97 4.14,4.92 6.51,6.86c2.09,1.72 4.25,3.46 6.13,5.32c0.23,0.23 0.45,0.46 0.69,0.69c0.24,-0.23 0.46,-0.46 0.69,-0.69c1.88,-1.86 4.04,-3.6 6.13,-5.32c2.37,-1.94 5.18,-3.89 6.51,-6.86c1.95,-4.36 -0.06,-9.42 -4.49,-11.13c-3.01,-1.16 -6.53,-0.22 -8.84,2.23Z" />
+
+    <!-- Línea de Vida Integrada -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M25,62 L37,62 L42,55 L47,69 L52,59 L57,62 L75,62" />
+
+</vector>

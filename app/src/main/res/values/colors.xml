@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colores Base Modernos (Paleta Médica Profesional) -->
+    <color name="primary">#0052CC</color> <!-- Azul Intenso -->
+    <color name="primary_variant">#0747A6</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="primary_container">#DEEBFF</color>
+    <color name="on_primary_container">#0747A6</color>
+
+    <color name="secondary">#00B8D9</color> <!-- Cyan Médico -->
+    <color name="on_secondary">#FFFFFF</color>
+    <color name="secondary_container">#E6FCFF</color>
+    <color name="on_secondary_container">#008DA6</color>
+
+    <color name="accent">#6554C0</color> <!-- Violeta para contrastes -->
+
+    <color name="background">#F4F5F7</color> <!-- Gris muy claro -->
+    <color name="on_background">#172B4D</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="on_surface">#172B4D</color>
+
+    <color name="error">#DE350B</color>
+    <color name="on_error">#FFFFFF</color>
+
+    <color name="success">#36B37E</color>
+    <color name="warning">#FFAB00</color>
+
+    <color name="outline">#DFE1E6</color>
+    <color name="text_primary">#172B4D</color>
+    <color name="text_secondary">#6B778C</color>
+    <color name="text_tertiary">#8993A4</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Launcher -->
+    <color name="ic_launcher_background">#FFFFFF</color>
+
+    <!-- Estados -->
+    <color name="status_pending_bg">#FFF0B3</color>
+    <color name="status_pending_text">#826A1C</color>
+    <color name="status_completed_bg">#E3FCEF</color>
+    <color name="status_completed_text">#006644</color>
+    <color name="status_cancelled_bg">#FFEBE6</color>
+    <color name="status_cancelled_text">#BF2600</color>
+</resources>
