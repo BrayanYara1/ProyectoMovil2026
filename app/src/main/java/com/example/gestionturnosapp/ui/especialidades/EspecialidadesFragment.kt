@@ -29,6 +29,7 @@ class EspecialidadesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
+        setupSearchView()
         setupObservers()
     }
 
@@ -36,8 +37,20 @@ class EspecialidadesFragment : Fragment() {
         binding.rvEspecialidades.layoutManager = GridLayoutManager(context, 2)
     }
 
+    private fun setupSearchView() {
+        binding.searchViewEspecialidades.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean = false
+            override fun onQueryTextChange(newText: String?): Boolean {
+                // Aquí filtramos localmente para simplificar con los recursos de strings
+                val adapter = binding.rvEspecialidades.adapter as? EspecialidadesAdapter
+                adapter?.filter(newText ?: "")
+                return true
+            }
+        })
+    }
+
     private fun setupObservers() {
-        viewModel.especialidades.observe(viewLifecycleOwner) { lista ->
+        viewModel.filteredEspecialidades.observe(viewLifecycleOwner) { lista ->
             val adapter = EspecialidadesAdapter(lista) { especialidad ->
                 val bundle = Bundle().apply {
                     putString("especialidadNombre", getString(especialidad.nombreRes))

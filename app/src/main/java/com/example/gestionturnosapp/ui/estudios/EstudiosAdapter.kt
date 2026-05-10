@@ -35,15 +35,14 @@ class EstudiosAdapter(
                 tvEstudioFecha.text = estudio.fecha
                 
                 if (!estudio.urlDocumento.isNullOrEmpty()) {
-                    ivEstudioAdjunto.visibility = View.VISIBLE
+                    ivEstudioAdjunto.visibility = android.view.View.VISIBLE
                     ivEstudioAdjunto.load(estudio.urlDocumento)
                 } else {
-                    ivEstudioAdjunto.visibility = View.GONE
+                    ivEstudioAdjunto.visibility = android.view.View.GONE
                 }
 
-                root.setOnLongClickListener {
+                btnDeleteEstudio.setOnClickListener {
                     onDeleteClick(estudio)
-                    true
                 }
             }
         }

@@ -39,7 +39,19 @@
             tools:text="Cada 8 horas - Próxima: 22:00" />
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/btnDeleteMed"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_delete"
+        app:tint="@color/error"
+        android:visibility="gone"
+        tools:visibility="visible"
+        android:contentDescription="@string/btn_delete" />
+
     <ImageView
+        android:id="@+id/ivMedInfo"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@android:drawable/ic_dialog_info"

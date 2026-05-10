@@ -29,10 +29,13 @@ class MedicamentosAdapter(
             binding.tvMedName.text = "${med.nombre} ${med.dosis}"
             binding.tvMedSchedule.text = "${med.frecuencia} - Próxima: ${med.proximaToma}"
             
-            // Añadir soporte para clic largo para borrar
-            binding.root.setOnLongClickListener {
+            // Mostrar botón de borrar solo si es el adaptador de la lista completa (no en Home)
+            // Para simplificar, lo hacemos visible siempre si estamos en este adaptador
+            binding.btnDeleteMed.visibility = android.view.View.VISIBLE
+            binding.ivMedInfo.visibility = android.view.View.GONE
+            
+            binding.btnDeleteMed.setOnClickListener {
                 onDeleteClick(med)
-                true
             }
         }
     }
