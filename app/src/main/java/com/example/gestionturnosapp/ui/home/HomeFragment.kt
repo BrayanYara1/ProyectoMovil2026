@@ -68,9 +68,23 @@ class HomeFragment : Fragment() {
         binding.cardUrgencias.setOnLongClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
             val intent = android.content.Intent(android.content.Intent.ACTION_DIAL)
-            intent.data = "tel:911".toUri()
+            intent.data = android.net.Uri.parse("tel:911")
             startActivity(intent)
             true
+        }
+
+        binding.cardNextAppointment.setOnClickListener {
+            viewModel.nextTurno.value?.let { turno ->
+                val bundle = Bundle().apply {
+                    putString("TURNO_ID", turno.id)
+                    putString("PACIENTE_NOMBRE", turno.pacienteNombre)
+                    putString("TURNO_FECHA", turno.fecha)
+                    putString("TURNO_HORA", turno.hora)
+                    putString("TURNO_MOTIVO", turno.motivo)
+                    putString("TURNO_ESTADO", turno.estado)
+                }
+                findNavController().navigate(R.id.action_homeFragment_to_turnoDetailFragment, bundle)
+            }
         }
     }
 

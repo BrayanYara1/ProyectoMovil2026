@@ -3,8 +3,6 @@ package com.example.gestionturnosapp.ui.estudios
 import android.app.DatePickerDialog
 import android.net.Uri
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +18,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
+import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentEstudiosBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -141,7 +140,12 @@ class EstudiosFragment : Fragment() {
                     binding.layoutEmpty.isVisible = list.isEmpty()
                 }
                 is Resource.Error -> {
-                    Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
+                    val msg = resource.message
+                    if (msg.contains("401") || msg.contains("token", true)) {
+                        handleSessionExpired()
+                    } else {
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    }
                 }
                 else -> {}
             }
@@ -160,6 +164,14 @@ class EstudiosFragment : Fragment() {
                 else -> {}
             }
         }
+    }
+
+    private fun handleSessionExpired() {
+        com.example.gestionturnosapp.data.UserManager.logout(requireContext())
+        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
     }
 
     private fun showAddEstudioDialog() {

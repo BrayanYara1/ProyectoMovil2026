@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentMedicamentosBinding
 
@@ -77,7 +78,12 @@ class MedicamentosFragment : Fragment() {
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
-                    Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
+                    val msg = resource.message
+                    if (msg.contains("401") || msg.contains("token", true)) {
+                        handleSessionExpired()
+                    } else {
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    }
                 }
                 is Resource.Loading -> {
                     binding.progressBar.isVisible = true
@@ -104,6 +110,14 @@ class MedicamentosFragment : Fragment() {
                 else -> {}
             }
         }
+    }
+
+    private fun handleSessionExpired() {
+        com.example.gestionturnosapp.data.UserManager.logout(requireContext())
+        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
     }
 
     private fun clearFields() {

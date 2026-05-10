@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentWelcomeBinding
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class WelcomeFragment : Fragment() {
 
@@ -44,10 +47,17 @@ class WelcomeFragment : Fragment() {
         val user = UserManager.getUser(requireContext())
         
         if (user != null) {
-            // Usuario logueado: Mostrar bienvenida personalizada
+            // Usuario logueado: Navegación automática después de un breve retraso
             binding.layoutAuthButtons.isVisible = false
             binding.btnGetStarted.isVisible = true
             binding.tvWelcomeSubtitle.text = "¡Hola de nuevo, ${user.nombre}!"
+            
+            viewLifecycleOwner.lifecycleScope.launch {
+                kotlinx.coroutines.delay(1500) // 1.5 segundos para que vea la bienvenida
+                if (isAdded) {
+                    findNavController().navigate(R.id.action_welcomeFragment_to_homeFragment)
+                }
+            }
             
             binding.btnGetStarted.setOnClickListener {
                 it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
