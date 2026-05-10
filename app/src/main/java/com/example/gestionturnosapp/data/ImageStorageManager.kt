@@ -7,16 +7,16 @@ import java.io.FileOutputStream
 
 object ImageStorageManager {
     private const val PREF_NAME = "image_prefs"
-    private const val KEY_PROFILE_IMAGE_PREFIX = "profile_image_"
+    private const val KEY_PROFILE_IMAGE_PREFIX = "profile_image_path_"
 
     /**
-     * Guarda la imagen en el almacenamiento interno de la app para que sea permanente
-     * y no dependa de permisos temporales de la galería.
+     * Guarda la imagen físicamente en el almacenamiento interno.
      */
     fun saveProfileImage(context: Context, userId: String, uri: Uri): String? {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri)
-            val file = File(context.filesDir, "profile_$userId.jpg")
+            // Usamos un nombre de archivo único por usuario para que no se borre al cambiar de cuenta
+            val file = File(context.filesDir, "profile_photo_$userId.jpg")
             val outputStream = FileOutputStream(file)
             
             inputStream?.use { input ->
@@ -25,26 +25,48 @@ object ImageStorageManager {
                 }
             }
             
-            val savedUri = Uri.fromFile(file).toString()
+            val savedPath = file.absolutePath
             val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-            prefs.edit().putString(KEY_PROFILE_IMAGE_PREFIX + userId, savedUri).apply()
+            prefs.edit().putString(KEY_PROFILE_IMAGE_PREFIX + userId, savedPath).apply()
             
-            savedUri
+            savedPath
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("ImageStorage", "Error saving image", e)
             null
         }
     }
 
+    /**
+     * Obtiene la ruta de la imagen del perfil verificando que el archivo exista físicamente.
+     */
     fun getProfileImageUri(context: Context, userId: String?): String? {
-        if (userId == null) return null
+        if (userId.isNullOrEmpty()) return null
+        
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        return prefs.getString(KEY_PROFILE_IMAGE_PREFIX + userId, null)
+        val savedPath = prefs.getString(KEY_PROFILE_IMAGE_PREFIX + userId, null)
+        
+        return if (savedPath != null) {
+            val file = File(savedPath)
+            if (file.exists()) {
+                Uri.fromFile(file).toString()
+            } else {
+                // Si la ruta en preferencias existe pero el archivo no, intentamos buscarlo por nombre estándar
+                val fallbackFile = File(context.filesDir, "profile_photo_$userId.jpg")
+                if (fallbackFile.exists()) Uri.fromFile(fallbackFile).toString() else null
+            }
+        } else {
+            // Intento de recuperación final: buscar archivo por nombre directamente
+            val fallbackFile = File(context.filesDir, "profile_photo_$userId.jpg")
+            if (fallbackFile.exists()) Uri.fromFile(fallbackFile).toString() else null
+        }
     }
 
-    // Mantener por compatibilidad o para el usuario actual sin ID conocido
+    /**
+     * Versión simplificada que usa el usuario actual de UserManager.
+     */
     fun getProfileImageUri(context: Context): String? {
-        val userId = UserManager.usuarioActual?.id
-        return getProfileImageUri(context, userId)
+        // Intentamos cargar el usuario si no está en memoria
+        val user = UserManager.getUser(context)
+        return getProfileImageUri(context, user?.id)
     }
 }
