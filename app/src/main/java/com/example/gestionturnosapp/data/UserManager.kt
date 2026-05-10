@@ -6,9 +6,6 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 
-/**
- * Clase Singleton para administrar los datos del usuario logueado con seguridad.
- */
 object UserManager {
     private const val PREF_NAME = "secure_user_prefs"
     private const val KEY_USER = "current_user"
@@ -21,12 +18,12 @@ object UserManager {
     var token: String? = null
 
     private fun getEncryptedPrefs(context: Context): SharedPreferences {
-        val masterKey = MasterKey.Builder(context)
+        val masterKey = MasterKey.Builder(context.applicationContext)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
 
         return EncryptedSharedPreferences.create(
-            context,
+            context.applicationContext,
             PREF_NAME,
             masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
@@ -37,7 +34,7 @@ object UserManager {
     fun saveUser(context: Context, usuario: Usuario, authToken: String? = null) {
         this.appContext = context.applicationContext
         usuarioActual = usuario
-        val prefs = getEncryptedPrefs(context)
+        val prefs = getEncryptedPrefs(appContext!!)
         val json = Gson().toJson(usuario)
         val editor = prefs.edit().putString(KEY_USER, json)
         if (authToken != null) {
@@ -48,7 +45,7 @@ object UserManager {
     }
 
     fun getToken(context: Context? = null): String? {
-        val targetContext = context ?: appContext
+        val targetContext = context?.applicationContext ?: appContext
         if (token == null && targetContext != null) {
             val prefs = getEncryptedPrefs(targetContext)
             token = prefs.getString(KEY_TOKEN, null)
@@ -65,13 +62,12 @@ object UserManager {
 
     fun loadUser(context: Context): Usuario? {
         this.appContext = context.applicationContext
-        val prefs = getEncryptedPrefs(context)
+        val prefs = getEncryptedPrefs(appContext!!)
         val json = prefs.getString(KEY_USER, null)
         if (json != null) {
             try {
                 usuarioActual = Gson().fromJson(json, Usuario::class.java)
             } catch (e: Exception) {
-                // Si hay un error (por ejemplo, al cambiar de prefs normales a encriptadas)
                 usuarioActual = null
                 prefs.edit().remove(KEY_USER).apply()
             }

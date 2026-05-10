@@ -7,16 +7,18 @@ import java.io.FileOutputStream
 
 object ImageStorageManager {
     private const val PREF_NAME = "image_prefs"
-    private const val KEY_PROFILE_IMAGE_PREFIX = "profile_image_path_"
+    private const val KEY_PROFILE_IMAGE_PREFIX = "profile_path_v2_"
 
     /**
-     * Guarda la imagen físicamente en el almacenamiento interno.
+     * Guarda la imagen físicamente. Usa un prefijo v2 para forzar una nueva carga limpia.
      */
     fun saveProfileImage(context: Context, userId: String, uri: Uri): String? {
+        if (userId.isBlank()) return null
+        val cleanId = userId.trim()
+        
         return try {
             val inputStream = context.contentResolver.openInputStream(uri)
-            // Usamos un nombre de archivo único por usuario para que no se borre al cambiar de cuenta
-            val file = File(context.filesDir, "profile_photo_$userId.jpg")
+            val file = File(context.filesDir, "profile_$cleanId.jpg")
             val outputStream = FileOutputStream(file)
             
             inputStream?.use { input ->
@@ -26,46 +28,35 @@ object ImageStorageManager {
             }
             
             val savedPath = file.absolutePath
-            val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-            prefs.edit().putString(KEY_PROFILE_IMAGE_PREFIX + userId, savedPath).apply()
+            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putString(KEY_PROFILE_IMAGE_PREFIX + cleanId, savedPath)
+                .apply()
             
             savedPath
         } catch (e: Exception) {
-            android.util.Log.e("ImageStorage", "Error saving image", e)
+            android.util.Log.e("ImageStorage", "Error saving photo for $cleanId", e)
             null
         }
     }
 
-    /**
-     * Obtiene la ruta de la imagen del perfil verificando que el archivo exista físicamente.
-     */
     fun getProfileImageUri(context: Context, userId: String?): String? {
-        if (userId.isNullOrEmpty()) return null
+        if (userId.isNullOrBlank()) return null
+        val cleanId = userId.trim()
         
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val savedPath = prefs.getString(KEY_PROFILE_IMAGE_PREFIX + userId, null)
+        val savedPath = prefs.getString(KEY_PROFILE_IMAGE_PREFIX + cleanId, null)
         
-        return if (savedPath != null) {
-            val file = File(savedPath)
-            if (file.exists()) {
-                Uri.fromFile(file).toString()
-            } else {
-                // Si la ruta en preferencias existe pero el archivo no, intentamos buscarlo por nombre estándar
-                val fallbackFile = File(context.filesDir, "profile_photo_$userId.jpg")
-                if (fallbackFile.exists()) Uri.fromFile(fallbackFile).toString() else null
-            }
+        val file = if (savedPath != null) File(savedPath) else File(context.filesDir, "profile_$cleanId.jpg")
+        
+        return if (file.exists()) {
+            Uri.fromFile(file).toString()
         } else {
-            // Intento de recuperación final: buscar archivo por nombre directamente
-            val fallbackFile = File(context.filesDir, "profile_photo_$userId.jpg")
-            if (fallbackFile.exists()) Uri.fromFile(fallbackFile).toString() else null
+            null
         }
     }
 
-    /**
-     * Versión simplificada que usa el usuario actual de UserManager.
-     */
     fun getProfileImageUri(context: Context): String? {
-        // Intentamos cargar el usuario si no está en memoria
         val user = UserManager.getUser(context)
         return getProfileImageUri(context, user?.id)
     }

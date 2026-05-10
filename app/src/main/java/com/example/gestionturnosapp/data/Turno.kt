@@ -9,7 +9,7 @@ data class Turno(
     val fecha: String,
     val hora: String,
     val motivo: String,
-    val estado: String,
+    val estado: String = "Pendiente",
     val especialidad: String? = "General",
     val doctor: String? = "Dr. Asignado"
 )
