@@ -24,6 +24,10 @@ interface ApiService {
     @DELETE("api/turnos/{id}")
     suspend fun eliminarTurno(@Path("id") id: String): Response<Unit>
 
+    // Perfil de Usuario
+    @PUT("api/auth/profile")
+    suspend fun updateProfile(@Body usuario: Usuario): Response<Usuario>
+
     // NUEVO: Servicios Profesionales de Medicación
     @GET("api/medicamentos")
     suspend fun getMedicamentos(): Response<List<Medicamento>>

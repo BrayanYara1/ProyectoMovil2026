@@ -54,7 +54,7 @@ class TurnoDetailFragment : Fragment() {
             
             // Formatear hora para mostrar AM/PM
             val displayTime = try {
-                val inputFormats = listOf("HH:mm", "hh:mm a", "h:mm a")
+                val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
                 var dateObj: java.util.Date? = null
                 for (fmt in inputFormats) {
                     try {
@@ -166,7 +166,7 @@ class TurnoDetailFragment : Fragment() {
             val dateParts = fecha.split("-")
             
             // Usar SimpleDateFormat para parsear la hora AM/PM correctamente
-            val inputFormats = listOf("HH:mm", "hh:mm a", "h:mm a")
+            val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
             var timeDate: java.util.Date? = null
             for (fmt in inputFormats) {
                 try {
@@ -199,13 +199,15 @@ class TurnoDetailFragment : Fragment() {
                 }
 
                 val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+                val notificationId = (paciente + fecha + hora).hashCode()
                 val intent = Intent(requireContext(), ReminderReceiver::class.java).apply {
                     putExtra("TITLE", "Recordatorio de Turno")
                     putExtra("MESSAGE", "Cita con $paciente en 1 hora.")
+                    putExtra("NOTIFICATION_ID", notificationId)
                 }
 
                 val pendingIntent = PendingIntent.getBroadcast(
-                    requireContext(), (paciente + fecha).hashCode(), intent,
+                    requireContext(), notificationId, intent,
                     PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
                 )
 
@@ -255,7 +257,7 @@ class TurnoDetailFragment : Fragment() {
         val cal = Calendar.getInstance()
         try {
             val d = fecha.split("-")
-            val inputFormats = listOf("HH:mm", "hh:mm a", "h:mm a")
+            val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
             var timeDate: java.util.Date? = null
             for (fmt in inputFormats) {
                 try {

@@ -31,6 +31,9 @@ class HomeViewModel : ViewModel() {
     private val _healthTipResId = MutableLiveData<Int>()
     val healthTipResId: LiveData<Int> = _healthTipResId
 
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> = _errorMessage
+
     init {
         loadRandomHealthTip()
         refreshData()
@@ -39,6 +42,7 @@ class HomeViewModel : ViewModel() {
     fun refreshData() {
         viewModelScope.launch {
             _isLoading.value = true
+            _errorMessage.value = null
             try {
                 // Cargar Turnos
                 val turnos = turnoRepository.getTurnos()
@@ -56,6 +60,7 @@ class HomeViewModel : ViewModel() {
                 _turnosCount.value = 0
                 _nextTurno.value = null
                 _medicamentos.value = emptyList()
+                _errorMessage.value = e.localizedMessage ?: "Error al conectar con el servidor"
             } finally {
                 _isLoading.value = false
             }

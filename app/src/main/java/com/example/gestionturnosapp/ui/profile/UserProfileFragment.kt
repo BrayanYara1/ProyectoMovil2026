@@ -10,6 +10,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import com.example.gestionturnosapp.network.RetrofitClient
+import kotlinx.coroutines.launch
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.example.gestionturnosapp.R
@@ -25,13 +28,17 @@ class UserProfileFragment : Fragment() {
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
-            ImageStorageManager.saveProfileImageUri(requireContext(), it.toString())
-            binding.ivProfileAvatar.load(it) {
-                crossfade(true)
-                transformations(CircleCropTransformation())
+            val userId = UserManager.usuarioActual?.id ?: "unknown"
+            val savedPath = ImageStorageManager.saveProfileImage(requireContext(), userId, it)
+            
+            if (savedPath != null) {
+                binding.ivProfileAvatar.load(savedPath) {
+                    crossfade(true)
+                    transformations(CircleCropTransformation())
+                }
+                binding.ivProfileAvatar.imageTintList = null
+                Toast.makeText(requireContext(), R.string.photo_updated, Toast.LENGTH_SHORT).show()
             }
-            binding.ivProfileAvatar.imageTintList = null
-            Toast.makeText(requireContext(), R.string.photo_updated, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -106,15 +113,36 @@ class UserProfileFragment : Fragment() {
                     email = usuario?.email ?: "",
                     telefono = nuevoTelefono
                 )
-                UserManager.saveUser(requireContext(), nuevoUsuario)
-                cargarDatos()
-                Toast.makeText(context, R.string.msg_register_success, Toast.LENGTH_SHORT).show()
+                actualizarPerfilEnServidor(nuevoUsuario)
             }
             dialog.dismiss()
         }
         builder.setNegativeButton(R.string.btn_cancel) { dialog, _ -> dialog.cancel() }
 
         builder.show()
+    }
+
+    private fun actualizarPerfilEnServidor(usuario: Usuario) {
+        lifecycleScope.launch {
+            try {
+                val response = RetrofitClient.instance.updateProfile(usuario)
+                if (response.isSuccessful) {
+                    val usuarioActualizado = response.body() ?: usuario
+                    UserManager.saveUser(requireContext(), usuarioActualizado)
+                    cargarDatos()
+                    Toast.makeText(context, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Error al sincronizar perfil", Toast.LENGTH_SHORT).show()
+                    // Si falla el servidor, al menos guardamos local para la sesión actual
+                    UserManager.saveUser(requireContext(), usuario)
+                    cargarDatos()
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Sin conexión: Perfil guardado localmente", Toast.LENGTH_SHORT).show()
+                UserManager.saveUser(requireContext(), usuario)
+                cargarDatos()
+            }
+        }
     }
 
     override fun onDestroyView() {

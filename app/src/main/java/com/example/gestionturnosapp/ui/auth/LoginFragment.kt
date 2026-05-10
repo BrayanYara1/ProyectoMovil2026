@@ -7,18 +7,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.LoginRequest
+import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentLoginBinding
-import com.example.gestionturnosapp.network.RetrofitClient
-import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,12 +31,14 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupObservers()
+
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                performLogin(email, password)
+                viewModel.login(email, password, requireContext())
             } else {
                 Toast.makeText(requireContext(), "Campos vacíos", Toast.LENGTH_SHORT).show()
             }
@@ -47,45 +49,27 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun performLogin(email: String, contrasena: String) {
-        binding.progressBar.isVisible = true
-        binding.btnLogin.isEnabled = false
-
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.instance.login(LoginRequest(email, contrasena))
-                if (response.isSuccessful) {
-                    val authResponse = response.body()
-                    val usuario = authResponse?.usuario
-                    if (usuario != null) {
-                        com.example.gestionturnosapp.data.UserManager.saveUser(
-                            requireContext(), 
-                            usuario, 
-                            authResponse.token
-                        )
-                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-                    }
-                } else {
-                    when (response.code()) {
-                        401 -> Toast.makeText(requireContext(), "Correo o contraseña incorrectos", Toast.LENGTH_SHORT).show()
-                        404 -> Toast.makeText(requireContext(), "Usuario no encontrado", Toast.LENGTH_SHORT).show()
-                        else -> Toast.makeText(requireContext(), "Error del servidor: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    }
+    private fun setupObservers() {
+        viewModel.authState.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    binding.progressBar.isVisible = true
+                    binding.btnLogin.isEnabled = false
                 }
-            } catch (e: Exception) {
-                if (_binding != null) {
-                    val errorMsg = e.localizedMessage ?: "Error de red"
-                    val displayMsg = when {
-                        errorMsg.contains("connect", true) -> "No se pudo conectar al servidor. Verifica tu internet."
-                        errorMsg.contains("timeout", true) -> "El servidor tardó mucho en responder (puede estar despertando)."
-                        else -> "Error: $errorMsg"
-                    }
-                    Toast.makeText(requireContext(), displayMsg, Toast.LENGTH_LONG).show()
+                is Resource.Success -> {
+                    binding.progressBar.isVisible = false
+                    binding.btnLogin.isEnabled = true
+                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                 }
-                android.util.Log.e("NETWORK_ERROR", "Fallo de login", e)
-            } finally {
-                binding.progressBar.isVisible = false
-                binding.btnLogin.isEnabled = true
+                is Resource.Error -> {
+                    binding.progressBar.isVisible = false
+                    binding.btnLogin.isEnabled = true
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
+                }
+                else -> {
+                    binding.progressBar.isVisible = false
+                    binding.btnLogin.isEnabled = true
+                }
             }
         }
     }

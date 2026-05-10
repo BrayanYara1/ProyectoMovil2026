@@ -159,7 +159,7 @@ class TurnosListViewModel : ViewModel() {
 
     private fun normalizeTime(time: String): String {
         return try {
-            val inputFormats = listOf("HH:mm", "hh:mm a", "h:mm a")
+            val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
             var date: java.util.Date? = null
             
             for (format in inputFormats) {

@@ -10,7 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import com.example.gestionturnosapp.network.RetrofitClient
+import kotlinx.coroutines.launch
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
@@ -75,6 +78,23 @@ class MainActivity : AppCompatActivity() {
         }
         
         pedirPermisoNotificaciones()
+        sincronizarFcmToken()
+    }
+
+    private fun sincronizarFcmToken() {
+        if (!UserManager.isFcmSynced(this)) {
+            val token = UserManager.getFcmToken(this)
+            token?.let {
+                lifecycleScope.launch {
+                    try {
+                        RetrofitClient.instance.updateFcmToken(mapOf("token" to it))
+                        UserManager.markFcmAsSynced(this@MainActivity)
+                    } catch (e: Exception) {
+                        android.util.Log.e("FCM", "Sync error", e)
+                    }
+                }
+            }
+        }
     }
 
     private fun pedirPermisoNotificaciones() {

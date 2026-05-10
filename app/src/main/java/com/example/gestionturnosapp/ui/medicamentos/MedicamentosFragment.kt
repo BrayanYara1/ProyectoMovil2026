@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentMedicamentosBinding
 
 class MedicamentosFragment : Fragment() {
@@ -58,24 +59,49 @@ class MedicamentosFragment : Fragment() {
                 Toast.makeText(context, "Completa nombre y dosis", Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.etMedNext.setOnClickListener {
+            val c = java.util.Calendar.getInstance()
+            android.app.TimePickerDialog(requireContext(), { _, hour, minute ->
+                binding.etMedNext.setText(String.format(java.util.Locale.US, "%02d:%02d", hour, minute))
+            }, c.get(java.util.Calendar.HOUR_OF_DAY), c.get(java.util.Calendar.MINUTE), true).show()
+        }
     }
 
     private fun setupObservers() {
-        viewModel.medicamentos.observe(viewLifecycleOwner) { meds ->
-            adapter.submitList(meds)
+        viewModel.medicamentosResource.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    adapter.submitList(resource.data)
+                    binding.progressBar.isVisible = false
+                }
+                is Resource.Error -> {
+                    binding.progressBar.isVisible = false
+                    Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Loading -> {
+                    binding.progressBar.isVisible = true
+                }
+                else -> {}
+            }
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.isVisible = isLoading
             binding.btnSaveMed.isEnabled = !isLoading
         }
 
-        viewModel.operationSuccess.observe(viewLifecycleOwner) { success ->
-            if (success) {
-                Toast.makeText(context, "Medicamento guardado", Toast.LENGTH_SHORT).show()
-                clearFields()
-            } else {
-                Toast.makeText(context, "Error al guardar", Toast.LENGTH_SHORT).show()
+        viewModel.operationResource.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Success -> {
+                    Toast.makeText(context, "Medicamento guardado", Toast.LENGTH_SHORT).show()
+                    clearFields()
+                    viewModel.resetOperationState()
+                }
+                is Resource.Error -> {
+                    Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
+                    viewModel.resetOperationState()
+                }
+                else -> {}
             }
         }
     }

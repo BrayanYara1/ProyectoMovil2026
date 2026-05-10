@@ -32,6 +32,12 @@ class TurnosAdapter(
         private val onTurnoClick: (Turno, ItemTurnoBinding) -> Unit,
         private val onDeleteClick: (Turno) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+        
+        private val displayTimeFormat = SimpleDateFormat("hh:mm a", Locale.US)
+        private val isoDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        private val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
+        private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
+
         fun bind(turno: Turno) {
             binding.apply {
                 tvItemNombre.text = turno.pacienteNombre
@@ -39,7 +45,6 @@ class TurnosAdapter(
 
                 // Formatear Hora para mostrar AM/PM siempre
                 try {
-                    val inputFormats = listOf("HH:mm", "hh:mm a", "h:mm a")
                     var dateHora: Date? = null
                     for (format in inputFormats) {
                         try {
@@ -50,7 +55,7 @@ class TurnosAdapter(
                     }
                     
                     if (dateHora != null) {
-                        tvItemHora.text = SimpleDateFormat("hh:mm a", Locale.US).format(dateHora)
+                        tvItemHora.text = displayTimeFormat.format(dateHora)
                     } else {
                         tvItemHora.text = turno.hora
                     }
@@ -60,13 +65,12 @@ class TurnosAdapter(
 
                 // Formatear Fecha para el Icono de Calendario
                 try {
-                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    val date = sdf.parse(turno.fecha)
+                    val date = isoDateFormat.parse(turno.fecha)
                     if (date != null) {
                         val cal = Calendar.getInstance()
                         cal.time = date
                         tvItemDiaMes.text = cal.get(Calendar.DAY_OF_MONTH).toString()
-                        tvItemMesCorta.text = SimpleDateFormat("MMM", Locale.getDefault()).format(date).uppercase()
+                        tvItemMesCorta.text = monthFormat.format(date).uppercase()
                     }
                 } catch (e: Exception) {
                     tvItemDiaMes.text = "??"

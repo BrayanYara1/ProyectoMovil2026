@@ -6,20 +6,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.MedicamentoRepository
+import com.example.gestionturnosapp.data.Resource
 import kotlinx.coroutines.launch
 
 class MedicamentosViewModel : ViewModel() {
 
     private val repository = MedicamentoRepository()
 
-    private val _medicamentos = MutableLiveData<List<Medicamento>>()
-    val medicamentos: LiveData<List<Medicamento>> = _medicamentos
+    private val _medicamentosResource = MutableLiveData<Resource<List<Medicamento>>>()
+    val medicamentosResource: LiveData<Resource<List<Medicamento>>> = _medicamentosResource
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val _operationSuccess = MutableLiveData<Boolean>()
-    val operationSuccess: LiveData<Boolean> = _operationSuccess
+    private val _operationResource = MutableLiveData<Resource<Medicamento>>(Resource.Idle)
+    val operationResource: LiveData<Resource<Medicamento>> = _operationResource
 
     init {
         loadMedicamentos()
@@ -27,12 +28,13 @@ class MedicamentosViewModel : ViewModel() {
 
     fun loadMedicamentos() {
         viewModelScope.launch {
+            _medicamentosResource.value = Resource.Loading
             _isLoading.value = true
             try {
                 val list = repository.getMedicamentos()
-                _medicamentos.value = list
+                _medicamentosResource.value = Resource.Success(list)
             } catch (e: Exception) {
-                _medicamentos.value = emptyList()
+                _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
             } finally {
                 _isLoading.value = false
             }
@@ -41,6 +43,7 @@ class MedicamentosViewModel : ViewModel() {
 
     fun agregarMedicamento(nombre: String, dosis: String, frecuencia: String, proximaToma: String) {
         viewModelScope.launch {
+            _operationResource.value = Resource.Loading
             _isLoading.value = true
             try {
                 val nuevoMed = Medicamento(
@@ -52,16 +55,20 @@ class MedicamentosViewModel : ViewModel() {
                 )
                 val result = repository.agregarMedicamento(nuevoMed)
                 if (result != null) {
-                    _operationSuccess.value = true
+                    _operationResource.value = Resource.Success(result)
                     loadMedicamentos()
                 } else {
-                    _operationSuccess.value = false
+                    _operationResource.value = Resource.Error("Error al guardar")
                 }
             } catch (e: Exception) {
-                _operationSuccess.value = false
+                _operationResource.value = Resource.Error(e.localizedMessage ?: "Error de red")
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+
+    fun resetOperationState() {
+        _operationResource.value = Resource.Idle
     }
 }

@@ -14,10 +14,11 @@ class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val title = intent.getStringExtra("TITLE") ?: "Recordatorio"
         val message = intent.getStringExtra("MESSAGE") ?: "Cita médica próxima"
-        showNotification(context, title, message)
+        val notificationId = intent.getIntExtra("NOTIFICATION_ID", 1001)
+        showNotification(context, title, message, notificationId)
     }
 
-    private fun showNotification(context: Context, title: String, message: String) {
+    private fun showNotification(context: Context, title: String, message: String, id: Int) {
         val channelId = "turno_reminder_channel"
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -28,7 +29,7 @@ class ReminderReceiver : BroadcastReceiver() {
 
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(
-            context, 0, intent, 
+            context, id, intent, 
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
@@ -37,9 +38,11 @@ class ReminderReceiver : BroadcastReceiver() {
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setContentIntent(pendingIntent)
             .build()
 
-        notificationManager.notify(1001, notification)
+        notificationManager.notify(id, notification)
     }
 }

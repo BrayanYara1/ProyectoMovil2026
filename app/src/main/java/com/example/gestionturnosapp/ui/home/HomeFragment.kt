@@ -97,6 +97,12 @@ class HomeFragment : Fragment() {
             binding.progressBar.isVisible = isLoading
         }
 
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                com.google.android.material.snackbar.Snackbar.make(binding.root, it, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show()
+            }
+        }
+
         viewModel.turnosCount.observe(viewLifecycleOwner) { count ->
             binding.tvBadgeTurnos.text = count.toString()
             binding.tvBadgeTurnos.isVisible = count > 0
@@ -113,7 +119,7 @@ class HomeFragment : Fragment() {
                 
                 // Formatear hora para mostrar AM/PM
                 val displayTime = try {
-                    val inputFormats = listOf("HH:mm", "hh:mm a", "h:mm a")
+                    val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
                     var dateObj: java.util.Date? = null
                     for (fmt in inputFormats) {
                         try {

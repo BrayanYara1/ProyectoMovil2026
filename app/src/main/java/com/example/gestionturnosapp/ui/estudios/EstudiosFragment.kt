@@ -173,6 +173,17 @@ class EstudiosFragment : Fragment() {
         val etTitulo = EditText(requireContext()).apply { hint = "Título del estudio" }
         val etTipo = EditText(requireContext()).apply { hint = "Tipo (Análisis, Placa, etc)" }
         val etResultado = EditText(requireContext()).apply { hint = "Resultado breve" }
+        val etFecha = EditText(requireContext()).apply {
+            hint = "Fecha del estudio"
+            isFocusable = false
+            setText(java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Calendar.getInstance().time))
+            setOnClickListener {
+                val c = java.util.Calendar.getInstance()
+                android.app.DatePickerDialog(requireContext(), { _, y, m, d ->
+                    setText(String.format(java.util.Locale.US, "%04d-%02d-%02d", y, m + 1, d))
+                }, c.get(java.util.Calendar.YEAR), c.get(java.util.Calendar.MONTH), c.get(java.util.Calendar.DAY_OF_MONTH)).show()
+            }
+        }
         
         val btnPick = Button(requireContext()).apply {
             text = "Adjuntar Foto"
@@ -191,6 +202,7 @@ class EstudiosFragment : Fragment() {
         layout.addView(etTitulo)
         layout.addView(etTipo)
         layout.addView(etResultado)
+        layout.addView(etFecha)
         layout.addView(btnPick)
         layout.addView(dialogImageView)
 
@@ -201,9 +213,9 @@ class EstudiosFragment : Fragment() {
                 val titulo = etTitulo.text.toString()
                 val tipo = etTipo.text.toString()
                 val resultado = etResultado.text.toString()
+                val fecha = etFecha.text.toString()
                 
                 if (titulo.isNotBlank()) {
-                    val fecha = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(Calendar.getInstance().time)
                     viewModel.agregarEstudio(titulo, fecha, tipo, resultado, selectedImageUri?.toString())
                 }
             }

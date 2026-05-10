@@ -7,19 +7,19 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.RegisterRequest
-import com.example.gestionturnosapp.data.UserManager
+import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentRegisterBinding
-import com.example.gestionturnosapp.network.RetrofitClient
-import kotlinx.coroutines.launch
 
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,7 +31,34 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupObservers()
         setupRegisterActions()
+    }
+
+    private fun setupObservers() {
+        viewModel.authState.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    binding.progressBar.isVisible = true
+                    binding.btnRegister.isEnabled = false
+                }
+                is Resource.Success -> {
+                    binding.progressBar.isVisible = false
+                    binding.btnRegister.isEnabled = true
+                    Toast.makeText(requireContext(), getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show()
+                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                }
+                is Resource.Error -> {
+                    binding.progressBar.isVisible = false
+                    binding.btnRegister.isEnabled = true
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
+                }
+                else -> {
+                    binding.progressBar.isVisible = false
+                    binding.btnRegister.isEnabled = true
+                }
+            }
+        }
     }
 
     private fun setupRegisterActions() {
@@ -43,7 +70,7 @@ class RegisterFragment : Fragment() {
 
             if (name.isNotEmpty() && email.isNotEmpty() && phone.isNotEmpty() && pass.isNotEmpty()) {
                 val request = RegisterRequest(name, email, phone, pass)
-                executeRegistration(request)
+                viewModel.register(request, requireContext())
             } else {
                 Toast.makeText(requireContext(), getString(R.string.msg_complete_fields), Toast.LENGTH_SHORT).show()
             }
@@ -51,47 +78,6 @@ class RegisterFragment : Fragment() {
 
         binding.tvGoToLogin.setOnClickListener {
             findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
-        }
-    }
-
-    private fun executeRegistration(request: RegisterRequest) {
-        binding.progressBar.isVisible = true
-        binding.btnRegister.isEnabled = false
-
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.instance.register(request)
-                
-                if (_binding == null) return@launch
-
-                if (response.isSuccessful) {
-                    val authResponse = response.body()
-                    val usuario = authResponse?.usuario
-                    if (usuario != null) {
-                        UserManager.saveUser(requireContext(), usuario, authResponse.token)
-                    }
-                    Toast.makeText(requireContext(), getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
-                } else {
-                    val errorBody = response.errorBody()?.string() ?: ""
-                    val displayMsg = when {
-                        errorBody.contains("email", true) -> "Este correo ya está registrado"
-                        errorBody.contains("password", true) -> "Contraseña demasiado débil"
-                        else -> "Error: $errorBody"
-                    }
-                    Toast.makeText(requireContext(), displayMsg, Toast.LENGTH_LONG).show()
-                }
-            } catch (e: Exception) {
-                if (_binding != null) {
-                    val errorMsg = e.localizedMessage ?: "Error de conexión"
-                    Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_LONG).show()
-                }
-            } finally {
-                _binding?.let {
-                    it.progressBar.isVisible = false
-                    it.btnRegister.isEnabled = true
-                }
-            }
         }
     }
 
