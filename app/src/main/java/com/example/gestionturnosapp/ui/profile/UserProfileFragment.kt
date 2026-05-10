@@ -132,9 +132,16 @@ class UserProfileFragment : Fragment() {
                     cargarDatos()
                     Toast.makeText(context, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show()
                 } else {
-                    val errorMsg = response.errorBody()?.string() ?: ""
-                    android.util.Log.e("SyncError", "Code: ${response.code()} Body: $errorMsg")
-                    Toast.makeText(context, "Error al sincronizar perfil (${response.code()})", Toast.LENGTH_SHORT).show()
+                    val errorBody = response.errorBody()?.string() ?: ""
+                    android.util.Log.e("SyncError", "Code: ${response.code()} Body: $errorBody")
+                    
+                    val displayError = if (errorBody.contains("ruta") || errorBody.contains("not exist")) {
+                        "Servidor desactualizado o ruta no encontrada (404)"
+                    } else {
+                        "Error al sincronizar perfil (${response.code()})"
+                    }
+                    
+                    Toast.makeText(context, displayError, Toast.LENGTH_SHORT).show()
                     // Si falla el servidor, al menos guardamos local para la sesión actual
                     UserManager.saveUser(requireContext(), usuario)
                     cargarDatos()

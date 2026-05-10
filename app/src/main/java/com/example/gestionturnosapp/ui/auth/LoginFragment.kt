@@ -37,10 +37,21 @@ class LoginFragment : Fragment() {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
-            if (email.isNotEmpty() && password.isNotEmpty()) {
+            binding.tilEmail.error = null
+            binding.tilPassword.error = null
+            
+            var isValid = true
+            if (email.isEmpty()) {
+                binding.tilEmail.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            }
+            if (password.isEmpty()) {
+                binding.tilPassword.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            }
+
+            if (isValid) {
                 viewModel.login(email, password, requireContext())
-            } else {
-                Toast.makeText(requireContext(), "Campos vacíos", Toast.LENGTH_SHORT).show()
             }
         }
 

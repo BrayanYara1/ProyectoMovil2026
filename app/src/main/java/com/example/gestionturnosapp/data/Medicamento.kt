@@ -1,6 +1,9 @@
 package com.example.gestionturnosapp.data
 
+import com.google.gson.annotations.SerializedName
+
 data class Medicamento(
+    @SerializedName("_id", alternate = ["id"])
     val id: String,
     val nombre: String,
     val dosis: String,

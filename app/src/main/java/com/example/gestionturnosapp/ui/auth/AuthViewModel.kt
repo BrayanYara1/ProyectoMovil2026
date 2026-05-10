@@ -15,6 +15,7 @@ class AuthViewModel : ViewModel() {
     val authState: LiveData<Resource<Usuario>> = _authState
 
     fun login(email: String, contrasena: String, context: Context) {
+        val appContext = context.applicationContext
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
@@ -23,7 +24,7 @@ class AuthViewModel : ViewModel() {
                     val authResponse = response.body()
                     val usuario = authResponse?.usuario
                     if (usuario != null) {
-                        UserManager.saveUser(context, usuario, authResponse.token)
+                        UserManager.saveUser(appContext, usuario, authResponse.token)
                         _authState.value = Resource.Success(usuario)
                     } else {
                         _authState.value = Resource.Error("Error: Usuario no encontrado")
@@ -49,6 +50,7 @@ class AuthViewModel : ViewModel() {
     }
 
     fun register(request: RegisterRequest, context: Context) {
+        val appContext = context.applicationContext
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
@@ -57,7 +59,7 @@ class AuthViewModel : ViewModel() {
                     val authResponse = response.body()
                     val usuario = authResponse?.usuario
                     if (usuario != null) {
-                        UserManager.saveUser(context, usuario, authResponse.token)
+                        UserManager.saveUser(appContext, usuario, authResponse.token)
                         _authState.value = Resource.Success(usuario)
                     } else {
                         _authState.value = Resource.Error("Error al registrar: Respuesta vacía")
