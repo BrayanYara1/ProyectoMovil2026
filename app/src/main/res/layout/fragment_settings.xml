@@ -130,6 +130,18 @@
                         app:iconPadding="16dp"
                         app:iconTint="@color/primary" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnHelp"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/menu_help"
+                        android:textColor="@color/text_primary"
+                        app:icon="@android:drawable/ic_menu_help"
+                        app:iconPadding="16dp"
+                        app:iconTint="@color/primary" />
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

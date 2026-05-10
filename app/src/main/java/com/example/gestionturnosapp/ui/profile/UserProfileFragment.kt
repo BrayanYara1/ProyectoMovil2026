@@ -137,6 +137,9 @@ class UserProfileFragment : Fragment() {
                     
                     val displayError = if (errorBody.contains("ruta") || errorBody.contains("not exist")) {
                         "Servidor desactualizado o ruta no encontrada (404)"
+                    } else if (response.code() == 401) {
+                        handleSessionExpired()
+                        return@launch
                     } else {
                         "Error al sincronizar perfil (${response.code()})"
                     }
@@ -152,6 +155,14 @@ class UserProfileFragment : Fragment() {
                 cargarDatos()
             }
         }
+    }
+
+    private fun handleSessionExpired() {
+        UserManager.logout(requireContext())
+        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
     }
 
     override fun onDestroyView() {

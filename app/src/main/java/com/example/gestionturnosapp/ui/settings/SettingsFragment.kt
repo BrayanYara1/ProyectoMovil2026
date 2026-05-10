@@ -1,6 +1,7 @@
 package com.example.gestionturnosapp.ui.settings
 
-import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,8 +13,8 @@ import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.databinding.FragmentSettingsBinding
 import com.example.gestionturnosapp.data.UserManager
+import com.example.gestionturnosapp.databinding.FragmentSettingsBinding
 
 class SettingsFragment : Fragment() {
 
@@ -46,7 +47,6 @@ class SettingsFragment : Fragment() {
                         LocaleListCompat.forLanguageTags("en")
                     }
                     AppCompatDelegate.setApplicationLocales(appLocale)
-                    Toast.makeText(requireContext(), R.string.label_language, Toast.LENGTH_SHORT).show()
                 }
                 .show()
         }
@@ -75,10 +75,9 @@ class SettingsFragment : Fragment() {
 
         // AYUDA
         binding.btnHelp.setOnClickListener {
-            val intent = android.content.Intent(android.content.Intent.ACTION_SENDTO).apply {
-                data = android.net.Uri.parse("mailto:")
-                putExtra(android.content.Intent.EXTRA_EMAIL, arrayOf("soporte@saludactiva.com"))
-                putExtra(android.content.Intent.EXTRA_SUBJECT, "Ayuda SaludActiva - Usuario: ${UserManager.usuarioActual?.nombre}")
+            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                data = Uri.parse("mailto:soporte@saludactiva.com")
+                putExtra(Intent.EXTRA_SUBJECT, "Ayuda SaludActiva - Usuario: ${UserManager.usuarioActual?.nombre ?: "Anónimo"}")
             }
             try {
                 startActivity(intent)

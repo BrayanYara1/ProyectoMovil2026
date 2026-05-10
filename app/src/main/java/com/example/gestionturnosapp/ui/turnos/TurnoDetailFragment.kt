@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
+import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentTurnoDetailBinding
 import com.example.gestionturnosapp.notifications.ReminderReceiver
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -151,13 +152,25 @@ class TurnoDetailFragment : Fragment() {
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             if (error.isNotEmpty()) {
-                com.google.android.material.snackbar.Snackbar.make(
-                    binding.root,
-                    error,
-                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                ).show()
+                if (error.contains("401") || error.contains("token", true)) {
+                    handleSessionExpired()
+                } else {
+                    com.google.android.material.snackbar.Snackbar.make(
+                        binding.root,
+                        error,
+                        com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                    ).show()
+                }
             }
         }
+    }
+
+    private fun handleSessionExpired() {
+        UserManager.logout(requireContext())
+        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
     }
 
     private fun setReminder(paciente: String, fecha: String, hora: String) {
