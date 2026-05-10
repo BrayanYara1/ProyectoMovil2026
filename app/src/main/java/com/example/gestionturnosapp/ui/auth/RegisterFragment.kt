@@ -68,11 +68,37 @@ class RegisterFragment : Fragment() {
             val phone = binding.etTelefono.text.toString().trim()
             val pass = binding.etPassword.text.toString().trim()
 
-            if (name.isNotEmpty() && email.isNotEmpty() && phone.isNotEmpty() && pass.isNotEmpty()) {
+            // Resetear errores
+            binding.tilNombre.error = null
+            binding.tilEmail.error = null
+            binding.tilTelefono.error = null
+            binding.tilPassword.error = null
+
+            var isValid = true
+
+            if (name.isEmpty()) {
+                binding.tilNombre.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            }
+
+            if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.error = if (email.isEmpty()) getString(R.string.msg_complete_fields) else "Email inválido"
+                isValid = false
+            }
+
+            if (phone.isEmpty()) {
+                binding.tilTelefono.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            }
+
+            if (pass.length < 6) {
+                binding.tilPassword.error = if (pass.isEmpty()) getString(R.string.msg_complete_fields) else "Mínimo 6 caracteres"
+                isValid = false
+            }
+
+            if (isValid) {
                 val request = RegisterRequest(name, email, phone, pass)
                 viewModel.register(request, requireContext())
-            } else {
-                Toast.makeText(requireContext(), getString(R.string.msg_complete_fields), Toast.LENGTH_SHORT).show()
             }
         }
 

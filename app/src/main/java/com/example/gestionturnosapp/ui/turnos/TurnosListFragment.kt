@@ -144,8 +144,10 @@ class TurnosListFragment : Fragment() {
                     val errorMessage = resource.message
                     if (errorMessage.contains("401") || errorMessage.contains("token", true)) {
                         com.example.gestionturnosapp.data.UserManager.logout(requireContext())
-                        findNavController().navigate(R.id.loginFragment)
                         Toast.makeText(requireContext(), "Sesión expirada", Toast.LENGTH_SHORT).show()
+                        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+                            .setPopUpTo(R.id.nav_graph, true)
+                            .build())
                         return@observe
                     }
 

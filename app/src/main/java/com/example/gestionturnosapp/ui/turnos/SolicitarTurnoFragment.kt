@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Resource
@@ -19,6 +20,8 @@ import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentSolicitarTurnoBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
@@ -190,15 +193,24 @@ class SolicitarTurnoFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                val fecha = binding.etFecha.text.toString().trim()
-                val hora = binding.etHora.text.toString().trim()
-                if (fecha.isNotEmpty() && hora.isNotEmpty()) {
-                    viewModel.verificarDisponibilidad(fecha, hora)
-                }
+                validarDebounced()
             }
         }
         binding.etFecha.addTextChangedListener(watcher)
         binding.etHora.addTextChangedListener(watcher)
+    }
+
+    private var availabilityCheckJob: kotlinx.coroutines.Job? = null
+    private fun validarDebounced() {
+        availabilityCheckJob?.cancel()
+        availabilityCheckJob = viewLifecycleOwner.lifecycleScope.launch {
+            kotlinx.coroutines.delay(500)
+            val fecha = binding.etFecha.text.toString().trim()
+            val hora = binding.etHora.text.toString().trim()
+            if (fecha.isNotEmpty() && hora.isNotEmpty()) {
+                viewModel.verificarDisponibilidad(fecha, hora)
+            }
+        }
     }
 
     private fun setupObservers() {
@@ -220,11 +232,23 @@ class SolicitarTurnoFragment : Fragment() {
                 is Resource.Error -> {
                     binding.btnConfirmarTurno.isEnabled = true
                     actualizarEstadoBotonDisponibilidad(viewModel.isSlotAvailable.value)
-                    Snackbar.make(binding.root, resource.message, Snackbar.LENGTH_LONG).show()
+                    val msg = resource.message
+                    if (msg.contains("401") || msg.contains("token", true)) {
+                        handleSessionExpired()
+                    } else {
+                        Snackbar.make(binding.root, msg, Snackbar.LENGTH_LONG).show()
+                    }
                 }
                 else -> {}
             }
         }
+    }
+
+    private fun handleSessionExpired() {
+        UserManager.logout(requireContext())
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
     }
 
     private fun actualizarEstadoBotonDisponibilidad(disponible: Boolean?) {

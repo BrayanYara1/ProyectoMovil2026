@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -113,7 +112,11 @@ class HomeFragment : Fragment() {
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             error?.let {
-                com.google.android.material.snackbar.Snackbar.make(binding.root, it, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show()
+                if (it.contains("401") || it.contains("token", true)) {
+                    handleSessionExpired()
+                } else {
+                    com.google.android.material.snackbar.Snackbar.make(binding.root, it, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show()
+                }
             }
         }
 
@@ -167,6 +170,13 @@ class HomeFragment : Fragment() {
         viewModel.healthTipResId.observe(viewLifecycleOwner) { resId ->
             binding.tvHealthTip.text = getString(resId)
         }
+    }
+
+    private fun handleSessionExpired() {
+        UserManager.logout(requireContext())
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
     }
 
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {

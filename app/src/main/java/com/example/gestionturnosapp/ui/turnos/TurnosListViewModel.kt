@@ -203,4 +203,9 @@ class TurnosListViewModel : ViewModel() {
             }
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        availabilityJob?.cancel()
+    }
 }

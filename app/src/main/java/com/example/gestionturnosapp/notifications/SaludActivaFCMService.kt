@@ -77,7 +77,8 @@ class SaludActivaFCMService : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        val notificationId = (title.hashCode() + body.hashCode() + System.currentTimeMillis().toInt() % 10000)
+        notificationManager.notify(notificationId, notification)
     }
 
     override fun onDestroy() {
