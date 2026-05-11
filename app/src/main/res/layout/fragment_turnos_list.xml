@@ -134,6 +134,7 @@
                     android:nestedScrollingEnabled="false"
                     android:paddingBottom="80dp"
                     android:clipToPadding="false"
+                    android:layoutAnimation="@anim/layout_animation_fall_down"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     tools:listitem="@layout/item_turno" />
 

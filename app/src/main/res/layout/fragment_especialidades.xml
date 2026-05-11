@@ -74,6 +74,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:padding="12dp"
+        android:layoutAnimation="@anim/layout_animation_fall_down"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:spanCount="2"

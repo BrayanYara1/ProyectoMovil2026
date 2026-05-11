@@ -34,10 +34,15 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         setupObservers()
+        applyAnimations()
     }
 
     private fun setupUI() {
         updateUI()
+
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refreshData()
+        }
 
         binding.cardHomeProfile.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
@@ -45,22 +50,27 @@ class HomeFragment : Fragment() {
         }
 
         binding.cardSolicitarTurno.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_solicitarTurnoFragment)
         }
 
         binding.cardMisTurnos.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_turnosListFragment)
         }
 
         binding.cardEspecialidades.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_especialidadesFragment)
         }
 
         binding.cardMedication.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_medicamentosFragment)
         }
 
         binding.cardEstudios.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_estudiosFragment)
         }
 
@@ -106,7 +116,17 @@ class HomeFragment : Fragment() {
 
     private fun updateUI() {
         val user = UserManager.getUser(requireContext())
-        binding.tvGreeting.text = "¡Hola, ${user?.nombre ?: "Usuario"}! (v3.0.3)"
+        val name = user?.nombre ?: "Usuario"
+        
+        // Saludo Dinámico según la hora del día
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val greeting = when (hour) {
+            in 0..11 -> "¡Buenos días, $name! ☀️"
+            in 12..18 -> "¡Buenas tardes, $name! ⛅"
+            else -> "¡Buenas noches, $name! 🌙"
+        }
+        
+        binding.tvGreeting.text = "$greeting (v3.0.4)"
         updateAvatar()
     }
 
@@ -125,6 +145,9 @@ class HomeFragment : Fragment() {
     private fun setupObservers() {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             binding.progressBar.isVisible = isLoading
+            if (!isLoading) {
+                binding.swipeRefresh.isRefreshing = false
+            }
         }
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
@@ -244,6 +267,32 @@ class HomeFragment : Fragment() {
             medView.findViewById<android.view.View>(R.id.btnDeleteMed).visibility = android.view.View.GONE
             
             binding.layoutMedication.addView(medView)
+        }
+    }
+
+    private fun applyAnimations() {
+        val animation = android.view.animation.AnimationUtils.loadAnimation(requireContext(), android.R.anim.fade_in)
+        animation.duration = 500
+        
+        val viewsToAnimate = listOf(
+            binding.cardNextAppointment,
+            binding.cardSolicitarTurno,
+            binding.cardMisTurnos,
+            binding.cardEspecialidades,
+            binding.cardUrgencias,
+            binding.tvMedTitle,
+            binding.cardMedication,
+            binding.cardShareSummary,
+            binding.tvTipTitle,
+            binding.cardTip
+        )
+        
+        viewsToAnimate.forEachIndexed { index, view ->
+            view.visibility = View.INVISIBLE
+            view.postDelayed({
+                view.visibility = View.VISIBLE
+                view.startAnimation(animation)
+            }, index * 100L)
         }
     }
 

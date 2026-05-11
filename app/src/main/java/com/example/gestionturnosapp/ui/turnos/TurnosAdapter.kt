@@ -77,35 +77,50 @@ class TurnosAdapter(
                     tvItemMesCorta.text = "ERR"
                 }
                 
-                // Configurar estado visualmente
-                val statusText = when(turno.estado.lowercase()) {
-                    "completado", "completed" -> root.context.getString(R.string.status_completed).uppercase()
-                    "cancelado", "cancelled" -> root.context.getString(R.string.status_cancelled).uppercase()
-                    else -> root.context.getString(R.string.status_pending).uppercase()
-                }
-                tvItemStatus.text = statusText
-
-                val statusBgColor = when(turno.estado.lowercase()) {
-                    "completado", "completed" -> ContextCompat.getColor(root.context, R.color.status_completed_bg)
-                    "cancelado", "cancelled" -> ContextCompat.getColor(root.context, R.color.status_cancelled_bg)
-                    else -> ContextCompat.getColor(root.context, R.color.status_pending_bg)
+                // Configurar estado visualmente con Material 3 Premium
+                val (statusLabel, bgColor, textColor) = when(turno.estado.lowercase()) {
+                    "completado", "completed" -> Triple(
+                        root.context.getString(R.string.status_completed).uppercase(),
+                        ContextCompat.getColor(root.context, R.color.status_completed_bg),
+                        ContextCompat.getColor(root.context, R.color.status_completed_text)
+                    )
+                    "cancelado", "cancelled" -> Triple(
+                        root.context.getString(R.string.status_cancelled).uppercase(),
+                        ContextCompat.getColor(root.context, R.color.status_cancelled_bg),
+                        ContextCompat.getColor(root.context, R.color.status_cancelled_text)
+                    )
+                    else -> Triple(
+                        root.context.getString(R.string.status_pending).uppercase(),
+                        ContextCompat.getColor(root.context, R.color.status_pending_bg),
+                        ContextCompat.getColor(root.context, R.color.status_pending_text)
+                    )
                 }
                 
-                val statusTextColor = when(turno.estado.lowercase()) {
-                    "completado", "completed" -> ContextCompat.getColor(root.context, R.color.status_completed_text)
-                    "cancelado", "cancelled" -> ContextCompat.getColor(root.context, R.color.status_cancelled_text)
-                    else -> ContextCompat.getColor(root.context, R.color.status_pending_text)
+                tvItemStatus.text = statusLabel
+                tvItemStatus.chipBackgroundColor = ColorStateList.valueOf(bgColor)
+                tvItemStatus.setTextColor(textColor)
+                
+                // Icono de estado dinámico
+                val statusIcon = when(turno.estado.lowercase()) {
+                    "completado", "completed" -> android.R.drawable.checkbox_on_background
+                    "cancelado", "cancelled" -> android.R.drawable.ic_delete
+                    else -> android.R.drawable.presence_online
                 }
-
-                tvItemStatus.chipBackgroundColor = ColorStateList.valueOf(statusBgColor)
-                tvItemStatus.setTextColor(statusTextColor)
+                tvItemStatus.setChipIconResource(statusIcon)
+                tvItemStatus.chipIconTint = ColorStateList.valueOf(textColor)
 
                 root.transitionName = "card_${turno.id}"
                 tvItemNombre.transitionName = "name_${turno.id}"
                 dateIconCard.transitionName = "date_${turno.id}"
 
-                root.setOnClickListener { onTurnoClick(turno, binding) }
-                btnDeleteItem.setOnClickListener { onDeleteClick(turno) }
+                root.setOnClickListener { 
+                    it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                    onTurnoClick(turno, binding) 
+                }
+                btnDeleteItem.setOnClickListener { 
+                    it.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                    onDeleteClick(turno) 
+                }
             }
         }
     }

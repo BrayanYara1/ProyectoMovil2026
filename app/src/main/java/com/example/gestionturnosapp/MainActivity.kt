@@ -29,6 +29,11 @@ class MainActivity : AppCompatActivity() {
     ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Aplicar Tema antes de crear la actividad
+        com.example.gestionturnosapp.data.PreferenceManager.applyTheme(
+            com.example.gestionturnosapp.data.PreferenceManager.isDarkMode(this)
+        )
+
         // Pantalla de Inicio (Splash Screen) - Debe llamarse antes de super.onCreate
         installSplashScreen()
         
