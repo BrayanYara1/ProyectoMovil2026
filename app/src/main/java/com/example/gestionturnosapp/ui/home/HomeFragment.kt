@@ -98,6 +98,10 @@ class HomeFragment : Fragment() {
                 findNavController().navigate(R.id.action_homeFragment_to_turnoDetailFragment, bundle)
             }
         }
+        
+        binding.cardShareSummary.setOnClickListener {
+            shareHealthSummary()
+        }
     }
 
     private fun updateUI() {
@@ -147,7 +151,6 @@ class HomeFragment : Fragment() {
                     turno.doctor ?: "Dr. Pendiente"
                 )
                 
-                // Formatear hora para mostrar AM/PM
                 val displayTime = try {
                     val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
                     var dateObj: java.util.Date? = null
@@ -192,6 +195,39 @@ class HomeFragment : Fragment() {
             .build())
     }
 
+    private fun shareHealthSummary() {
+        val nextTurno = viewModel.nextTurno.value
+        val meds = viewModel.medicamentos.value ?: emptyList()
+        val user = UserManager.getUser(requireContext())
+        
+        val summary = StringBuilder()
+        summary.append("🏥 *Resumen de Salud - SaludActiva*\n")
+        summary.append("👤 *Paciente:* ${user?.nombre}\n\n")
+        
+        if (nextTurno != null) {
+            summary.append("📅 *Próxima Cita:*\n")
+            summary.append("- ${nextTurno.especialidad}: ${nextTurno.fecha} a las ${nextTurno.hora}\n")
+            summary.append("- Dr. ${nextTurno.doctor}\n\n")
+        }
+        
+        if (meds.isNotEmpty()) {
+            summary.append("💊 *Medicamentos Actuales:*\n")
+            meds.forEach { med ->
+                summary.append("- ${med.nombre} (${med.dosis}): ${med.frecuencia}\n")
+            }
+        } else {
+            summary.append("💊 Sin medicamentos configurados.\n")
+        }
+        
+        summary.append("\n_Enviado desde mi app SaludActiva_")
+        
+        val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(android.content.Intent.EXTRA_TEXT, summary.toString())
+        }
+        startActivity(android.content.Intent.createChooser(intent, "Compartir con"))
+    }
+
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {
         binding.layoutMedication.removeAllViews()
         if (meds.isEmpty()) {
@@ -204,9 +240,9 @@ class HomeFragment : Fragment() {
             medView.findViewById<android.widget.TextView>(R.id.tvMedName).text = "${med.nombre} ${med.dosis}"
             medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = "${med.frecuencia} - Próxima: ${med.proximaToma}"
             
-            // LIMPIEZA HOME: Ocultar botón de borrar en el dashboard para una vista más limpia
+            // LIMPIEZA HOME: Ocultar botón de borrar en el dashboard
             medView.findViewById<android.view.View>(R.id.btnDeleteMed).visibility = android.view.View.GONE
-
+            
             binding.layoutMedication.addView(medView)
         }
     }

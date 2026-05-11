@@ -1,5 +1,10 @@
 package com.example.gestionturnosapp.ui.medicamentos
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,8 +16,11 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gestionturnosapp.R
+import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentMedicamentosBinding
+import com.example.gestionturnosapp.notifications.ReminderReceiver
+import java.util.Calendar
 
 class MedicamentosFragment : Fragment() {
 
@@ -85,6 +93,7 @@ class MedicamentosFragment : Fragment() {
                 is Resource.Success -> {
                     adapter.submitList(resource.data)
                     binding.progressBar.isVisible = false
+                    binding.layoutEmptyMeds.isVisible = resource.data.isEmpty()
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
@@ -110,6 +119,8 @@ class MedicamentosFragment : Fragment() {
             when (resource) {
                 is Resource.Success -> {
                     Toast.makeText(context, "Medicamento guardado", Toast.LENGTH_SHORT).show()
+                    // PROGRAMAR ALERTA: Programamos una notificación para la próxima toma
+                    scheduleMedicationAlarm(resource.data)
                     clearFields()
                     viewModel.resetOperationState()
                 }
@@ -119,6 +130,46 @@ class MedicamentosFragment : Fragment() {
                 }
                 else -> {}
             }
+        }
+    }
+
+    private fun scheduleMedicationAlarm(med: Medicamento) {
+        try {
+            val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val parts = med.proximaToma.split(":")
+            if (parts.size != 2) return
+
+            val calendar = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, parts[0].toInt())
+                set(Calendar.MINUTE, parts[1].toInt())
+                set(Calendar.SECOND, 0)
+                
+                if (timeInMillis <= System.currentTimeMillis()) {
+                    add(Calendar.DAY_OF_YEAR, 1)
+                }
+            }
+
+            val intent = Intent(requireContext(), ReminderReceiver::class.java).apply {
+                putExtra("TITLE", "Hora de tu Medicación")
+                putExtra("MESSAGE", "Toma ahora: ${med.nombre} (${med.dosis})")
+                putExtra("TYPE", "MEDICAMENTO")
+                putExtra("NOTIFICATION_ID", med.id.hashCode())
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                requireContext(),
+                med.id.hashCode(),
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+            } else {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("Medicamentos", "Error scheduling alarm", e)
         }
     }
 
