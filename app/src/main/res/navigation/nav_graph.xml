@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/welcomeFragment"
         android:name="com.example.gestionturnosapp.ui.WelcomeFragment"
-        android:label="Bienvenido"
+        android:label="@string/welcome"
         tools:layout="@layout/fragment_welcome">
         <action
             android:id="@+id/action_welcomeFragment_to_loginFragment"
@@ -154,7 +154,7 @@
     <fragment
         android:id="@+id/estudiosFragment"
         android:name="com.example.gestionturnosapp.ui.estudios.EstudiosFragment"
-        android:label="Mis Estudios"
+        android:label="@string/menu_my_studies"
         tools:layout="@layout/fragment_estudios" />
 
     <fragment
@@ -198,7 +198,7 @@
     <fragment
         android:id="@+id/turnoDetailFragment"
         android:name="com.example.gestionturnosapp.ui.turnos.TurnoDetailFragment"
-        android:label="Detalle de Turno"
+        android:label="@string/title_appointment_detail"
         tools:layout="@layout/fragment_turno_detail" />
 
     <fragment

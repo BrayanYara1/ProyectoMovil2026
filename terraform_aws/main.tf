@@ -136,6 +136,21 @@ resource "aws_ecr_repository" "app_repo" {
   force_delete         = true
 }
 
+# --- NUEVO: ALMACENAMIENTO DE DOCUMENTOS (S3) ---
+resource "aws_s3_bucket" "app_docs" {
+  bucket_prefix = "gestion-turnos-docs-"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_public_access_block" "app_docs_block" {
+  bucket = aws_s3_bucket.app_docs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 # --- NUEVO: SERVIDOR DE APLICACIONES (ECS FARGATE) ---
 
 # 8. Cluster de ECS
@@ -143,7 +158,7 @@ resource "aws_ecs_cluster" "main_cluster" {
   name = "gestion-turnos-cluster"
 }
 
-# 9. Rol de Ejecución para ECS (Permisos)
+# 9. Rol de Ejecución para ECS (Permisos para que ECS arranque la tarea)
 resource "aws_iam_role" "ecs_task_execution_role" {
   name = "ecsTaskExecutionRole"
 
@@ -160,6 +175,44 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# 9b. Rol de Tarea para ECS (Permisos para lo que la APP hace adentro: S3, etc.)
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecsTaskRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = { Service = "ecs-tasks.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_policy" "s3_access_policy" {
+  name        = "S3AccessPolicy"
+  description = "Permite a la app subir y leer archivos de S3"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action   = ["s3:PutObject", "s3:GetObject", "s3:ListBucket"]
+        Effect   = "Allow"
+        Resource = [
+          aws_s3_bucket.app_docs.arn,
+          "${aws_s3_bucket.app_docs.arn}/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_s3_attach" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.s3_access_policy.arn
 }
 
 # --- NUEVO: GRUPO DE LOGS PARA VER ERRORES ---
@@ -196,6 +249,7 @@ resource "aws_ecs_task_definition" "app_task" {
   cpu                      = "256"
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([{
     name  = "backend-container"
@@ -215,7 +269,12 @@ resource "aws_ecs_task_definition" "app_task" {
     environment = [
       { name = "PORT", value = "3000" },
       { name = "MONGODB_URI", value = var.mongodb_uri },
-      { name = "JWT_SECRET", value = var.jwt_secret }
+      { name = "JWT_SECRET", value = var.jwt_secret },
+      { name = "S3_BUCKET_NAME", value = aws_s3_bucket.app_docs.id },
+      { name = "DB_HOST", value = aws_db_instance.gestion_turnos_db.address },
+      { name = "DB_NAME", value = aws_db_instance.gestion_turnos_db.db_name },
+      { name = "DB_USER", value = aws_db_instance.gestion_turnos_db.username },
+      { name = "DB_PASS", value = var.db_password }
     ]
   }])
 }
@@ -272,23 +331,17 @@ resource "aws_appautoscaling_policy" "ecs_policy_cpu" {
   }
 }
 
-# --- OUTPUT: LA URL PARA TU APP DE ANDROID ---
-output "app_url" {
-  value       = "http://${aws_lb.app_lb.dns_name}"
-  description = "Copia esta URL en el BASE_URL de tu RetrofitClient.kt"
-}
-
 # 1. Crear un Grupo de Seguridad (Firewall) para la Base de Datos
 resource "aws_security_group" "db_sg" {
   name        = "db-security-group"
   vpc_id      = aws_vpc.main_vpc.id
 
-  # Permitir entrada de datos (Puerto 5432 para PostgreSQL)
+  # Permitir entrada de datos (Puerto 5432 para PostgreSQL) desde el ECS
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"] # Solo permite conexiones desde dentro de tu red
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ecs_sg.id]
   }
 
   egress {
@@ -313,4 +366,25 @@ resource "aws_db_instance" "gestion_turnos_db" {
   publicly_accessible    = false
   vpc_security_group_ids = [aws_security_group.db_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name # Agregamos esto
+}
+
+# --- OUTPUTS: DATOS PARA CONFIGURAR TU APP ---
+output "app_url" {
+  value       = "http://${aws_lb.app_lb.dns_name}"
+  description = "Copia esta URL en el BASE_URL de tu RetrofitClient.kt"
+}
+
+output "rds_endpoint" {
+  value       = aws_db_instance.gestion_turnos_db.endpoint
+  description = "Endpoint de la base de datos PostgreSQL"
+}
+
+output "s3_bucket_name" {
+  value       = aws_s3_bucket.app_docs.id
+  description = "Nombre del bucket para documentos médicos"
+}
+
+output "ecr_repository_url" {
+  value       = aws_ecr_repository.app_repo.repository_url
+  description = "URL del repositorio para subir tu imagen Docker"
 }

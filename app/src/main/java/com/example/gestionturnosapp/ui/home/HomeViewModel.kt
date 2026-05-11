@@ -40,6 +40,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun refreshData() {
+        loadRandomHealthTip()
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
@@ -75,8 +76,15 @@ class HomeViewModel : ViewModel() {
             R.string.tip_health_2,
             R.string.tip_health_3,
             R.string.tip_health_4,
-            R.string.tip_health_5
+            R.string.tip_health_5,
+            R.string.tip_health_6,
+            R.string.tip_health_7,
+            R.string.tip_health_8,
+            R.string.tip_health_9,
+            R.string.tip_health_10
         )
-        _healthTipResId.value = tips.random()
+        // Usamos el día del año para que la recomendación sea realmente "del día"
+        val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+        _healthTipResId.value = tips[dayOfYear % tips.size]
     }
 }

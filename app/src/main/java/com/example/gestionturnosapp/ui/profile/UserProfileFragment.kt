@@ -56,14 +56,17 @@ class UserProfileFragment : Fragment() {
         cargarDatos()
 
         binding.ivProfileAvatar.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             pickImageLauncher.launch("image/*")
         }
 
         binding.btnProfileSettings.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_userProfileFragment_to_settingsFragment)
         }
 
         binding.btnEditProfile.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             mostrarDialogoEdicion()
         }
     }
@@ -78,13 +81,24 @@ class UserProfileFragment : Fragment() {
             binding.tvProfileName.text = getString(R.string.loading_user)
         }
 
+        updateAvatar()
+    }
+
+    private fun updateAvatar() {
         val savedImageUri = ImageStorageManager.getProfileImageUri(requireContext())
-        if (savedImageUri != null) {
-            binding.ivProfileAvatar.load(savedImageUri) {
-                crossfade(true)
-                transformations(CircleCropTransformation())
-            }
-            binding.ivProfileAvatar.imageTintList = null
+        binding.ivProfileAvatar.load(savedImageUri) {
+            crossfade(true)
+            placeholder(R.drawable.ic_nav_profile)
+            error(R.drawable.ic_nav_profile)
+            transformations(CircleCropTransformation())
+            listener(
+                onSuccess = { _, _ -> binding.ivProfileAvatar.imageTintList = null },
+                onError = { _, _ -> 
+                    binding.ivProfileAvatar.imageTintList = android.content.res.ColorStateList.valueOf(
+                        requireContext().getColor(R.color.primary)
+                    )
+                }
+            )
         }
     }
 
@@ -130,18 +144,18 @@ class UserProfileFragment : Fragment() {
                     val usuarioActualizado = response.body() ?: usuario
                     UserManager.saveUser(requireContext(), usuarioActualizado)
                     cargarDatos()
-                    Toast.makeText(context, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.msg_profile_update_success, Toast.LENGTH_SHORT).show()
                 } else {
                     val errorBody = response.errorBody()?.string() ?: ""
                     android.util.Log.e("SyncError", "Code: ${response.code()} Body: $errorBody")
                     
                     val displayError = if (errorBody.contains("ruta") || errorBody.contains("not exist")) {
-                        "Servidor desactualizado o ruta no encontrada (404)"
+                        getString(R.string.msg_server_route_error)
                     } else if (response.code() == 401) {
                         handleSessionExpired()
                         return@launch
                     } else {
-                        "Error al sincronizar perfil (${response.code()})"
+                        "${getString(R.string.msg_generic_sync_error)} (${response.code()})"
                     }
                     
                     Toast.makeText(context, displayError, Toast.LENGTH_SHORT).show()
@@ -150,7 +164,7 @@ class UserProfileFragment : Fragment() {
                     cargarDatos()
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Sin conexión: Perfil guardado localmente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.msg_profile_sync_local, Toast.LENGTH_SHORT).show()
                 UserManager.saveUser(requireContext(), usuario)
                 cargarDatos()
             }
@@ -159,7 +173,7 @@ class UserProfileFragment : Fragment() {
 
     private fun handleSessionExpired() {
         UserManager.logout(requireContext())
-        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)
             .build())

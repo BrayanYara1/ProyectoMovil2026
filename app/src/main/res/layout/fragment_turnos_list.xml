@@ -42,7 +42,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Gestiona tus citas médicas activas"
+                    android:text="@string/subtitle_appointments"
                     android:textColor="#E0E0E0"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -81,7 +81,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:iconifiedByDefault="false"
-                        app:queryHint="Buscar por paciente o motivo..."
+                        app:queryHint="@string/hint_search_appointments"
                         app:queryBackground="@android:color/transparent"
                         app:searchIcon="@drawable/ic_nav_search" />
                 </com.google.android.material.card.MaterialCardView>
@@ -185,15 +185,16 @@
         <ImageView
             android:layout_width="160dp"
             android:layout_height="160dp"
-            android:alpha="0.4"
-            android:src="@drawable/ic_medical_logo"
-            app:tint="@color/primary" />
+            android:alpha="0.2"
+            android:src="@drawable/ic_nav_calendar"
+            app:tint="@color/primary"
+            android:contentDescription="@null" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="¡Sin citas pendientes!"
+            android:text="@string/no_appointments"
             android:textColor="@color/text_primary"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -202,7 +203,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Tus próximos turnos aparecerán aquí para que no olvides ninguno."
+            android:text="@string/msg_empty_appointments"
             android:textAlignment="center"
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
@@ -214,7 +215,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:layout_gravity="bottom|end"
-        android:text="Agendar Cita"
+        android:text="@string/btn_schedule_appointment"
         android:textColor="@color/white"
         app:icon="@drawable/ic_add_circle"
         app:iconTint="@color/white"

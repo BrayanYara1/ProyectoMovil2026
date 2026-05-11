@@ -68,6 +68,7 @@ class TurnosListFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = TurnosAdapter(
             onTurnoClick = { turno, bindingItems ->
+                view?.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
                 val bundle = Bundle().apply {
                     putString("TURNO_ID", turno.id)
                     putString("PACIENTE_NOMBRE", turno.pacienteNombre)
@@ -176,7 +177,7 @@ class TurnosListFragment : Fragment() {
 
     private fun handleSessionExpired() {
         com.example.gestionturnosapp.data.UserManager.logout(requireContext())
-        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)
             .build())
@@ -184,6 +185,7 @@ class TurnosListFragment : Fragment() {
 
     private fun setupFab() {
         binding.fabAddTurno.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_turnosListFragment_to_solicitarTurnoFragment)
         }
         

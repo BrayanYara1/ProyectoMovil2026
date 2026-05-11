@@ -14,52 +14,57 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <com.google.android.material.card.MaterialCardView
+        <ImageView
             android:id="@+id/dateIconCard"
             android:layout_width="52dp"
             android:layout_height="52dp"
+            android:background="@drawable/bg_icon_container_blue"
+            android:padding="0dp"
+            android:scaleType="centerInside"
             android:transitionName="date_container_shared"
-            app:cardBackgroundColor="@color/primary_container"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="0dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical">
+        <LinearLayout
+            android:id="@+id/layoutDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="1dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/dateIconCard"
+            app:layout_constraintEnd_toEndOf="@id/dateIconCard"
+            app:layout_constraintStart_toStartOf="@id/dateIconCard"
+            app:layout_constraintTop_toTopOf="@id/dateIconCard">
 
-                <TextView
-                    android:id="@+id/tvItemDiaMes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/primary"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    tools:text="15" />
+            <TextView
+                android:id="@+id/tvItemDiaMes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="15" />
 
-                <TextView
-                    android:id="@+id/tvItemMesCorta"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/primary"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    tools:text="OCT" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+            <TextView
+                android:id="@+id/tvItemMesCorta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                tools:text="OCT" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvItemNombre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:transitionName="patient_name"
             android:textColor="@color/text_primary"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:transitionName="patient_name"
             app:layout_constraintEnd_toStartOf="@id/tvItemHora"
             app:layout_constraintStart_toEndOf="@id/dateIconCard"
             app:layout_constraintTop_toTopOf="@id/dateIconCard"
@@ -94,12 +99,13 @@
             android:id="@+id/tvItemStatus"
             style="@style/Widget.Material3.Chip.Assist"
             android:layout_width="wrap_content"
-            android:layout_height="24dp"
+            android:layout_height="32dp"
             android:layout_marginTop="8dp"
             android:textColor="@color/white"
-            android:textSize="10sp"
+            android:textSize="11sp"
+            android:textStyle="bold"
             app:chipBackgroundColor="@color/status_pending_bg"
-            app:chipCornerRadius="4dp"
+            app:chipCornerRadius="8dp"
             app:chipStrokeWidth="0dp"
             app:layout_constraintStart_toStartOf="@id/tvItemNombre"
             app:layout_constraintTop_toBottomOf="@id/tvItemMotivo"
@@ -107,11 +113,11 @@
 
         <ImageButton
             android:id="@+id/btnDeleteItem"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/btn_delete"
-            android:padding="4dp"
+            android:padding="8dp"
             android:src="@drawable/ic_delete"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

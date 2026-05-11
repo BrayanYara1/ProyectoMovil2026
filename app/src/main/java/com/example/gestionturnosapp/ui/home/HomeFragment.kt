@@ -94,21 +94,8 @@ class HomeFragment : Fragment() {
             true
         }
 
-        binding.cardNextAppointment.setOnClickListener {
-            viewModel.nextTurno.value?.let { turno ->
-                val bundle = Bundle().apply {
-                    putString("TURNO_ID", turno.id)
-                    putString("PACIENTE_NOMBRE", turno.pacienteNombre)
-                    putString("TURNO_FECHA", turno.fecha)
-                    putString("TURNO_HORA", turno.hora)
-                    putString("TURNO_MOTIVO", turno.motivo)
-                    putString("TURNO_ESTADO", turno.estado)
-                }
-                findNavController().navigate(R.id.action_homeFragment_to_turnoDetailFragment, bundle)
-            }
-        }
-        
         binding.cardShareSummary.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             shareHealthSummary()
         }
     }
@@ -119,25 +106,23 @@ class HomeFragment : Fragment() {
         
         // Saludo Dinámico según la hora del día
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-        val greeting = when (hour) {
-            in 0..11 -> "¡Buenos días, $name! ☀️"
-            in 12..18 -> "¡Buenas tardes, $name! ⛅"
-            else -> "¡Buenas noches, $name! 🌙"
+        val greetingRes = when (hour) {
+            in 0..11 -> R.string.greeting_morning
+            in 12..18 -> R.string.greeting_afternoon
+            else -> R.string.greeting_evening
         }
         
-        binding.tvGreeting.text = "$greeting (v3.0.4)"
+        binding.tvGreeting.text = getString(greetingRes, name)
         updateAvatar()
     }
 
     private fun updateAvatar() {
         val savedImageUri = ImageStorageManager.getProfileImageUri(requireContext())
-        if (savedImageUri != null) {
-            binding.ivUserAvatar.load(savedImageUri) {
-                crossfade(true)
-                transformations(CircleCropTransformation())
-            }
-        } else {
-            binding.ivUserAvatar.setImageResource(android.R.drawable.ic_menu_gallery)
+        binding.ivUserAvatar.load(savedImageUri) {
+            crossfade(true)
+            placeholder(R.drawable.ic_nav_profile)
+            error(R.drawable.ic_nav_profile)
+            transformations(CircleCropTransformation())
         }
     }
 
@@ -166,12 +151,17 @@ class HomeFragment : Fragment() {
 
         viewModel.nextTurno.observe(viewLifecycleOwner) { turno ->
             if (turno != null) {
-                binding.cardNextAppointment.isVisible = true
+                // Estado con cita
+                binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.primary))
+                binding.tvNextAppointLabel.text = getString(R.string.title_next_appointment)
+                binding.tvNextAppointLabel.setTextColor(android.graphics.Color.parseColor("#B3FFFFFF"))
+                
                 binding.tvNextAppointName.text = getString(
                     R.string.label_next_appointment_format,
                     turno.especialidad ?: "Consulta",
                     turno.doctor ?: "Dr. Pendiente"
                 )
+                binding.tvNextAppointName.setTextColor(requireContext().getColor(R.color.white))
                 
                 val displayTime = try {
                     val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
@@ -195,8 +185,38 @@ class HomeFragment : Fragment() {
                     turno.fecha,
                     displayTime
                 )
+                binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.white))
+                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.white))
+                
+                binding.cardNextAppointment.setOnClickListener {
+                    it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                    val bundle = Bundle().apply {
+                        putString("TURNO_ID", turno.id)
+                        putString("PACIENTE_NOMBRE", turno.pacienteNombre)
+                        putString("TURNO_FECHA", turno.fecha)
+                        putString("TURNO_HORA", turno.hora)
+                        putString("TURNO_MOTIVO", turno.motivo)
+                        putString("TURNO_ESTADO", turno.estado)
+                    }
+                    findNavController().navigate(R.id.action_homeFragment_to_turnoDetailFragment, bundle)
+                }
             } else {
-                binding.cardNextAppointment.isVisible = false
+                // Estado vacío: Invitar a agendar
+                binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.primary_container))
+                binding.tvNextAppointLabel.text = getString(R.string.no_upcoming_appointments).uppercase()
+                binding.tvNextAppointLabel.setTextColor(requireContext().getColor(R.color.primary))
+                
+                binding.tvNextAppointName.text = getString(R.string.schedule_appointment_prompt)
+                binding.tvNextAppointName.setTextColor(requireContext().getColor(R.color.text_primary))
+                
+                binding.tvNextAppointDate.text = getString(R.string.menu_request_appointment)
+                binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.primary))
+                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary))
+
+                binding.cardNextAppointment.setOnClickListener {
+                    it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                    findNavController().navigate(R.id.action_homeFragment_to_solicitarTurnoFragment)
+                }
             }
         }
 

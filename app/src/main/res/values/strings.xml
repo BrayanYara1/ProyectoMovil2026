@@ -39,7 +39,11 @@
     <string name="hint_reason">Motivo de consulta</string>
     <string name="btn_confirm_appointment">CONFIRMAR TURNO</string>
     <string name="title_my_appointments">Mis Turnos</string>
-    <string name="no_appointments">No tienes turnos programados</string>
+    <string name="subtitle_appointments">Gestiona tus citas médicas activas</string>
+    <string name="no_appointments">¡Sin citas pendientes!</string>
+    <string name="msg_empty_appointments">Tus próximos turnos aparecerán aquí para que no olvides ninguno.</string>
+    <string name="hint_search_appointments">Buscar por paciente o motivo…</string>
+    <string name="btn_schedule_appointment">Agendar Cita</string>
     <string name="msg_appointment_success">Turno programado con éxito</string>
     <string name="msg_appointment_error">Error al programar el turno</string>
     <string name="title_delete_appointment">Cancelar Turno</string>
@@ -55,7 +59,13 @@
     <string name="label_email_uppercase">CORREO ELECTRÓNICO</string>
     <string name="label_phone_uppercase">TELÉFONO</string>
     <string name="btn_edit_data">EDITAR DATOS</string>
-    <string name="photo_updated">Foto actualizada</string>
+    <string name="photo_updated">Foto de perfil actualizada</string>
+    <string name="label_profile_type">Paciente GestionTurnos</string>
+    <string name="msg_profile_update_success">Perfil actualizado correctamente</string>
+    <string name="msg_profile_sync_local">Sin conexión: Perfil guardado localmente</string>
+    <string name="msg_session_expired">Tu sesión ha expirado. Por favor inicia sesión de nuevo.</string>
+    <string name="msg_server_route_error">Error del servidor: Ruta no encontrada</string>
+    <string name="msg_generic_sync_error">Error al sincronizar datos</string>
 
     <!-- Ajustes -->
     <string name="title_settings">Ajustes</string>
@@ -79,6 +89,8 @@
 
     <string name="title_recommendation">Recomendación del día</string>
     <string name="title_next_appointment">PRÓXIMA CITA</string>
+    <string name="no_upcoming_appointments">Sin citas pendientes</string>
+    <string name="schedule_appointment_prompt">Asegura tu próxima consulta médica hoy mismo.</string>
     <string name="title_medication">Mi Medicación</string>
     <string name="msg_no_medication">No tienes medicación activa configurada.</string>
     <string name="label_next_appointment_format">%1$s - %2$s</string>
@@ -113,6 +125,11 @@
     <string name="tip_health_3">Dormir 8 horas diarias mejora tu sistema inmunológico.</string>
     <string name="tip_health_4">No olvides lavarte las manos frecuentemente.</string>
     <string name="tip_health_5">Una dieta equilibrada es la base de una buena salud.</string>
+    <string name="tip_health_6">Reduce el consumo de sal para cuidar tu presión arterial.</string>
+    <string name="tip_health_7">Evita el uso de pantallas al menos 30 minutos antes de dormir.</string>
+    <string name="tip_health_8">Realiza pausas activas si trabajas mucho tiempo sentado.</string>
+    <string name="tip_health_9">Mantén tus chequeos médicos al día para prevenir enfermedades.</string>
+    <string name="tip_health_10">Practica la meditación o respiración profunda para reducir el estrés.</string>
     <!-- Estados de Turnos -->
     <string name="status_pending">Pendiente</string>
     <string name="status_completed">Completado</string>
@@ -131,4 +148,12 @@
     <string name="acc_open_map">Ver ubicación de la clínica en el mapa</string>
     <string name="acc_add_calendar">Añadir este turno a mi calendario personal</string>
     <string name="acc_set_reminder">Configurar un recordatorio para esta cita</string>
+    <string name="menu_my_studies">Mis Estudios</string>
+    <string name="title_health_summary">Resumen de GestionTurnos</string>
+    <string name="subtitle_health_summary">Compartir mis citas y medicinas</string>
+
+    <!-- Saludos dinámicos -->
+    <string name="greeting_morning">¡Buenos días, %1$s! ☀️</string>
+    <string name="greeting_afternoon">¡Buenas tardes, %1$s! ⛅</string>
+    <string name="greeting_evening">¡Buenas noches, %1$s! 🌙</string>
 </resources>
