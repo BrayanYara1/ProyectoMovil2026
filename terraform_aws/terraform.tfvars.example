@@ -1,0 +1,3 @@
+mongodb_uri = "tu_mongodb_uri_aqui"
+jwt_secret  = "tu_jwt_secret_aqui"
+db_password = "tu_db_password_aqui"

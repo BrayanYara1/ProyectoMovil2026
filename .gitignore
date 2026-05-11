@@ -17,3 +17,10 @@ node_modules/
 .idea/
 build/
 *.rar
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+*.tfvars

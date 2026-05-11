@@ -34,7 +34,6 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupUI()
         setupObservers()
-        applyAnimations()
     }
 
     private fun setupUI() {
@@ -267,32 +266,6 @@ class HomeFragment : Fragment() {
             medView.findViewById<android.view.View>(R.id.btnDeleteMed).visibility = android.view.View.GONE
             
             binding.layoutMedication.addView(medView)
-        }
-    }
-
-    private fun applyAnimations() {
-        val animation = android.view.animation.AnimationUtils.loadAnimation(requireContext(), android.R.anim.fade_in)
-        animation.duration = 500
-        
-        val viewsToAnimate = listOf(
-            binding.cardNextAppointment,
-            binding.cardSolicitarTurno,
-            binding.cardMisTurnos,
-            binding.cardEspecialidades,
-            binding.cardUrgencias,
-            binding.tvMedTitle,
-            binding.cardMedication,
-            binding.cardShareSummary,
-            binding.tvTipTitle,
-            binding.cardTip
-        )
-        
-        viewsToAnimate.forEachIndexed { index, view ->
-            view.visibility = View.INVISIBLE
-            view.postDelayed({
-                view.visibility = View.VISIBLE
-                view.startAnimation(animation)
-            }, index * 100L)
         }
     }
 

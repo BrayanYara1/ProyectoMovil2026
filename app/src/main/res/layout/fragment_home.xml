@@ -21,7 +21,8 @@
                 android:id="@+id/mainContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layoutAnimation="@anim/layout_animation_fall_down">
 
                 <!-- Cabecera Premium -->
                 <RelativeLayout
@@ -222,6 +223,21 @@
                             <View android:layout_width="48dp" android:layout_height="48dp" android:background="@drawable/bg_icon_container_red" />
                             <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_marginTop="-36dp" android:src="@drawable/ic_emergency" app:tint="@color/error" />
                             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/menu_emergencies" android:textStyle="bold" android:textColor="@color/error" android:textSize="@dimen/text_size_caption" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardEstudios"
+                        style="@style/Widget.App.Card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp">
+
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="20dp">
+                            <View android:layout_width="48dp" android:layout_height="48dp" android:background="@drawable/bg_icon_container_purple" />
+                            <ImageView android:layout_width="24dp" android:layout_height="24dp" android:layout_marginTop="-36dp" android:src="@drawable/ic_nav_calendar" app:tint="@color/accent" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Mis Estudios" android:textStyle="bold" android:textSize="@dimen/text_size_caption" />
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
