@@ -121,7 +121,10 @@ class TurnosListFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.filteredTurnos.observe(viewLifecycleOwner) { turnos ->
-            adapter.submitList(turnos)
+            adapter.submitList(turnos) {
+                // Forzar la animación de cascada cada vez que se actualiza la lista
+                binding.rvTurnos.scheduleLayoutAnimation()
+            }
             binding.layoutEmpty.isVisible = turnos.isEmpty() && (viewModel.turnosResource.value as? Resource.Success)?.data?.isEmpty() == true
             binding.swipeRefresh.isRefreshing = false
         }
