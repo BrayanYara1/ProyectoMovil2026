@@ -78,6 +78,9 @@ class SolicitarTurnoFragment : Fragment() {
                     .setTitle(R.string.msg_confirm_booking_title)
                     .setMessage(getString(R.string.msg_confirm_booking_body, fecha, hora))
                     .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                        // Prevenir múltiples clics
+                        binding.btnConfirmarTurno.isEnabled = false
+
                         viewModel.crearNuevoTurno(
                             nombre, fecha, hora, motivo, 
                             especialidad = especialidadArg,

@@ -1,6 +1,8 @@
 package com.example.gestionturnosapp.ui.auth
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,13 +64,25 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setupRegisterActions() {
+        binding.etTelefono.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                val text = s.toString()
+                if (text.isNotEmpty() && !text.startsWith("+57 ")) {
+                    val clean = text.replace("+57 ", "")
+                    binding.etTelefono.setText("+57 $clean")
+                    binding.etTelefono.setSelection(binding.etTelefono.text?.length ?: 0)
+                }
+            }
+        })
+
         binding.btnRegister.setOnClickListener {
             val name = binding.etNombre.text.toString().trim()
             val email = binding.etEmail.text.toString().trim()
             val phone = binding.etTelefono.text.toString().trim()
             val pass = binding.etPassword.text.toString().trim()
 
-            // Resetear errores
             binding.tilNombre.error = null
             binding.tilEmail.error = null
             binding.tilTelefono.error = null
@@ -86,8 +100,8 @@ class RegisterFragment : Fragment() {
                 isValid = false
             }
 
-            if (phone.isEmpty()) {
-                binding.tilTelefono.error = getString(R.string.msg_complete_fields)
+            if (phone.length < 10) {
+                binding.tilTelefono.error = "Ingresa un número válido"
                 isValid = false
             }
 
@@ -97,8 +111,8 @@ class RegisterFragment : Fragment() {
             }
 
             if (isValid) {
-                val request = RegisterRequest(name, email, phone, pass)
-                viewModel.register(request, requireContext())
+                binding.btnRegister.isEnabled = false
+                viewModel.register(RegisterRequest(name, email, phone, pass), requireContext())
             }
         }
 

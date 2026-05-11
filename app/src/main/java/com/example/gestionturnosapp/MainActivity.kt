@@ -32,9 +32,6 @@ class MainActivity : AppCompatActivity() {
         // Pantalla de Inicio (Splash Screen) - Debe llamarse antes de super.onCreate
         installSplashScreen()
         
-        // Forzar modo claro
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
         super.onCreate(savedInstanceState)
         
         // Cargar sesión

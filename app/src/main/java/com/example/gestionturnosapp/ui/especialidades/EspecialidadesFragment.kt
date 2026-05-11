@@ -43,7 +43,7 @@ class EspecialidadesFragment : Fragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 // Aquí filtramos localmente para simplificar con los recursos de strings
                 val adapter = binding.rvEspecialidades.adapter as? EspecialidadesAdapter
-                adapter?.filter(newText ?: "")
+                adapter?.filter(newText ?: "", requireContext())
                 return true
             }
         })

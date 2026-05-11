@@ -51,6 +51,7 @@ class LoginFragment : Fragment() {
             }
 
             if (isValid) {
+                binding.btnLogin.isEnabled = false // Prevenir doble clic
                 viewModel.login(email, password, requireContext())
             }
         }

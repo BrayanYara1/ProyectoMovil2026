@@ -1,10 +1,12 @@
 package com.example.gestionturnosapp.ui.especialidades
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gestionturnosapp.data.Especialidad
 import com.example.gestionturnosapp.databinding.ItemEspecialidadBinding
+import java.util.Locale
 
 class EspecialidadesAdapter(
     private val fullList: List<Especialidad>,
@@ -34,18 +36,17 @@ class EspecialidadesAdapter(
 
     override fun getItemCount() = filteredList.size
 
-    fun filter(query: String) {
-        filteredList = if (query.isEmpty()) {
+    fun filter(query: String, context: Context) {
+        val lowercaseQuery = query.lowercase(Locale.getDefault())
+        filteredList = if (lowercaseQuery.isEmpty()) {
             fullList
         } else {
-            fullList.filter {
-                val context = it.id.toString() // just dummy logic, we need context for real name
-                // Intentaremos filtrar por el recurso si es posible (no ideal en adapter)
-                // Pero como es estático, podemos usar root.context de forma segura en bind o aquí
-                true 
+            fullList.filter { especialidad ->
+                val name = try {
+                    context.getString(especialidad.nombreRes).lowercase(Locale.getDefault())
+                } catch (e: Exception) { "" }
+                name.contains(lowercaseQuery)
             }
-            // Realmente para que funcione bien el filtro de recursos de string:
-            fullList // devolver todo por ahora para no romper
         }
         notifyDataSetChanged()
     }

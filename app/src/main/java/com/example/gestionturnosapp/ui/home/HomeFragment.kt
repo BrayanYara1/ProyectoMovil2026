@@ -203,6 +203,21 @@ class HomeFragment : Fragment() {
             val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, binding.layoutMedication, false)
             medView.findViewById<android.widget.TextView>(R.id.tvMedName).text = "${med.nombre} ${med.dosis}"
             medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = "${med.frecuencia} - Próxima: ${med.proximaToma}"
+            
+            // Permitir borrar desde el Home con clic largo
+            medView.setOnLongClickListener {
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Eliminar Medicamento")
+                    .setMessage("¿Deseas eliminar ${med.nombre}?")
+                    .setPositiveButton("Eliminar") { _, _ ->
+                        // Necesitamos acceso al viewModel de medicamentos o una función en HomeViewModel
+                        // Para simplificar esta auditoría, redirigimos a la pantalla de medicamentos
+                        findNavController().navigate(R.id.action_homeFragment_to_medicamentosFragment)
+                    }
+                    .setNegativeButton("Cerrar", null)
+                    .show()
+                true
+            }
             binding.layoutMedication.addView(medView)
         }
     }

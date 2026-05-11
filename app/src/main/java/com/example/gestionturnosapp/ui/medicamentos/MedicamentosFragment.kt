@@ -64,6 +64,7 @@ class MedicamentosFragment : Fragment() {
             val proxima = binding.etMedNext.text.toString()
 
             if (nombre.isNotBlank() && dosis.isNotBlank()) {
+                binding.btnSaveMed.isEnabled = false // Prevenir duplicados
                 viewModel.agregarMedicamento(nombre, dosis, frecuencia, proxima)
             } else {
                 Toast.makeText(context, "Completa nombre y dosis", Toast.LENGTH_SHORT).show()
