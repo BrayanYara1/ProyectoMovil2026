@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class SaludActivaFCMService : FirebaseMessagingService() {
+class GestionTurnosFCMService : FirebaseMessagingService() {
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
@@ -44,7 +44,7 @@ class SaludActivaFCMService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         
-        val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "SaludActiva"
+        val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "GestionTurnos"
         val body = remoteMessage.notification?.body ?: remoteMessage.data["body"] ?: "Tienes una nueva actualización"
         
         showNotification(title, body)

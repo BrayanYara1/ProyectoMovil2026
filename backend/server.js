@@ -20,13 +20,13 @@ const Estudio = require('./models/Estudio');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
+const SECRET_KEY = process.env.JWT_SECRET || 'GestionTurnos_Secret_Key_2024';
 
 app.use(cors());
 app.use(express.json());
 
 // Ruta de estado
-app.get('/', (req, res) => res.send('🚀 SaludActiva Backend is RUNNING (v3.0.2)'));
+app.get('/', (req, res) => res.send('🚀 GestionTurnos Backend is RUNNING (v3.0.2)'));
 app.get('/api/status', (req, res) => res.json({ status: "online", version: "3.0.2", database: mongoose.connection.readyState === 1 ? "connected" : "disconnected" }));
 
 // Conexión a MongoDB
@@ -224,7 +224,7 @@ app.use((req, res) => {
 
 if (require.main === module) {
     app.listen(PORT, '0.0.0.0', () => {
-        console.log(`🚀 SaludActiva CLOUD Backend v3.0.2 en puerto ${PORT}`);
+        console.log(`🚀 GestionTurnos CLOUD Backend v3.0.2 en puerto ${PORT}`);
     });
 }
 

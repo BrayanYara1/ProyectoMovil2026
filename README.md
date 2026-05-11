@@ -1,7 +1,7 @@
-# SaludActiva - Gestión de Turnos Médicos
+# GestionTurnos - Gestión de Turnos Médicos
 
 ## Descripción
-SaludActiva es una plataforma integral para la gestión de turnos médicos. El proyecto incluye una aplicación móvil Android nativa y un backend escalable desplegado en la nube de AWS.
+GestionTurnos es una plataforma integral para la gestión de turnos médicos. El proyecto incluye una aplicación móvil Android nativa y un backend escalable desplegado en la nube de AWS.
 
 ## Arquitectura del Proyecto
 El proyecto sigue principios de **Clean Architecture** y **Clean Code**:

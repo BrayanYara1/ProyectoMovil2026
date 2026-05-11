@@ -1,6 +1,6 @@
-# Backend - SaludActiva
+# Backend - GestionTurnos
 
-Este es el servidor de API para la aplicación SaludActiva, construido con Node.js y Express.
+Este es el servidor de API para la aplicación GestionTurnos, construido con Node.js y Express.
 
 ## Estructura de Carpetas
 - `models/`: Definiciones de esquemas de Mongoose (MongoDB).

@@ -24,7 +24,7 @@
         <receiver android:name=".notifications.ReminderReceiver" android:enabled="true" android:exported="false" />
 
         <service
-            android:name=".notifications.SaludActivaFCMService"
+            android:name=".notifications.GestionTurnosFCMService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

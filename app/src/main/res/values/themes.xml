@@ -7,7 +7,7 @@
         <item name="postSplashScreenTheme">@style/Theme.GestionTurnosApp</item>
     </style>
 
-    <!-- Base application theme SaludActiva - Professional Medical Theme -->
+    <!-- Base application theme GestionTurnos - Professional Medical Theme -->
     <style name="Theme.GestionTurnosApp" parent="Theme.Material3.Light.NoActionBar">
         <!-- Colores de Marca -->
         <item name="colorPrimary">@color/primary</item>

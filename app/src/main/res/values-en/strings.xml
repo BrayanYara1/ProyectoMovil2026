@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">SaludActiva</string>
+    <string name="app_name">GestionTurnos</string>
 
     <string name="login_welcome_subtitle">Your health, in a single touch</string>
     <string name="login_card_title">LOG IN</string>
@@ -59,12 +59,12 @@
     <string name="label_notifications">Appointment Notifications</string>
     <string name="label_dark_mode">Dark Mode</string>
     <string name="label_language">Language: English</string>
-    <string name="label_about">About SaludActiva</string>
+    <string name="label_about">About GestionTurnos</string>
     <string name="btn_logout">LOG OUT</string>
     <string name="msg_logout_confirm">Are you sure you want to exit?</string>
     <string name="btn_yes">Yes, exit</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="version_info">SaludActiva v1.0.2</string>
+    <string name="version_info">GestionTurnos v1.0.2</string>
     <string name="menu_emergencies">Emergencies</string>
     <string name="menu_help">Help</string>
     <string name="loading_user">Loading user…</string>

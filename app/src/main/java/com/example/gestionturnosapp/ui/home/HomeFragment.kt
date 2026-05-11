@@ -223,7 +223,7 @@ class HomeFragment : Fragment() {
         val user = UserManager.getUser(requireContext())
         
         val summary = StringBuilder()
-        summary.append("🏥 *Resumen de Salud - SaludActiva*\n")
+        summary.append("🏥 *Resumen de Salud - GestionTurnos*\n")
         summary.append("👤 *Paciente:* ${user?.nombre}\n\n")
         
         if (nextTurno != null) {
@@ -241,7 +241,7 @@ class HomeFragment : Fragment() {
             summary.append("💊 Sin medicamentos configurados.\n")
         }
         
-        summary.append("\n_Enviado desde mi app SaludActiva_")
+        summary.append("\n_Enviado desde mi app GestionTurnos_")
         
         val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
             type = "text/plain"
