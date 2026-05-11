@@ -106,7 +106,7 @@ class HomeFragment : Fragment() {
 
     private fun updateUI() {
         val user = UserManager.getUser(requireContext())
-        binding.tvGreeting.text = getString(R.string.home_greeting, user?.nombre ?: "Usuario")
+        binding.tvGreeting.text = "¡Hola, ${user?.nombre ?: "Usuario"}! (v3.0.3)"
         updateAvatar()
     }
 
