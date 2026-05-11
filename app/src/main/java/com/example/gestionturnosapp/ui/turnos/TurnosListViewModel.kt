@@ -9,6 +9,7 @@ import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.data.TurnoRepository
 import com.example.gestionturnosapp.data.NuevoTurnoRequest
 import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.OfflineCacheManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -72,17 +73,34 @@ class TurnosListViewModel : ViewModel() {
         }
     }
 
-    fun fetchTurnos() {
+    fun fetchTurnos(context: android.content.Context? = null) {
         viewModelScope.launch {
             _turnosResource.value = Resource.Loading
             _isLoading.value = true
+            
+            // 1. Cargar de caché primero para respuesta instantánea (Offline Pro)
+            context?.let {
+                val cached = OfflineCacheManager.getCachedTurnos(it)
+                if (cached.isNotEmpty()) {
+                    _turnos.value = cached
+                    _turnosResource.value = Resource.Success(cached)
+                }
+            }
+
             try {
                 val turnosList = repository.getTurnos()
                 _turnos.value = turnosList
                 _turnosResource.value = Resource.Success(turnosList)
+                
+                // 2. Guardar en caché para uso offline
+                context?.let { OfflineCacheManager.saveTurnos(it, turnosList) }
+                
             } catch (e: Exception) {
                 android.util.Log.e("TurnosListViewModel", "Error fetchTurnos", e)
-                _turnosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
+                // Si ya tenemos datos del caché, no mostramos error crítico, solo log
+                if (_turnos.value.isNullOrEmpty()) {
+                    _turnosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
+                }
             } finally {
                 _isLoading.value = false
             }

@@ -18,7 +18,7 @@
             android:id="@+id/dateIconCard"
             android:layout_width="52dp"
             android:layout_height="52dp"
-            android:transitionName="date_container"
+            android:transitionName="date_container_shared"
             app:cardBackgroundColor="@color/primary_container"
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp"

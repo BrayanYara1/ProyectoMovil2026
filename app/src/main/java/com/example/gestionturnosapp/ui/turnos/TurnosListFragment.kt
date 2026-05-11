@@ -41,10 +41,7 @@ class TurnosListFragment : Fragment() {
         setupObservers()
         setupFab()
         
-        // Cargar turnos al iniciar si la lista está vacía o es la primera vez
-        if (viewModel.turnosResource.value == null) {
-            viewModel.fetchTurnos()
-        }
+        viewModel.fetchTurnos(requireContext())
     }
 
     private fun setupFilters() {
@@ -70,7 +67,7 @@ class TurnosListFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = TurnosAdapter(
-            onTurnoClick = { turno, _ ->
+            onTurnoClick = { turno, bindingItems ->
                 val bundle = Bundle().apply {
                     putString("TURNO_ID", turno.id)
                     putString("PACIENTE_NOMBRE", turno.pacienteNombre)
@@ -79,7 +76,17 @@ class TurnosListFragment : Fragment() {
                     putString("TURNO_MOTIVO", turno.motivo)
                     putString("TURNO_ESTADO", turno.estado)
                 }
-                findNavController().navigate(R.id.action_turnosListFragment_to_turnoDetailFragment, bundle)
+                
+                val extras = androidx.navigation.fragment.FragmentNavigatorExtras(
+                    bindingItems.dateIconCard to "date_container_shared"
+                )
+                
+                findNavController().navigate(
+                    R.id.action_turnosListFragment_to_turnoDetailFragment, 
+                    bundle,
+                    null,
+                    extras
+                )
             },
             onDeleteClick = { turno ->
                 showDeleteConfirmation(turno)
@@ -90,7 +97,7 @@ class TurnosListFragment : Fragment() {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.fetchTurnos()
+            viewModel.fetchTurnos(requireContext())
         }
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
     }
@@ -100,11 +107,8 @@ class TurnosListFragment : Fragment() {
             .setTitle(getString(R.string.title_delete_appointment))
             .setMessage("${getString(R.string.msg_delete_confirm)}: ${turno.pacienteNombre}?")
             .setPositiveButton(getString(R.string.btn_delete)) { _, _ ->
-                // Feedback háptico profesional
                 view?.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-                
                 viewModel.eliminarTurno(turno.id)
-                
                 com.google.android.material.snackbar.Snackbar.make(
                     binding.root,
                     "Turno cancelado",
@@ -143,11 +147,7 @@ class TurnosListFragment : Fragment() {
                     
                     val errorMessage = resource.message
                     if (errorMessage.contains("401") || errorMessage.contains("token", true)) {
-                        com.example.gestionturnosapp.data.UserManager.logout(requireContext())
-                        Toast.makeText(requireContext(), "Sesión expirada", Toast.LENGTH_SHORT).show()
-                        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
-                            .setPopUpTo(R.id.nav_graph, true)
-                            .build())
+                        handleSessionExpired()
                         return@observe
                     }
 
@@ -171,6 +171,14 @@ class TurnosListFragment : Fragment() {
         }
     }
 
+    private fun handleSessionExpired() {
+        com.example.gestionturnosapp.data.UserManager.logout(requireContext())
+        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
+    }
+
     private fun setupFab() {
         binding.fabAddTurno.setOnClickListener {
             findNavController().navigate(R.id.action_turnosListFragment_to_solicitarTurnoFragment)
@@ -178,7 +186,7 @@ class TurnosListFragment : Fragment() {
         
         binding.btnRetry.setOnClickListener {
             view?.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-            viewModel.fetchTurnos()
+            viewModel.fetchTurnos(requireContext())
         }
     }
 

@@ -33,6 +33,7 @@
                     android:id="@+id/tvDetailTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:transitionName="date_container_shared"
                     android:text="@string/title_appointment_detail"
                     android:textColor="@color/white"
                     android:textSize="28sp"

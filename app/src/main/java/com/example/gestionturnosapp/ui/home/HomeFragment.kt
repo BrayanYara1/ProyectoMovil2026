@@ -204,20 +204,9 @@ class HomeFragment : Fragment() {
             medView.findViewById<android.widget.TextView>(R.id.tvMedName).text = "${med.nombre} ${med.dosis}"
             medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = "${med.frecuencia} - Próxima: ${med.proximaToma}"
             
-            // Permitir borrar desde el Home con clic largo
-            medView.setOnLongClickListener {
-                com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Eliminar Medicamento")
-                    .setMessage("¿Deseas eliminar ${med.nombre}?")
-                    .setPositiveButton("Eliminar") { _, _ ->
-                        // Necesitamos acceso al viewModel de medicamentos o una función en HomeViewModel
-                        // Para simplificar esta auditoría, redirigimos a la pantalla de medicamentos
-                        findNavController().navigate(R.id.action_homeFragment_to_medicamentosFragment)
-                    }
-                    .setNegativeButton("Cerrar", null)
-                    .show()
-                true
-            }
+            // LIMPIEZA HOME: Ocultar botón de borrar en el dashboard para una vista más limpia
+            medView.findViewById<android.view.View>(R.id.btnDeleteMed).visibility = android.view.View.GONE
+
             binding.layoutMedication.addView(medView)
         }
     }
