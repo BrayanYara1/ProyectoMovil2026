@@ -31,6 +31,13 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
+# MANTENER INTERFACES DE API (Fundamental para Retrofit)
+-keep interface com.example.gestionturnosapp.network.** { *; }
+# Mantener tipos genéricos en los métodos de la API
+-keepclassmembers interface com.example.gestionturnosapp.network.** {
+    <methods>;
+}
+
 # 5. Firebase & Crashlytics
 # Reglas necesarias para reportes de errores precisos
 -keepattributes SourceFile, LineNumberTable
