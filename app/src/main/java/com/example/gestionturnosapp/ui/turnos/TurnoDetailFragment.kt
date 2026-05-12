@@ -252,7 +252,7 @@ class TurnoDetailFragment : Fragment() {
     }
 
     private fun shareTurno(paciente: String, fecha: String, hora: String, motivo: String) {
-        val message = "📅 *Turno GestionTurnos*\n👤 $paciente\n🗓️ $fecha\n⏰ $hora\n🩺 $motivo"
+        val message = "📅 *Turno Salud Activa*\n👤 $paciente\n🗓️ $fecha\n⏰ $hora\n🩺 $motivo"
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, message)
@@ -261,7 +261,7 @@ class TurnoDetailFragment : Fragment() {
     }
 
     private fun openMap() {
-        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("geo:0,0?q=Clinica+GestionTurnos"))
+        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("geo:0,0?q=Clinica+Salud+Activa"))
         intent.setPackage("com.google.android.apps.maps")
         try { startActivity(intent) } catch (e: Exception) { 
             com.google.android.material.snackbar.Snackbar.make(

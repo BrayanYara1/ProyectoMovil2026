@@ -1,4 +1,4 @@
-# Reglas de ProGuard optimizadas para GestionTurnosApp
+# Reglas de ProGuard optimizadas para Salud Activa
 
 # 1. Modelos de Datos (GSON)
 # Es vital mantener los nombres de los campos en las clases de datos porque

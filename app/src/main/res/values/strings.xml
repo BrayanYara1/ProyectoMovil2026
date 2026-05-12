@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GestionTurnos</string>
+    <string name="app_name">Salud Activa</string>
 
     <string name="login_welcome_subtitle">Tu salud, en un solo toque</string>
     <string name="login_card_title">INICIAR SESIÓN</string>
@@ -60,7 +60,7 @@
     <string name="label_phone_uppercase">TELÉFONO</string>
     <string name="btn_edit_data">EDITAR DATOS</string>
     <string name="photo_updated">Foto de perfil actualizada</string>
-    <string name="label_profile_type">Paciente GestionTurnos</string>
+    <string name="label_profile_type">Paciente Salud Activa</string>
     <string name="msg_profile_update_success">Perfil actualizado correctamente</string>
     <string name="msg_profile_sync_local">Sin conexión: Perfil guardado localmente</string>
     <string name="msg_session_expired">Tu sesión ha expirado. Por favor inicia sesión de nuevo.</string>
@@ -72,12 +72,12 @@
     <string name="label_notifications">Notificaciones de Turnos</string>
     <string name="label_dark_mode">Modo Oscuro</string>
     <string name="label_language">Idioma: Español</string>
-    <string name="label_about">Acerca de GestionTurnos</string>
+    <string name="label_about">Acerca de Salud Activa</string>
     <string name="btn_logout">CERRAR SESIÓN</string>
     <string name="msg_logout_confirm">¿Estás seguro de que quieres salir?</string>
     <string name="btn_yes">Sí, salir</string>
     <string name="btn_cancel">Cancelar</string>
-    <string name="version_info">GestionTurnos v1.0.2</string>
+    <string name="version_info">Salud Activa v1.0.2</string>
     <string name="menu_emergencies">Emergencias</string>
     <string name="menu_help">Ayuda</string>
     <string name="loading_user">Cargando usuario…</string>
@@ -149,7 +149,7 @@
     <string name="acc_add_calendar">Añadir este turno a mi calendario personal</string>
     <string name="acc_set_reminder">Configurar un recordatorio para esta cita</string>
     <string name="menu_my_studies">Mis Estudios</string>
-    <string name="title_health_summary">Resumen de GestionTurnos</string>
+    <string name="title_health_summary">Resumen de Salud Activa</string>
     <string name="subtitle_health_summary">Compartir mis citas y medicinas</string>
 
     <!-- Saludos dinámicos -->
