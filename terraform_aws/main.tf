@@ -221,7 +221,7 @@ resource "aws_cloudwatch_log_group" "ecs_logs" {
   retention_in_days = 7
 }
 
-# 10. Security Group para el Contenedor (Permite tráfico desde el ALB)
+# 10. Security Group para el Contenedor (Permite tráfico desde el ALB y directo)
 resource "aws_security_group" "ecs_sg" {
   name   = "ecs-security-group"
   vpc_id = aws_vpc.main_vpc.id
@@ -230,7 +230,7 @@ resource "aws_security_group" "ecs_sg" {
     from_port       = 3000 # Puerto de Node.js
     to_port         = 3000
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    cidr_blocks     = ["0.0.0.0/0"] # CAMBIO: Permitir acceso desde cualquier red para pruebas
   }
 
   egress {
@@ -336,12 +336,12 @@ resource "aws_security_group" "db_sg" {
   name        = "db-security-group"
   vpc_id      = aws_vpc.main_vpc.id
 
-  # Permitir entrada de datos (Puerto 5432 para PostgreSQL) desde el ECS
+  # Permitir entrada de datos (Puerto 5432 para PostgreSQL) desde cualquier red
   ingress {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_sg.id]
+    cidr_blocks     = ["0.0.0.0/0"] # CAMBIO: Permitir acceso externo para gestión
   }
 
   egress {
@@ -363,7 +363,7 @@ resource "aws_db_instance" "gestion_turnos_db" {
   password               = var.db_password
   parameter_group_name   = "default.postgres15"
   skip_final_snapshot    = true
-  publicly_accessible    = false
+  publicly_accessible    = true # CAMBIO: Permitir acceso desde internet
   vpc_security_group_ids = [aws_security_group.db_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name # Agregamos esto
 }
