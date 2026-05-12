@@ -7,7 +7,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://gestion-turnos-alb-921298980.us-east-1.elb.amazonaws.com/"
+    // URL de Render
+    private const val BASE_URL = "https://saludactiva-backend.onrender.com/"
+    // URL Local para pruebas rápidas
+    // private const val BASE_URL = "http://192.168.40.7:3000/"
 
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
