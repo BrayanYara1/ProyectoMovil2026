@@ -90,20 +90,6 @@ const authenticate = async (req, res, next) => {
     }
 };
 
-// --- RUTAS DE ADMINISTRACIÓN (Temporales) ---
-app.post('/api/admin/reset-database-secure-final', async (req, res) => {
-    try {
-        await User.deleteMany({});
-        await Turno.deleteMany({});
-        await Medicamento.deleteMany({});
-        await Estudio.deleteMany({});
-        console.log('☢️ BASE DE DATOS RESETEADA POR COMPLETO');
-        res.json({ mensaje: "Base de datos limpiada con éxito. Todos los registros eliminados." });
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error al limpiar base de datos", error: error.message });
-    }
-});
-
 // --- RUTAS DE AUTENTICACIÓN ---
 
 app.post('/api/auth/register', async (req, res) => {
