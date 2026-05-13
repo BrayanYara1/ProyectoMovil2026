@@ -16,17 +16,18 @@ const nodemailer = require('nodemailer');
 // Configuración de Nodemailer robusta para Render/Gmail
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL
+    port: 587,
+    secure: false, // true para 465, false para otros puertos
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-    connectionTimeout: 10000, // 10 segundos
-    greetingTimeout: 10000,
-    socketTimeout: 10000,
+    connectionTimeout: 20000, // Aumentado a 20 segundos
+    greetingTimeout: 20000,
+    socketTimeout: 20000,
     tls: {
-        rejectUnauthorized: false // Ayuda en entornos como Render
+        rejectUnauthorized: false, // Ayuda en entornos como Render
+        minVersion: 'TLSv1.2'
     }
 });
 
