@@ -20,10 +20,16 @@ app.use(express.json());
 
 // Función para enviar correo usando la API de BREVO (v3)
 const sendVerificationEmail = async (email, code) => {
-    console.log(`📧 Intentando enviar correo vía BREVO a: ${email}`);
+    const BREVO_API_KEY = process.env.BREVO_API_KEY;
+
+    if (!BREVO_API_KEY) {
+        console.error('❌ ERROR: No se encontró BREVO_API_KEY en las variables de entorno.');
+        throw new Error('Configuración de API faltante');
+    }
+
+    console.log(`📧 Intentando enviar correo vía BREVO a: ${email} (Key empieza por: ${BREVO_API_KEY.substring(0, 5)}...)`);
 
     const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
-    const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
     try {
         const response = await fetch(BREVO_API_URL, {
