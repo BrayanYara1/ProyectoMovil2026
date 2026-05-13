@@ -159,6 +159,20 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// --- RUTA DE EMERGENCIA PARA LIMPIAR BASE DE DATOS ---
+app.delete('/api/admin/reset-database', async (req, res) => {
+    try {
+        await User.deleteMany({});
+        await Turno.deleteMany({});
+        await Medicamento.deleteMany({});
+        await Estudio.deleteMany({});
+        console.log('💥 BASE DE DATOS LIMPIADA POR COMPLETO');
+        res.json({ mensaje: "Base de datos reiniciada. Todas las cuentas y datos han sido eliminados." });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al reiniciar base de datos", error: error.message });
+    }
+});
+
 app.get('/', (req, res) => res.send('🚀 Salud Activa Backend BREVO Edition is RUNNING'));
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Servidor en puerto ${PORT}`));
 
