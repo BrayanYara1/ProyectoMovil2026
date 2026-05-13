@@ -4,6 +4,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -12,34 +13,36 @@ const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 app.use(cors());
 app.use(express.json());
 
-// Función de envío vía API de Brevo (GRATIS y NO BLOQUEADA)
+// Función de envío por SMTP Seguro (Puerto 465)
 const sendVerificationEmail = async (email, code) => {
     console.log(`📧 Intentando enviar código a: ${email}`);
-    try {
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'api-key': process.env.BREVO_API_KEY,
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                sender: { name: 'Salud Activa', email: 'andybrahian1996@gmail.com' },
-                to: [{ email: email }],
-                subject: `Tu codigo: ${code}`,
-                // Enviamos texto plano para que los filtros de SPAM no lo bloqueen
-                textContent: `Hola! Tu codigo de verificacion para Salud Activa es: ${code}. Ingresalo en la app para continuar.`
-            })
-        });
 
-        const data = await response.json();
-        if (response.ok) {
-            console.log('✅ Correo entregado a Brevo con éxito');
-        } else {
-            console.error('❌ Brevo rechazó el envío:', data);
+    // Configuramos el transporte usando SSL directo (Puerto 465)
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // Uso de SSL
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
         }
+    });
+
+    const mailOptions = {
+        from: `"Salud Activa" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: `${code} es tu código de verificación`,
+        text: `Hola! Tu código de verificación para Salud Activa es: ${code}`,
+        html: `<p>Hola! Tu código de verificación para <b>Salud Activa</b> es: <br><br> <span style="font-size: 24px; font-weight: bold; color: #007bff;">${code}</span></p>`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Correo enviado exitosamente');
     } catch (err) {
-        console.error('❌ Error de conexión:', err.message);
+        console.error('❌ Error de Nodemailer:', err.message);
+        // Si falla el envío, al menos logueamos el código para que tú lo veas en Render
+        console.log(`🔑 CÓDIGO DE EMERGENCIA PARA ${email}: ${code}`);
     }
 };
 
