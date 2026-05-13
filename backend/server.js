@@ -4,29 +4,59 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { Resend } = require('resend');
 
 const app = express();
-const resend = new Resend(process.env.RESEND_API_KEY);
 const PORT = process.env.PORT || 10000;
 const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 
 app.use(cors());
 app.use(express.json());
 
-// Función para enviar correo usando RESEND (Mucho más fiable)
+// Función para enviar correo usando la API de BREVO (Vía HTTP - Única que funciona en Render)
 const sendVerificationEmail = async (email, code) => {
-    console.log(`📧 Intentando enviar correo a: ${email}`);
+    console.log(`📧 Iniciando envío de código a: ${email}`);
+    const BREVO_API_KEY = process.env.BREVO_API_KEY;
+
+    if (!BREVO_API_KEY) {
+        console.error('❌ ERROR: BREVO_API_KEY no configurada');
+        return;
+    }
+
     try {
-        await resend.emails.send({
-            from: 'Salud Activa <onboarding@resend.dev>',
-            to: email,
-            subject: 'Código de Verificación - Salud Activa',
-            html: `<strong>Tu código es: ${code}</strong>`
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': BREVO_API_KEY,
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                // IMPORTANTE: El email del sender DEBE ser el mismo que verificaste en Brevo
+                sender: { name: 'Salud Activa', email: 'andybrahian1996@gmail.com' },
+                to: [{ email: email }],
+                subject: `${code} es tu código de verificación - Salud Activa`,
+                textContent: `Tu código de verificación para Salud Activa es: ${code}`,
+                htmlContent: `
+                    <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                        <h2 style="color: #007bff; text-align: center;">Verifica tu cuenta</h2>
+                        <p>Hola, gracias por unirte a <strong>Salud Activa</strong>. Usa el siguiente código para completar tu registro:</p>
+                        <div style="background: #f4f7ff; padding: 20px; text-align: center; font-size: 30px; font-weight: bold; color: #007bff; letter-spacing: 5px; border-radius: 8px; margin: 20px 0;">
+                            ${code}
+                        </div>
+                        <p style="font-size: 12px; color: #777;">Si no solicitaste este código, puedes ignorar este correo.</p>
+                    </div>
+                `
+            })
         });
-        console.log('✅ Correo enviado vía Resend');
+
+        const data = await response.json();
+        if (response.ok) {
+            console.log(`✅ Correo enviado con éxito a ${email}. ID: ${data.messageId}`);
+        } else {
+            console.error('❌ Brevo rechazó el envío:', data);
+        }
     } catch (err) {
-        console.error('❌ Error en Resend:', err.message);
+        console.error('❌ Error de conexión al enviar correo:', err.message);
     }
 };
 
@@ -48,8 +78,6 @@ app.post('/api/auth/register', async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contrasena, salt);
-
-        // Generamos el código real, pero en la ruta de verificación aceptaremos el maestro
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
         const nuevoUsuario = new User({
@@ -57,7 +85,9 @@ app.post('/api/auth/register', async (req, res) => {
         });
         await nuevoUsuario.save();
 
+        // Enviamos el correo (sin esperar el await para no bloquear la respuesta)
         sendVerificationEmail(email, verificationCode);
+
         res.status(201).json({ mensaje: "OK", email: nuevoUsuario.email });
     } catch (error) {
         res.status(500).json({ mensaje: "Error en el servidor" });
@@ -70,8 +100,7 @@ app.post('/api/auth/verify', async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ mensaje: "Usuario no encontrado" });
 
-        // SOLUCIÓN MAESTRA: Si el código es el correcto O es '123456', verificamos.
-        if (user.verificationCode === code || code === '123456') {
+        if (user.verificationCode === code) {
             user.isVerified = true;
             user.verificationCode = null;
             await user.save();
