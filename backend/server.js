@@ -58,19 +58,7 @@ const sendVerificationEmail = async (email, code) => {
 
 // Ruta de estado
 app.get('/', (req, res) => res.send('🚀 Salud Activa Backend is RUNNING (v3.0.3)'));
-app.get('/api/status', async (req, res) => {
-    try {
-        const userCount = await User.countDocuments();
-        res.json({
-            status: "online",
-            version: "3.0.6",
-            database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
-            usersCount: userCount
-        });
-    } catch (e) {
-        res.json({ status: "error", error: e.message });
-    }
-});
+app.get('/api/status', (req, res) => res.json({ status: "online", version: "3.0.7", database: mongoose.connection.readyState === 1 ? "connected" : "disconnected" }));
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -101,22 +89,6 @@ const authenticate = async (req, res, next) => {
         return res.status(401).json({ mensaje: "Token inválido o expirado" });
     }
 };
-
-// --- RUTAS DE ADMINISTRACIÓN (Temporales) ---
-app.post('/api/admin/clean-all-data-now', async (req, res) => {
-    try {
-        const u = await User.deleteMany({});
-        const t = await Turno.deleteMany({});
-        const m = await Medicamento.deleteMany({});
-        const e = await Estudio.deleteMany({});
-        res.json({
-            mensaje: "LIMPIEZA TOTAL COMPLETADA",
-            deleted: { users: u.deletedCount, turnos: t.deletedCount, meds: m.deletedCount, estudios: e.deletedCount }
-        });
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error", error: error.message });
-    }
-});
 
 // --- RUTAS DE AUTENTICACIÓN ---
 
