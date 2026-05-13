@@ -102,6 +102,22 @@ const authenticate = async (req, res, next) => {
     }
 };
 
+// --- RUTAS DE ADMINISTRACIÓN (Temporales) ---
+app.post('/api/admin/clean-all-data-now', async (req, res) => {
+    try {
+        const u = await User.deleteMany({});
+        const t = await Turno.deleteMany({});
+        const m = await Medicamento.deleteMany({});
+        const e = await Estudio.deleteMany({});
+        res.json({
+            mensaje: "LIMPIEZA TOTAL COMPLETADA",
+            deleted: { users: u.deletedCount, turnos: t.deletedCount, meds: m.deletedCount, estudios: e.deletedCount }
+        });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error", error: error.message });
+    }
+});
+
 // --- RUTAS DE AUTENTICACIÓN ---
 
 app.post('/api/auth/register', async (req, res) => {
