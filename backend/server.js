@@ -58,7 +58,19 @@ const sendVerificationEmail = async (email, code) => {
 
 // Ruta de estado
 app.get('/', (req, res) => res.send('🚀 Salud Activa Backend is RUNNING (v3.0.3)'));
-app.get('/api/status', (req, res) => res.json({ status: "online", version: "3.0.3", database: mongoose.connection.readyState === 1 ? "connected" : "disconnected" }));
+app.get('/api/status', async (req, res) => {
+    try {
+        const userCount = await User.countDocuments();
+        res.json({
+            status: "online",
+            version: "3.0.6",
+            database: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+            usersCount: userCount
+        });
+    } catch (e) {
+        res.json({ status: "error", error: e.message });
+    }
+});
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI)
