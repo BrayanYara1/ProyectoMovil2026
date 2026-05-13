@@ -201,11 +201,21 @@ app.delete('/api/estudios/:id', authenticateToken, async (req, res) => {
 // --- OTROS ---
 
 app.delete('/api/admin/reset-database', async (req, res) => {
-    await User.deleteMany({});
-    await Turno.deleteMany({});
-    await Medicamento.deleteMany({});
-    await Estudio.deleteMany({});
-    res.json({ mensaje: "Base de datos reiniciada" });
+    const adminKey = req.headers['x-admin-key'];
+    if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
+        console.warn(`⚠️ Intento de reset no autorizado desde IP: ${req.ip}`);
+        return res.status(403).json({ mensaje: "No autorizado" });
+    }
+
+    try {
+        await User.deleteMany({});
+        await Turno.deleteMany({});
+        await Medicamento.deleteMany({});
+        await Estudio.deleteMany({});
+        res.json({ mensaje: "Base de datos reiniciada con éxito" });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al reiniciar base de datos" });
+    }
 });
 
 app.get('/', (req, res) => res.send('🚀 Backend Online y Funcional (Sin Verificación)'));
