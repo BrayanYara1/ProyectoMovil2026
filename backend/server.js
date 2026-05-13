@@ -26,12 +26,14 @@ const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 app.use(cors());
 app.use(express.json());
 
-// Configuración de Nodemailer (Recomendado usar variables de entorno)
+// Configuración de Nodemailer mejorada
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true, // Use SSL
     auth: {
-        user: process.env.EMAIL_USER || 'tucorreo@gmail.com',
-        pass: process.env.EMAIL_PASS || 'tu_password_de_aplicacion'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
@@ -98,12 +100,21 @@ app.post('/api/auth/register', async (req, res) => {
         if (!nombre || !email || !contrasena) return res.status(400).json({ mensaje: "Campos incompletos" });
 
         const existe = await User.findOne({ email });
+
+        // SI YA EXISTE PERO NO ESTÁ VERIFICADO, PERMITIMOS RE-ENVIAR CÓDIGO
+        if (existe && !existe.isVerified) {
+            const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+            existe.verificationCode = newCode;
+            await existe.save();
+            sendVerificationEmail(email, newCode).catch(e => console.error("Fallo re-envío:", e.message));
+            return res.json({ mensaje: "OK", requiresVerification: true, email: existe.email });
+        }
+
         if (existe) return res.status(400).json({ mensaje: "El email ya está registrado" });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contrasena, salt);
 
-        // Generar código de 6 dígitos
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
         const nuevoUsuario = new User({
@@ -116,16 +127,12 @@ app.post('/api/auth/register', async (req, res) => {
         });
         await nuevoUsuario.save();
 
-        // Enviar correo (no bloqueamos la respuesta si falla el correo, pero avisamos)
-        try {
-            await sendVerificationEmail(email, verificationCode);
-        } catch (mailError) {
-            console.error('Error enviando correo:', mailError);
-        }
+        // ENVIAR CORREO EN SEGUNDO PLANO (Evita Timeout)
+        sendVerificationEmail(email, verificationCode).catch(mailError => {
+            console.error('Error enviando correo:', mailError.message);
+        });
 
-        const token = jwt.sign({ userId: nuevoUsuario._id, email: nuevoUsuario.email }, SECRET_KEY, { expiresIn: '30d' });
-        const userSafe = { id: nuevoUsuario._id, _id: nuevoUsuario._id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, telefono: nuevoUsuario.telefono, isVerified: false };
-        res.status(201).json({ mensaje: "OK", usuario: userSafe, token });
+        res.status(201).json({ mensaje: "OK", requiresVerification: true, email: nuevoUsuario.email });
     } catch (error) {
         res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
     }
