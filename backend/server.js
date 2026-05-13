@@ -24,11 +24,17 @@ const sendVerificationEmail = async (email, code) => {
     console.log(`📧 Intentando enviar correo a: ${email}`);
 
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // Usa TLS
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
-        }
+        },
+        tls: {
+            rejectUnauthorized: false // Ayuda con filtros institucionales
+        },
+        connectionTimeout: 10000 // 10 segundos de espera
     });
 
     const mailOptions = {
