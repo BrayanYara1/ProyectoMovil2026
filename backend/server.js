@@ -10,7 +10,6 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -19,47 +18,46 @@ const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 app.use(cors());
 app.use(express.json());
 
-// Función para enviar correo usando Nodemailer (Más confiable para Gmail/Institucionales)
+// Función para enviar correo usando la API de BREVO (HTTP - No se bloquea en Render)
 const sendVerificationEmail = async (email, code) => {
     console.log(`📧 Intentando enviar correo a: ${email}`);
-
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // Usa TLS
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        tls: {
-            rejectUnauthorized: false // Ayuda con filtros institucionales
-        },
-        connectionTimeout: 10000 // 10 segundos de espera
-    });
-
-    const mailOptions = {
-        from: `"Salud Activa" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: 'Código de Verificación - Salud Activa',
-        html: `
-            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-                <h2 style="color: #007bff;">¡Bienvenido a Salud Activa!</h2>
-                <p>Tu código de verificación es:</p>
-                <div style="background: #f4f4f4; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; border-radius: 8px; letter-spacing: 5px;">
-                    ${code}
-                </div>
-                <p>Usa este código en la aplicación para activar tu cuenta.</p>
-            </div>
-        `
-    };
+    const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
     try {
-        const info = await transporter.sendMail(mailOptions);
-        console.log('✅ Correo enviado con éxito. ID:', info.messageId);
-        return info;
+        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'api-key': BREVO_API_KEY,
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: { name: 'Salud Activa', email: 'andybrahian1996@gmail.com' },
+                to: [{ email: email }],
+                subject: 'Código de Verificación - Salud Activa',
+                htmlContent: `
+                    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333; max-width: 600px; margin: auto; border: 1px solid #eee;">
+                        <h2 style="color: #007bff; text-align: center;">¡Bienvenido a Salud Activa!</h2>
+                        <p>Gracias por registrarte. Tu código de verificación es:</p>
+                        <div style="background: #f8f9fa; padding: 20px; font-size: 32px; font-weight: bold; text-align: center; border-radius: 10px; border: 2px dashed #007bff; letter-spacing: 10px; color: #007bff;">
+                            ${code}
+                        </div>
+                        <p style="margin-top: 20px;">Copia este código en la aplicación para activar tu cuenta.</p>
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+                        <p style="font-size: 12px; color: #777; text-align: center;">Este es un correo automático, por favor no lo respondas.</p>
+                    </div>
+                `
+            })
+        });
+
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Error en API de Brevo');
+
+        console.log('✅ Correo aceptado por Brevo. ID:', data.messageId);
+        return data;
     } catch (err) {
-        console.error('❌ Error crítico en sendVerificationEmail:', err.message);
-        throw err;
+        console.error('❌ Error en envío de email:', err.message);
+        // No lanzamos error para que el registro no falle si falla el correo
     }
 };
 
@@ -92,7 +90,9 @@ app.post('/api/auth/register', async (req, res) => {
         });
         await nuevoUsuario.save();
 
-        sendVerificationEmail(email, verificationCode).catch(e => console.error("Error envío inicial:", e.message));
+        // Enviamos el correo pero no esperamos a que termine para responder al cliente
+        sendVerificationEmail(email, verificationCode);
+
         res.status(201).json({ mensaje: "OK", email: nuevoUsuario.email });
     } catch (error) {
         res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
@@ -127,7 +127,7 @@ app.post('/api/auth/resend-code', async (req, res) => {
         user.verificationCode = newCode;
         await user.save();
 
-        sendVerificationEmail(email, newCode).catch(e => console.error("Error re-envío:", e.message));
+        sendVerificationEmail(email, newCode);
         res.json({ mensaje: "Código reenviado" });
     } catch (error) {
         res.status(500).json({ mensaje: "Error al reenviar" });
@@ -166,7 +166,7 @@ app.delete('/api/admin/reset-database', async (req, res) => {
     }
 });
 
-app.get('/', (req, res) => res.send('🚀 Salud Activa Backend BREVO Edition is RUNNING'));
+app.get('/', (req, res) => res.send('🚀 Salud Activa Backend API Edition is RUNNING'));
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Servidor en puerto ${PORT}`));
 
 module.exports = app;
