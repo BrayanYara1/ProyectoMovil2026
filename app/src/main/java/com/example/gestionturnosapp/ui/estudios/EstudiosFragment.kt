@@ -67,7 +67,7 @@ class EstudiosFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = EstudiosAdapter { estudio ->
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Eliminar Estudio")
+                .setTitle(getString(R.string.title_delete_study))
                 .setMessage("¿Deseas eliminar el registro: ${estudio.titulo}?")
                 .setPositiveButton("Eliminar") { _, _ ->
                     viewModel.eliminarEstudio(estudio.id)
@@ -163,7 +163,7 @@ class EstudiosFragment : Fragment() {
         viewModel.createResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    Toast.makeText(context, "Estudio guardado correctamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.msg_study_saved), Toast.LENGTH_SHORT).show()
                     viewModel.resetCreateState()
                 }
                 is Resource.Error -> {
@@ -177,7 +177,7 @@ class EstudiosFragment : Fragment() {
 
     private fun handleSessionExpired() {
         com.example.gestionturnosapp.data.UserManager.logout(requireContext())
-        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.msg_session_expired), Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)
             .build())
@@ -228,7 +228,7 @@ class EstudiosFragment : Fragment() {
         layout.addView(dialogImageView)
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Nuevo Estudio")
+            .setTitle(getString(R.string.btn_upload_study))
             .setView(layout)
             .setPositiveButton("Guardar") { _, _ ->
                 val titulo = etTitulo.text.toString()

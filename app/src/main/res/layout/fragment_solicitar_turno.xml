@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="32dp"
-                android:text="Completa los datos para agendar tu cita médica"
+                android:text="@string/subtitle_solicitar_turno"
                 android:textColor="#E0E0E0"
                 android:textSize="14sp" />
 
@@ -59,7 +59,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="20dp"
                         android:letterSpacing="0.05"
-                        android:text="INFORMACIÓN DE LA CITA"
+                        android:text="@string/label_appointment_info"
                         android:textColor="@color/primary"
                         android:textSize="12sp"
                         android:textStyle="bold" />

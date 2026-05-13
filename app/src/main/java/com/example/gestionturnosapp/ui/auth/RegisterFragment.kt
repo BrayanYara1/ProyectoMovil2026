@@ -101,7 +101,7 @@ class RegisterFragment : Fragment() {
             }
 
             if (phone.length < 10) {
-                binding.tilTelefono.error = "Ingresa un número válido"
+                binding.tilTelefono.error = getString(R.string.msg_invalid_phone)
                 isValid = false
             }
 

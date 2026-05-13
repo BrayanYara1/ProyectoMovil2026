@@ -112,7 +112,7 @@ class TurnosListFragment : Fragment() {
                 viewModel.eliminarTurno(turno.id)
                 com.google.android.material.snackbar.Snackbar.make(
                     binding.root,
-                    "Turno cancelado",
+                    getString(R.string.msg_cancel_success),
                     com.google.android.material.snackbar.Snackbar.LENGTH_LONG
                 ).show()
             }
@@ -157,7 +157,7 @@ class TurnosListFragment : Fragment() {
 
                     if (adapter.currentList.isEmpty()) {
                         binding.layoutError.isVisible = true
-                        binding.tvErrorMessage.text = "¡Ups! $errorMessage"
+                        binding.tvErrorMessage.text = getString(R.string.msg_error_prefix, errorMessage)
                         binding.layoutEmpty.isVisible = false
                     } else {
                         com.google.android.material.snackbar.Snackbar.make(

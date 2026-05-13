@@ -75,7 +75,7 @@ class HomeFragment : Fragment() {
 
         binding.cardUrgencias.setOnClickListener {
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Llamada de Emergencia")
+                .setTitle(getString(R.string.label_emergency_call))
                 .setMessage("¿Deseas llamar a la línea de emergencias 123 (Colombia)?")
                 .setPositiveButton("Llamar") { _, _ ->
                     val intent = android.content.Intent(android.content.Intent.ACTION_DIAL)
@@ -267,7 +267,7 @@ class HomeFragment : Fragment() {
             type = "text/plain"
             putExtra(android.content.Intent.EXTRA_TEXT, summary.toString())
         }
-        startActivity(android.content.Intent.createChooser(intent, "Compartir con"))
+        startActivity(android.content.Intent.createChooser(intent, getString(R.string.label_share_via)))
     }
 
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {

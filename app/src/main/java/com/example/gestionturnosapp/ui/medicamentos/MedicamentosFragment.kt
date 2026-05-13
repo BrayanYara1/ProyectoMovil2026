@@ -48,7 +48,7 @@ class MedicamentosFragment : Fragment() {
     private fun setupRecyclerView() {
         adapter = MedicamentosAdapter { med ->
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Eliminar Medicamento")
+                .setTitle(getString(R.string.title_delete_medication))
                 .setMessage("¿Deseas eliminar ${med.nombre} de tu lista?")
                 .setPositiveButton("Eliminar") { _, _ ->
                     viewModel.eliminarMedicamento(med.id)
@@ -75,7 +75,7 @@ class MedicamentosFragment : Fragment() {
                 binding.btnSaveMed.isEnabled = false // Prevenir duplicados
                 viewModel.agregarMedicamento(nombre, dosis, frecuencia, proxima)
             } else {
-                Toast.makeText(context, "Completa nombre y dosis", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, getString(R.string.msg_complete_name_dosis), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -118,7 +118,7 @@ class MedicamentosFragment : Fragment() {
         viewModel.operationResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    Toast.makeText(context, "Medicamento guardado", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, getString(R.string.msg_medication_saved), Toast.LENGTH_SHORT).show()
                     // PROGRAMAR ALERTA: Programamos una notificación para la próxima toma
                     scheduleMedicationAlarm(resource.data)
                     clearFields()
@@ -150,8 +150,8 @@ class MedicamentosFragment : Fragment() {
             }
 
             val intent = Intent(requireContext(), ReminderReceiver::class.java).apply {
-                putExtra("TITLE", "Hora de tu Medicación")
-                putExtra("MESSAGE", "Toma ahora: ${med.nombre} (${med.dosis})")
+                putExtra("TITLE", getString(R.string.title_reminder_medication))
+                putExtra("MESSAGE", getString(R.string.msg_reminder_medication, med.nombre, med.dosis))
                 putExtra("TYPE", "MEDICAMENTO")
                 putExtra("NOTIFICATION_ID", med.id.hashCode())
             }
@@ -175,7 +175,7 @@ class MedicamentosFragment : Fragment() {
 
     private fun handleSessionExpired() {
         com.example.gestionturnosapp.data.UserManager.logout(requireContext())
-        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.msg_session_expired), Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)
             .build())

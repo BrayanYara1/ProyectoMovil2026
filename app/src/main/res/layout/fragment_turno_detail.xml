@@ -47,7 +47,7 @@
                     android:background="@drawable/bg_icon_container_white"
                     android:paddingHorizontal="12dp"
                     android:paddingVertical="4dp"
-                    android:text="Pendiente"
+                    android:text="@string/status_pending"
                     android:textColor="@color/primary"
                     android:textSize="12sp"
                     android:textStyle="bold" />
@@ -94,7 +94,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:transitionName="patient_name_detail"
-                        android:text="Nombre del Paciente"
+                        android:text="@string/hint_patient_name"
                         android:textColor="@color/text_primary"
                         android:textSize="20sp"
                         android:textStyle="bold"

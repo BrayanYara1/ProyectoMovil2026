@@ -44,7 +44,7 @@ class SettingsFragment : Fragment() {
 
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             PreferenceManager.setNotificationsEnabled(requireContext(), isChecked)
-            val msg = if (isChecked) "Notificaciones activadas" else "Notificaciones desactivadas"
+            val msg = if (isChecked) getString(R.string.msg_notifications_on) else getString(R.string.msg_notifications_off)
             Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
         }
 
@@ -99,7 +99,7 @@ class SettingsFragment : Fragment() {
             try {
                 startActivity(intent)
             } catch (e: Exception) {
-                Snackbar.make(binding.root, "No hay app de correo instalada", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.root, getString(R.string.msg_no_mail_app), Snackbar.LENGTH_SHORT).show()
             }
         }
     }

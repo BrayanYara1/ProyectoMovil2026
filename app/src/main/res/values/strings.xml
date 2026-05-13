@@ -33,7 +33,9 @@
 
     <!-- Turnos -->
     <string name="title_request_appointment">Solicitar Turno</string>
+    <string name="subtitle_solicitar_turno">Completa los datos para agendar tu cita médica</string>
     <string name="hint_patient_name">Nombre del Paciente</string>
+    <string name="label_appointment_info">INFORMACIÓN DE LA CITA</string>
     <string name="hint_date_format">Fecha (YYYY-MM-DD)</string>
     <string name="hint_time_format">Hora (HH:MM)</string>
     <string name="hint_reason">Motivo de consulta</string>
@@ -69,6 +71,8 @@
 
     <!-- Ajustes -->
     <string name="title_settings">Ajustes</string>
+    <string name="title_app_preferences">Preferencias de la App</string>
+    <string name="title_info_account">Información y Cuenta</string>
     <string name="label_notifications">Notificaciones de Turnos</string>
     <string name="label_dark_mode">Modo Oscuro</string>
     <string name="label_language">Idioma: Español</string>
@@ -92,10 +96,14 @@
     <string name="no_upcoming_appointments">Sin citas pendientes</string>
     <string name="schedule_appointment_prompt">Asegura tu próxima consulta médica hoy mismo.</string>
     <string name="title_medication">Mi Medicación</string>
+    <string name="title_add_medication">Agregar Medicamento</string>
+    <string name="btn_save_medication">GUARDAR MEDICACIÓN</string>
+    <string name="title_your_medications">Tus Medicamentos</string>
     <string name="msg_no_medication">No tienes medicación activa configurada.</string>
     <string name="label_next_appointment_format">%1$s - %2$s</string>
     <string name="msg_past_date">No puedes agendar un turno en una fecha u hora pasada</string>
     <string name="menu_specialties">Especialidades</string>
+    <string name="subtitle_specialties">Selecciona un área para agendar con un especialista</string>
     <string name="desc_cardiology">Corazón y vasos</string>
     <string name="desc_pediatrics">Cuidado infantil</string>
     <string name="desc_traumatology">Huesos y articulaciones</string>
@@ -149,6 +157,10 @@
     <string name="acc_add_calendar">Añadir este turno a mi calendario personal</string>
     <string name="acc_set_reminder">Configurar un recordatorio para esta cita</string>
     <string name="menu_my_studies">Mis Estudios</string>
+    <string name="btn_upload_study">SUBIR ESTUDIO</string>
+    <string name="msg_no_studies">No tienes estudios registrados</string>
+    <string name="filter_from">Desde: Todas</string>
+    <string name="filter_to">Hasta: Todas</string>
     <string name="title_health_summary">Resumen de Salud Activa</string>
     <string name="subtitle_health_summary">Compartir mis citas y medicinas</string>
 
@@ -156,4 +168,38 @@
     <string name="greeting_morning">¡Buenos días, %1$s! ☀️</string>
     <string name="greeting_afternoon">¡Buenas tardes, %1$s! ⛅</string>
     <string name="greeting_evening">¡Buenas noches, %1$s! 🌙</string>
+
+    <string name="title_studies_results">Mis Estudios y Resultados</string>
+    <string name="hint_search_studies">Buscar estudio por nombre o tipo…</string>
+    <string name="title_new_appointment">Nuevo Turno</string>
+    <string name="hint_search_specialty">Buscar especialidad…</string>
+    <string name="msg_study_saved">Estudio guardado correctamente</string>
+    <string name="msg_medication_saved">Medicamento guardado</string>
+    <string name="title_delete_study">Eliminar Estudio</string>
+    <string name="title_delete_medication">Eliminar Medicamento</string>
+    <string name="title_reminder_medication">Hora de tu Medicación</string>
+    <string name="msg_reminder_medication">Toma ahora: %1$s (%2$s)</string>
+    <string name="title_reminder_appointment">Recordatorio de Turno</string>
+    <string name="msg_reminder_appointment">Cita con %1$s en 1 hora.</string>
+    <string name="msg_cancel_success">Turno cancelado con éxito</string>
+    <string name="msg_invalid_phone">Ingresa un número válido</string>
+    <string name="msg_no_mail_app">No hay app de correo instalada</string>
+    <string name="msg_notifications_on">Notificaciones activadas</string>
+    <string name="msg_notifications_off">Notificaciones desactivadas</string>
+    <string name="msg_complete_name_dosis">Completa nombre y dosis</string>
+    <string name="msg_slot_too_soon">El turno es muy pronto para el recordatorio</string>
+    <string name="label_share_via">Compartir vía</string>
+    <string name="msg_install_maps">Instala Google Maps</string>
+    <string name="label_emergency_call">Llamada de Emergencia</string>
+
+    <string name="msg_error_unknown">Error desconocido</string>
+    <string name="msg_user_not_found">Usuario no encontrado</string>
+    <string name="msg_server_error">Error del servidor: %1$s</string>
+    <string name="msg_no_connection">No se pudo conectar al servidor. Verifica tu internet.</string>
+    <string name="msg_timeout">El servidor tardó mucho en responder.</string>
+    <string name="msg_error_prefix">¡Ups! %1$s</string>
+    <string name="msg_email_already_registered">Este correo ya está registrado</string>
+    <string name="msg_password_weak">Contraseña demasiado débil</string>
+    <string name="msg_register_empty">Error al registrar: Respuesta vacía</string>
+    <string name="acc_study_image">Imagen del estudio</string>
 </resources>

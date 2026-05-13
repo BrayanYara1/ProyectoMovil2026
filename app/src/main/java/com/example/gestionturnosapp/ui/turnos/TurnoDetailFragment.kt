@@ -143,7 +143,7 @@ class TurnoDetailFragment : Fragment() {
             if (exito) {
                 com.google.android.material.snackbar.Snackbar.make(
                     binding.root,
-                    "Turno cancelado con éxito",
+                    getString(R.string.msg_cancel_success),
                     com.google.android.material.snackbar.Snackbar.LENGTH_LONG
                 ).show()
                 viewModel.resetNavegacion()
@@ -173,7 +173,7 @@ class TurnoDetailFragment : Fragment() {
 
     private fun handleSessionExpired() {
         UserManager.logout(requireContext())
-        Toast.makeText(requireContext(), "Tu sesión ha expirado", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), getString(R.string.msg_session_expired), Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)
             .build())
@@ -211,7 +211,7 @@ class TurnoDetailFragment : Fragment() {
                 if (calendar.timeInMillis <= System.currentTimeMillis()) {
                     com.google.android.material.snackbar.Snackbar.make(
                         binding.root,
-                        "El turno es muy pronto para el recordatorio",
+                        getString(R.string.msg_slot_too_soon),
                         com.google.android.material.snackbar.Snackbar.LENGTH_LONG
                     ).show()
                     return
@@ -220,8 +220,8 @@ class TurnoDetailFragment : Fragment() {
                 val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
                 val notificationId = (paciente + fecha + hora).hashCode()
                 val intent = Intent(requireContext(), ReminderReceiver::class.java).apply {
-                    putExtra("TITLE", "Recordatorio de Turno")
-                    putExtra("MESSAGE", "Cita con $paciente en 1 hora.")
+                    putExtra("TITLE", getString(R.string.title_reminder_appointment))
+                    putExtra("MESSAGE", getString(R.string.msg_reminder_appointment, paciente))
                     putExtra("NOTIFICATION_ID", notificationId)
                 }
 
@@ -257,7 +257,7 @@ class TurnoDetailFragment : Fragment() {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, message)
         }
-        startActivity(Intent.createChooser(intent, "Compartir vía"))
+        startActivity(Intent.createChooser(intent, getString(R.string.label_share_via)))
     }
 
     private fun openMap() {
@@ -266,7 +266,7 @@ class TurnoDetailFragment : Fragment() {
         try { startActivity(intent) } catch (e: Exception) { 
             com.google.android.material.snackbar.Snackbar.make(
                 binding.root,
-                "Instala Google Maps",
+                getString(R.string.msg_install_maps),
                 com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
             ).show()
         }

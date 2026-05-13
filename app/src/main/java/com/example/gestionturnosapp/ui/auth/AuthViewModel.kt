@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.*
 import com.example.gestionturnosapp.network.RetrofitClient
 import kotlinx.coroutines.launch
@@ -27,22 +28,22 @@ class AuthViewModel : ViewModel() {
                         UserManager.saveUser(appContext, usuario, authResponse.token)
                         _authState.value = Resource.Success(usuario)
                     } else {
-                        _authState.value = Resource.Error("Error: Usuario no encontrado")
+                        _authState.value = Resource.Error(context.getString(R.string.msg_user_not_found))
                     }
                 } else {
                     val errorMsg = when (response.code()) {
-                        401 -> "Correo o contraseña incorrectos"
-                        404 -> "Usuario no encontrado"
-                        else -> "Error del servidor: ${response.code()}"
+                        401 -> context.getString(R.string.msg_login_error)
+                        404 -> context.getString(R.string.msg_user_not_found)
+                        else -> context.getString(R.string.msg_server_error, response.code().toString())
                     }
                     _authState.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                val errorMsg = e.localizedMessage ?: "Error de red"
+                val errorMsg = e.localizedMessage ?: context.getString(R.string.error_connection)
                 val displayMsg = when {
-                    errorMsg.contains("connect", true) -> "No se pudo conectar al servidor. Verifica tu internet."
-                    errorMsg.contains("timeout", true) -> "El servidor tardó mucho en responder."
-                    else -> "Error: $errorMsg"
+                    errorMsg.contains("connect", true) -> context.getString(R.string.msg_no_connection)
+                    errorMsg.contains("timeout", true) -> context.getString(R.string.msg_timeout)
+                    else -> context.getString(R.string.msg_server_error, errorMsg)
                 }
                 _authState.value = Resource.Error(displayMsg)
             }
@@ -62,19 +63,19 @@ class AuthViewModel : ViewModel() {
                         UserManager.saveUser(appContext, usuario, authResponse.token)
                         _authState.value = Resource.Success(usuario)
                     } else {
-                        _authState.value = Resource.Error("Error al registrar: Respuesta vacía")
+                        _authState.value = Resource.Error(context.getString(R.string.msg_register_empty))
                     }
                 } else {
                     val errorBody = response.errorBody()?.string() ?: ""
                     val displayMsg = when {
-                        errorBody.contains("email", true) -> "Este correo ya está registrado"
-                        errorBody.contains("password", true) -> "Contraseña demasiado débil"
-                        else -> "Error: $errorBody"
+                        errorBody.contains("email", true) -> context.getString(R.string.msg_email_already_registered)
+                        errorBody.contains("password", true) -> context.getString(R.string.msg_password_weak)
+                        else -> context.getString(R.string.msg_server_error, errorBody)
                     }
                     _authState.value = Resource.Error(displayMsg)
                 }
             } catch (e: Exception) {
-                _authState.value = Resource.Error(e.localizedMessage ?: "Error de conexión")
+                _authState.value = Resource.Error(e.localizedMessage ?: context.getString(R.string.error_connection))
             }
         }
     }

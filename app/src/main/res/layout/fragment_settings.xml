@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:layout_marginStart="4dp"
-                android:text="Preferencias de la App"
+                android:text="@string/title_app_preferences"
                 android:textColor="@color/primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -123,7 +123,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:layout_marginStart="4dp"
-                android:text="Información y Cuenta"
+                android:text="@string/title_info_account"
                 android:textColor="@color/primary"
                 android:textSize="14sp"
                 android:textStyle="bold" />
