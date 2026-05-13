@@ -13,7 +13,7 @@ class TurnoRepository {
                 if (errorBody.trim().startsWith("{")) {
                     val gson = com.google.gson.Gson()
                     val map = gson.fromJson(errorBody, Map::class.java)
-                    (map["message"] as? String) ?: (map["error"] as? String) ?: "Error ${response.code()}"
+                    (map["mensaje"] as? String) ?: (map["message"] as? String) ?: (map["error"] as? String) ?: "Error ${response.code()}"
                 } else {
                     // Si no es JSON (ej: HTML 404), devolver el mensaje de estatus
                     response.message().ifEmpty { "Error ${response.code()}" }

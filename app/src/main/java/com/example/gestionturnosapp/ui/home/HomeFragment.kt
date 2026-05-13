@@ -102,17 +102,27 @@ class HomeFragment : Fragment() {
 
     private fun updateUI() {
         val user = UserManager.getUser(requireContext())
-        val name = user?.nombre ?: getString(R.string.label_anonymous)
+        var name = user?.nombre ?: getString(R.string.label_anonymous)
+        
+        // LIMPIEZA AGRESIVA: Eliminar versión (vX.X.X), saltos de línea y emojis previos del nombre
+        name = name.replace(Regex("\\s*\\(v?\\d+(\\.\\d+)*\\)\\s*"), "")
+                   .split("\n")[0]
+                   .trim()
         
         // Saludo Dinámico según la hora del día
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
         val greetingRes = when (hour) {
-            in 0..11 -> R.string.greeting_morning
+            in 6..11 -> R.string.greeting_morning
             in 12..18 -> R.string.greeting_afternoon
-            else -> R.string.greeting_evening
+            in 19..23 -> R.string.greeting_evening
+            else -> R.string.welcome
         }
         
-        binding.tvGreeting.text = getString(greetingRes, name)
+        binding.tvGreeting.text = if (greetingRes == R.string.welcome) {
+            getString(greetingRes) + ", " + name
+        } else {
+            getString(greetingRes, name)
+        }
         updateAvatar()
     }
 
@@ -180,9 +190,30 @@ class HomeFragment : Fragment() {
                     turno.hora
                 }
 
+                // Formatear fecha de forma más amigable
+                val displayDate = try {
+                    val sdfInput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                    val date = sdfInput.parse(turno.fecha)
+                    if (date != null) {
+                        val calendar = java.util.Calendar.getInstance()
+                        val today = calendar.time
+                        calendar.add(java.util.Calendar.DAY_OF_YEAR, 1)
+                        val tomorrow = calendar.time
+                        
+                        val sdfDay = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                        when (sdfDay.format(date)) {
+                            sdfDay.format(today) -> getString(R.string.filter_all).replace("Todos", "Hoy") // O un string específico
+                            sdfDay.format(tomorrow) -> "Mañana"
+                            else -> java.text.SimpleDateFormat("EEE, d MMM", java.util.Locale("es", "ES")).format(date).replaceFirstChar { it.uppercase() }
+                        }
+                    } else turno.fecha
+                } catch (e: Exception) {
+                    turno.fecha
+                }
+
                 binding.tvNextAppointDate.text = getString(
                     R.string.detail_date_time_format,
-                    turno.fecha,
+                    displayDate,
                     displayTime
                 )
                 binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.white))
@@ -277,14 +308,13 @@ class HomeFragment : Fragment() {
             return
         }
 
-        meds.forEach { med ->
+        // Mostrar solo los 2-3 primeros para no saturar el home
+        meds.take(3).forEach { med ->
             val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, binding.layoutMedication, false)
             medView.findViewById<android.widget.TextView>(R.id.tvMedName).text = "${med.nombre} ${med.dosis}"
-            medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = "${med.frecuencia} - Próxima: ${med.proximaToma}"
+            medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = "${med.frecuencia}"
             
-            // LIMPIEZA HOME: Ocultar botón de borrar en el dashboard
             medView.findViewById<android.view.View>(R.id.btnDeleteMed).visibility = android.view.View.GONE
-            
             binding.layoutMedication.addView(medView)
         }
     }

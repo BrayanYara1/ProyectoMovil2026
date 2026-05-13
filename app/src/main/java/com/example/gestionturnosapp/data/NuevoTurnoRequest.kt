@@ -1,6 +1,9 @@
 package com.example.gestionturnosapp.data
 
+import com.google.gson.annotations.SerializedName
+
 data class NuevoTurnoRequest(
+    @SerializedName("pacienteNombre")
     val nombre: String,
     val fecha: String,
     val hora: String,

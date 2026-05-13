@@ -119,11 +119,13 @@ app.get('/api/turnos', authenticateToken, async (req, res) => {
 
 app.post('/api/turnos', authenticateToken, async (req, res) => {
     try {
+        console.log("Creando turno con body:", req.body);
         const nuevoTurno = new Turno({ ...req.body, usuarioId: req.userId });
         await nuevoTurno.save();
         res.status(201).json(nuevoTurno);
     } catch (error) {
-        res.status(500).json({ mensaje: "Error al crear turno" });
+        console.error("❌ Error al crear turno:", error);
+        res.status(500).json({ mensaje: "Error al crear turno", error: error.message });
     }
 });
 
