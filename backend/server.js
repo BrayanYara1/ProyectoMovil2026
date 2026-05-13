@@ -26,19 +26,27 @@ const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 app.use(cors());
 app.use(express.json());
 
-// Configuración de Nodemailer mejorada
+// Configuración de Nodemailer mejorada con logs
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true, // Use SSL
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     }
 });
 
+// Verificar conexión con el servidor de correos al arrancar
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('❌ Error en configuración de correo:', error.message);
+    } else {
+        console.log('✅ Servidor de correos listo para enviar mensajes');
+    }
+});
+
 // Función para enviar correo de verificación
 const sendVerificationEmail = async (email, code) => {
+    console.log(`📧 Intentando enviar correo a: ${email} con código: ${code}`);
     const mailOptions = {
         from: `"Salud Activa" <${process.env.EMAIL_USER}>`,
         to: email,
@@ -55,7 +63,15 @@ const sendVerificationEmail = async (email, code) => {
             </div>
         `
     };
-    return transporter.sendMail(mailOptions);
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log('✅ Correo enviado con éxito:', info.messageId);
+        return info;
+    } catch (err) {
+        console.error('❌ Error REAL al enviar correo:', err.message);
+        throw err;
+    }
 };
 
 // Ruta de estado
