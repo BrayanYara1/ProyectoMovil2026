@@ -12,9 +12,9 @@ const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 app.use(cors());
 app.use(express.json());
 
-// Función de envío vía API de Brevo (HTTP - La única que NO se bloquea en Render)
+// Función de envío vía API de Brevo (La vía más segura en Render)
 const sendVerificationEmail = async (email, code) => {
-    console.log(`📧 Iniciando envío de código a: ${email}`);
+    console.log(`📧 Enviando código [${code}] a: ${email}`);
     const BREVO_API_KEY = process.env.BREVO_API_KEY;
 
     try {
@@ -28,24 +28,23 @@ const sendVerificationEmail = async (email, code) => {
             body: JSON.stringify({
                 sender: { name: 'Salud Activa', email: 'andybrahian1996@gmail.com' },
                 to: [{ email: email }],
-                subject: `${code} es tu codigo de verificacion`,
-                textContent: `Hola! Tu codigo de verificacion para Salud Activa es: ${code}`,
-                htmlContent: `<h3>Tu codigo de verificacion es: <b style="color: #007bff;">${code}</b></h3>`
+                subject: `Tu codigo de acceso: ${code}`,
+                textContent: `Tu codigo de verificacion es: ${code}`,
+                htmlContent: `<h3>Codigo de verificacion: <b style="color: #007bff;">${code}</b></h3>`
             })
         });
 
-        const data = await response.json();
         if (response.ok) {
-            console.log(`✅ Correo aceptado por Brevo para: ${email}`);
+            console.log(`✅ Brevo aceptó el correo para ${email}`);
         } else {
-            console.error('❌ Brevo rechazó el envío:', data);
+            const errData = await response.json();
+            console.error('❌ Brevo rechazó el envío:', errData);
         }
     } catch (err) {
-        console.error('❌ Error de conexión con la API:', err.message);
+        console.error('❌ Error de conexión API:', err.message);
     }
 };
 
-// Modelos y Rutas
 const User = require('./models/User');
 const Turno = require('./models/Turno');
 const Medicamento = require('./models/Medicamento');
@@ -70,10 +69,12 @@ app.post('/api/auth/register', async (req, res) => {
         });
         await nuevoUsuario.save();
 
+        console.log(`🔑 CÓDIGO PARA ${email}: ${verificationCode}`); // Esto saldrá en el log de Render
         sendVerificationEmail(email, verificationCode);
+
         res.status(201).json({ mensaje: "OK", email: nuevoUsuario.email });
     } catch (error) {
-        res.status(500).json({ mensaje: "Error en el servidor" });
+        res.status(500).json({ mensaje: "Error" });
     }
 });
 
