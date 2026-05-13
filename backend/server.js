@@ -40,7 +40,7 @@ const sendVerificationEmail = async (email, code) => {
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                sender: { name: 'Salud Activa', email: 'andybrahian1995@gmail.com' }, // TU CORREO VERIFICADO EN BREVO
+                sender: { name: 'Salud Activa', email: 'andybrahian1996@gmail.com' }, // CORREGIDO A 1996
                 to: [{ email: email }],
                 subject: 'Código de Verificación - Salud Activa',
                 htmlContent: `
