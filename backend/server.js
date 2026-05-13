@@ -4,59 +4,46 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { Resend } = require('resend');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 
+// Inicializar Resend con la API KEY de tus variables de entorno
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 app.use(cors());
 app.use(express.json());
 
-// Función para enviar correo usando la API de BREVO (Vía HTTP - Única que funciona en Render)
+// Función para enviar correo usando la API de RESEND (HTTP - No se bloquea en Render)
 const sendVerificationEmail = async (email, code) => {
-    console.log(`📧 Iniciando envío de código a: ${email}`);
-    const BREVO_API_KEY = process.env.BREVO_API_KEY;
-
-    if (!BREVO_API_KEY) {
-        console.error('❌ ERROR: BREVO_API_KEY no configurada');
-        return;
-    }
+    console.log(`📧 Intentando enviar correo vía RESEND a: ${email}`);
 
     try {
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'api-key': BREVO_API_KEY,
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                // IMPORTANTE: El email del sender DEBE ser el mismo que verificaste en Brevo
-                sender: { name: 'Salud Activa', email: 'andybrahian1996@gmail.com' },
-                to: [{ email: email }],
-                subject: `${code} es tu código de verificación - Salud Activa`,
-                textContent: `Tu código de verificación para Salud Activa es: ${code}`,
-                htmlContent: `
-                    <div style="font-family: sans-serif; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                        <h2 style="color: #007bff; text-align: center;">Verifica tu cuenta</h2>
-                        <p>Hola, gracias por unirte a <strong>Salud Activa</strong>. Usa el siguiente código para completar tu registro:</p>
-                        <div style="background: #f4f7ff; padding: 20px; text-align: center; font-size: 30px; font-weight: bold; color: #007bff; letter-spacing: 5px; border-radius: 8px; margin: 20px 0;">
-                            ${code}
-                        </div>
-                        <p style="font-size: 12px; color: #777;">Si no solicitaste este código, puedes ignorar este correo.</p>
+        const { data, error } = await resend.emails.send({
+            from: 'Salud Activa <onboarding@resend.dev>',
+            to: email,
+            subject: 'Tu código de verificación: ' + code,
+            html: `
+                <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; max-width: 500px; margin: auto;">
+                    <h2 style="color: #007bff; text-align: center;">Verifica tu cuenta</h2>
+                    <p>Hola, usa el siguiente código para completar tu registro en <strong>Salud Activa</strong>:</p>
+                    <div style="background: #f4f7ff; padding: 20px; text-align: center; font-size: 30px; font-weight: bold; color: #007bff; letter-spacing: 5px; border-radius: 8px; margin: 20px 0;">
+                        ${code}
                     </div>
-                `
-            })
+                    <p style="font-size: 12px; color: #777; text-align: center;">Si no solicitaste este código, puedes ignorar este correo.</p>
+                </div>
+            `
         });
 
-        const data = await response.json();
-        if (response.ok) {
-            console.log(`✅ Correo enviado con éxito a ${email}. ID: ${data.messageId}`);
+        if (error) {
+            console.error('❌ Error de Resend:', error);
         } else {
-            console.error('❌ Brevo rechazó el envío:', data);
+            console.log('✅ Correo enviado con éxito. ID:', data.id);
         }
     } catch (err) {
-        console.error('❌ Error de conexión al enviar correo:', err.message);
+        console.error('❌ Error de conexión con Resend:', err.message);
     }
 };
 
@@ -85,7 +72,7 @@ app.post('/api/auth/register', async (req, res) => {
         });
         await nuevoUsuario.save();
 
-        // Enviamos el correo (sin esperar el await para no bloquear la respuesta)
+        // Enviar correo
         sendVerificationEmail(email, verificationCode);
 
         res.status(201).json({ mensaje: "OK", email: nuevoUsuario.email });
@@ -143,5 +130,5 @@ app.delete('/api/admin/reset-database', async (req, res) => {
     }
 });
 
-app.get('/', (req, res) => res.send('🚀 Salud Activa Backend LIVE'));
+app.get('/', (req, res) => res.send('🚀 Salud Activa Backend LIVE with Resend'));
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Servidor en puerto ${PORT}`));
