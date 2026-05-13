@@ -33,8 +33,8 @@ app.use(express.json());
 const sendVerificationEmail = async (email, code) => {
     console.log(`📧 Intentando enviar correo vía RESEND a: ${email} con código: ${code}`);
     try {
-        const data = await resend.emails.send({
-            from: 'Salud Activa <onboarding@resend.dev>', // Usar este dominio mientras validas el tuyo
+        const { data, error } = await resend.emails.send({
+            from: 'Salud Activa <onboarding@resend.dev>',
             to: email,
             subject: 'Código de Verificación - Salud Activa',
             html: `
@@ -48,10 +48,16 @@ const sendVerificationEmail = async (email, code) => {
                 </div>
             `
         });
-        console.log('✅ Correo enviado con éxito vía API:', data.id);
+
+        if (error) {
+            console.error('❌ Error devuelto por Resend API:', error);
+            throw new Error(error.message);
+        }
+
+        console.log('✅ Correo aceptado por Resend. ID:', data.id);
         return data;
     } catch (err) {
-        console.error('❌ Error al enviar correo con Resend:', err.message);
+        console.error('❌ Fallo crítico en sendVerificationEmail:', err.message);
         throw err;
     }
 };
