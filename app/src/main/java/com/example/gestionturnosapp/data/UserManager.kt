@@ -22,13 +22,27 @@ object UserManager {
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
 
-        return EncryptedSharedPreferences.create(
-            context.applicationContext,
-            PREF_NAME,
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        return try {
+            EncryptedSharedPreferences.create(
+                context.applicationContext,
+                PREF_NAME,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (e: Exception) {
+            // Si hay un error de cifrado (común al cambiar versiones o Keystore), 
+            // borramos las preferencias corruptas para que la app no crashee.
+            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+            // Intentamos crear de nuevo
+            EncryptedSharedPreferences.create(
+                context.applicationContext,
+                PREF_NAME,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        }
     }
 
     fun saveUser(context: Context, usuario: Usuario, authToken: String? = null) {
