@@ -25,6 +25,19 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Modelos
+const User = require('./models/User');
+const Turno = require('./models/Turno');
+const Medicamento = require('./models/Medicamento');
+const Estudio = require('./models/Estudio');
+
+const app = express();
+const PORT = process.env.PORT || 10000;
+const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
+
+app.use(cors());
+app.use(express.json());
+
 // Verificar conexión con el servidor de correos al arrancar
 transporter.verify((error, success) => {
     if (error) {
