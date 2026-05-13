@@ -26,44 +26,6 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// --- FUNCIÓN DE ENVÍO DE CORREO (BREVO API) ---
-const sendVerificationEmail = async (email, code) => {
-    console.log(`📧 Enviando código [${code}] a: ${email}`);
-    const BREVO_API_KEY = process.env.BREVO_API_KEY;
-
-    if (!BREVO_API_KEY) {
-        console.error('❌ Error: BREVO_API_KEY no configurada');
-        return;
-    }
-
-    try {
-        const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'api-key': BREVO_API_KEY,
-                'content-type': 'application/json'
-            },
-            body: JSON.stringify({
-                sender: { name: 'Salud Activa', email: 'andybrahian1996@gmail.com' },
-                to: [{ email: email }],
-                subject: `Tu código de acceso: ${code}`,
-                textContent: `Tu código de verificación es: ${code}`,
-                htmlContent: `<h3>Código de verificación: <b style="color: #007bff;">${code}</b></h3>`
-            })
-        });
-
-        if (response.ok) {
-            console.log(`✅ Brevo aceptó el correo para ${email}`);
-        } else {
-            const errData = await response.json();
-            console.error('❌ Brevo rechazó el envío:', errData);
-        }
-    } catch (err) {
-        console.error('❌ Error de conexión API Brevo:', err.message);
-    }
-};
-
 // --- MODELOS ---
 const User = require('./models/User');
 const Turno = require('./models/Turno');
@@ -85,54 +47,18 @@ app.post('/api/auth/register', async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contrasena, salt);
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+        // Registro directo sin código de verificación
         const nuevoUsuario = new User({
-            nombre, email, telefono, contrasena: hashedPassword, verificationCode, isVerified: false
+            nombre, email, telefono, contrasena: hashedPassword, verificationCode: null, isVerified: true
         });
         await nuevoUsuario.save();
 
-        console.log(`🔑 CÓDIGO PARA ${email}: ${verificationCode}`);
-        sendVerificationEmail(email, verificationCode);
+        console.log(`👤 Usuario registrado: ${email}`);
 
         res.status(201).json({ mensaje: "OK", email: nuevoUsuario.email });
     } catch (error) {
         res.status(500).json({ mensaje: "Error en el servidor" });
-    }
-});
-
-app.post('/api/auth/verify', async (req, res) => {
-    try {
-        const { email, code } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ mensaje: "Usuario no encontrado" });
-        if (user.verificationCode === code) {
-            user.isVerified = true;
-            user.verificationCode = null;
-            await user.save();
-            res.json({ mensaje: "Cuenta verificada" });
-        } else {
-            res.status(400).json({ mensaje: "Código incorrecto" });
-        }
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error en el servidor" });
-    }
-});
-
-app.post('/api/auth/resend-code', async (req, res) => {
-    try {
-        const { email } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ mensaje: "Usuario no encontrado" });
-
-        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        user.verificationCode = verificationCode;
-        await user.save();
-
-        sendVerificationEmail(email, verificationCode);
-        res.json({ mensaje: "Código reenviado" });
-    } catch (error) {
-        res.status(500).json({ mensaje: "Error al reenviar" });
     }
 });
 
@@ -143,7 +69,6 @@ app.post('/api/auth/login', async (req, res) => {
         if (!user || !await bcrypt.compare(contrasena, user.contrasena)) {
             return res.status(401).json({ mensaje: "Credenciales inválidas" });
         }
-        if (!user.isVerified) return res.status(403).json({ mensaje: "Cuenta no verificada", email: user.email });
 
         const token = jwt.sign({ userId: user._id }, SECRET_KEY, { expiresIn: '30d' });
         res.json({
@@ -281,5 +206,5 @@ app.delete('/api/admin/reset-database', async (req, res) => {
     res.json({ mensaje: "Base de datos reiniciada" });
 });
 
-app.get('/', (req, res) => res.send('🚀 Backend Online y Funcional'));
+app.get('/', (req, res) => res.send('🚀 Backend Online y Funcional (Sin Verificación)'));
 app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Puerto ${PORT}`));
