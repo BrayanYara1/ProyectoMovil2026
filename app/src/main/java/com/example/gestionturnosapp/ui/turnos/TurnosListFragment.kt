@@ -106,7 +106,7 @@ class TurnosListFragment : Fragment() {
     private fun showDeleteConfirmation(turno: Turno) {
         com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.title_delete_appointment))
-            .setMessage("${getString(R.string.msg_delete_confirm)}: ${turno.pacienteNombre}?")
+            .setMessage(getString(R.string.msg_delete_confirm_with_name, turno.pacienteNombre))
             .setPositiveButton(getString(R.string.btn_delete)) { _, _ ->
                 view?.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
                 viewModel.eliminarTurno(turno.id)

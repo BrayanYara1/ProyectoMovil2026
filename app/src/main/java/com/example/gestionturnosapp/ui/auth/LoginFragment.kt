@@ -75,13 +75,7 @@ class LoginFragment : Fragment() {
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
                     binding.btnLogin.isEnabled = true
-                    if (resource.message.startsWith("VERIFY_REQUIRED")) {
-                        val email = resource.message.split(":")[1]
-                        val bundle = Bundle().apply { putString("email", email) }
-                        findNavController().navigate(R.id.action_loginFragment_to_verificationFragment, bundle)
-                    } else {
-                        Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
-                    }
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
                 }
                 else -> {
                     binding.progressBar.isVisible = false

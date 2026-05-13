@@ -1,35 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Sobrescribir colores nocturnos con los claros para eliminar el modo oscuro visual -->
-    <color name="primary">#0052CC</color>
-    <color name="primary_variant">#0747A6</color>
-    <color name="on_primary">#FFFFFF</color>
-    <color name="primary_container">#DEEBFF</color>
-    <color name="on_primary_container">#0747A6</color>
+    <!-- Colores para Modo Oscuro (Paleta Médica Nocturna) -->
+    <color name="primary">#4C9AFF</color> <!-- Azul más claro para mejor contraste -->
+    <color name="primary_variant">#2684FF</color>
+    <color name="on_primary">#091E42</color>
+    <color name="primary_container">#091E42</color>
+    <color name="on_primary_container">#B3D4FF</color>
 
-    <color name="secondary">#00B8D9</color>
-    <color name="on_secondary">#FFFFFF</color>
-    <color name="secondary_container">#E6FCFF</color>
-    <color name="on_secondary_container">#008DA6</color>
+    <color name="secondary">#00B8D9</color> <!-- Se mantiene el Cyan Médico -->
+    <color name="on_secondary">#091E42</color>
+    <color name="secondary_container">#00505D</color>
+    <color name="on_secondary_container">#E6FCFF</color>
 
-    <color name="accent">#6554C0</color>
+    <color name="accent">#998DD9</color>
 
-    <color name="background">#F4F5F7</color>
-    <color name="on_background">#172B4D</color>
-    <color name="surface">#FFFFFF</color>
-    <color name="on_surface">#172B4D</color>
+    <color name="background">#091E42</color> <!-- Azul Profundo -->
+    <color name="on_background">#EBECF0</color>
+    <color name="surface">#172B4D</color>
+    <color name="on_surface">#EBECF0</color>
 
-    <color name="error">#DE350B</color>
-    <color name="on_error">#FFFFFF</color>
+    <color name="error">#FF5630</color>
+    <color name="on_error">#091E42</color>
 
     <color name="success">#36B37E</color>
     <color name="warning">#FFAB00</color>
 
-    <color name="outline">#DFE1E6</color>
-    <color name="text_primary">#172B4D</color>
-    <color name="text_secondary">#6B778C</color>
+    <color name="outline">#344563</color>
+    <color name="text_primary">#EBECF0</color>
+    <color name="text_secondary">#B3BAC5</color>
     <color name="text_tertiary">#8993A4</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+
+    <!-- Estados en Modo Oscuro -->
+    <color name="status_pending_bg">#344563</color>
+    <color name="status_pending_text">#FFC400</color>
+    <color name="status_completed_bg">#006644</color>
+    <color name="status_completed_text">#E3FCEF</color>
+    <color name="status_cancelled_bg">#BF2600</color>
+    <color name="status_cancelled_text">#FFEBE6</color>
+
+    <color name="icon_container_blue">#1E293B</color>
+    <color name="icon_container_cyan">#0F172A</color>
+    <color name="icon_container_purple">#1E1B4B</color>
+    <color name="icon_container_red">#450A0A</color>
 </resources>

@@ -103,7 +103,7 @@ class EstudiosFragment : Fragment() {
         binding.chipDateStart.setOnClickListener {
             showDatePicker { date ->
                 filterStart = date
-                binding.chipDateStart.text = "Desde: $date"
+                binding.chipDateStart.text = getString(R.string.filter_from_date, date)
                 applyFilters()
             }
         }
@@ -111,7 +111,7 @@ class EstudiosFragment : Fragment() {
         binding.chipDateEnd.setOnClickListener {
             showDatePicker { date ->
                 filterEnd = date
-                binding.chipDateEnd.text = "Hasta: $date"
+                binding.chipDateEnd.text = getString(R.string.filter_to_date, date)
                 applyFilters()
             }
         }
@@ -119,8 +119,8 @@ class EstudiosFragment : Fragment() {
         binding.btnClearFilters.setOnClickListener {
             filterStart = null
             filterEnd = null
-            binding.chipDateStart.text = "Desde: Todas"
-            binding.chipDateEnd.text = "Hasta: Todas"
+            binding.chipDateStart.text = getString(R.string.filter_from_date, getString(R.string.all_dates))
+            binding.chipDateEnd.text = getString(R.string.filter_to_date, getString(R.string.all_dates))
             applyFilters()
         }
     }

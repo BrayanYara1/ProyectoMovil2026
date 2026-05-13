@@ -7,6 +7,7 @@
 
     <!-- Login & Register -->
     <string name="welcome">Welcome</string>
+    <string name="welcome_back">Hello again, %1$s!</string>
     <string name="login_subtitle">Log in to manage your appointments</string>
     <string name="hint_email">Email address</string>
     <string name="hint_password">Password</string>
@@ -52,6 +53,7 @@
     <string name="msg_appointment_error">Error scheduling appointment</string>
     <string name="title_delete_appointment">Cancel Appointment</string>
     <string name="msg_delete_confirm">Are you sure you want to cancel this appointment? This action cannot be undone.</string>
+    <string name="msg_delete_confirm_with_name">Are you sure you want to cancel the appointment for %1$s? This action cannot be undone.</string>
     <string name="btn_delete">YES, CANCEL</string>
     <string name="title_appointment_detail">Appointment Detail</string>
     <string name="btn_back_to_list">BACK TO LIST</string>
@@ -196,6 +198,7 @@
     <string name="label_study_date">Study date</string>
     <string name="btn_attach_photo">Attach Photo</string>
     <string name="msg_confirm_delete_study">Do you want to delete the record: %1$s?</string>
+    <string name="msg_confirm_delete_medication">Do you want to delete %1$s from your list?</string>
 
     <string name="msg_error_unknown">Unknown error</string>
     <string name="msg_user_not_found">User not found</string>
@@ -205,6 +208,7 @@
     <string name="msg_error_prefix">Oops! %1$s</string>
     <string name="msg_email_already_registered">This email is already registered</string>
     <string name="msg_password_weak">Password is too weak</string>
+    <string name="msg_password_length">Minimum 6 characters</string>
     <string name="msg_register_empty">Registration error: Empty response</string>
     <string name="acc_study_image">Study image</string>
     <string name="msg_no_mail_app_found">No email app installed</string>
@@ -218,4 +222,37 @@
     <string name="msg_verify_success">Account verified successfully. Log in.</string>
     <string name="msg_verify_error">Incorrect verification code</string>
     <string name="msg_verify_required">Account not verified. Check your email.</string>
+    <string name="btn_resend_code">Didn\'t receive the code? Resend</string>
+    <string name="msg_code_resent">Code resent successfully</string>
+
+    <string name="filter_from_date">From: %1$s</string>
+    <string name="filter_to_date">To: %1$s</string>
+    <string name="all_dates">All</string>
+
+    <string name="title_recommendation">Recommendation of the day</string>
+    <string name="title_next_appointment">NEXT APPOINTMENT</string>
+    <string name="no_upcoming_appointments">No pending appointments</string>
+    <string name="schedule_appointment_prompt">Secure your next medical consultation today.</string>
+    <string name="title_medication">My Medication</string>
+    <string name="title_add_medication">Add Medication</string>
+    <string name="btn_save_medication">SAVE MEDICATION</string>
+    <string name="title_your_medications">Your Medications</string>
+    <string name="msg_no_medication">You have no active medication configured.</string>
+    <string name="label_next_appointment_format">%1$s - %2$s</string>
+
+    <string name="btn_call">Call</string>
+    <string name="msg_emergency_confirm">Do you want to call the emergency line 123 (Colombia)?</string>
+    <string name="msg_about_app">Salud Activa is a comprehensive platform for managing your medical well-being, designed to improve the patient experience.</string>
+    <string name="label_help_subject">Salud Activa Help - User: %1$s</string>
+    <string name="label_anonymous">Anonymous</string>
+    <string name="label_assigned_doctor">Assigned Dr.</string>
+    <string name="msg_reminder_set">Alert activated for 1h before!</string>
+    <string name="msg_reminder_error">Error setting reminder</string>
+    <string name="label_share_appointment_header">📅 *Salud Activa Appointment*</string>
+    <string name="label_share_patient">👤 %1$s</string>
+    <string name="label_share_date">🗓️ %1$s</string>
+    <string name="label_share_time">⏰ %1$s</string>
+    <string name="label_share_reason">🩺 %1$s</string>
+    <string name="label_calendar_event_title">Appointment: %1$s</string>
+    <string name="label_calendar_event_desc">Reason: %1$s</string>
 </resources>

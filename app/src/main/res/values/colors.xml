@@ -43,4 +43,9 @@
     <color name="status_completed_text">#006644</color>
     <color name="status_cancelled_bg">#FFEBE6</color>
     <color name="status_cancelled_text">#BF2600</color>
+
+    <color name="icon_container_blue">#E3F2FD</color>
+    <color name="icon_container_cyan">#E0F7FA</color>
+    <color name="icon_container_purple">#F3E5F5</color>
+    <color name="icon_container_red">#FFEBEE</color>
 </resources>

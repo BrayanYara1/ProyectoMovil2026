@@ -50,7 +50,7 @@ class WelcomeFragment : Fragment() {
             // Usuario logueado: Navegación automática después de un breve retraso
             binding.layoutAuthButtons.isVisible = false
             binding.btnGetStarted.isVisible = true
-            binding.tvWelcomeSubtitle.text = "¡Hola de nuevo, ${user.nombre}!"
+            binding.tvWelcomeSubtitle.text = getString(R.string.welcome_back, user.nombre)
             
             viewLifecycleOwner.lifecycleScope.launch {
                 kotlinx.coroutines.delay(1500) // 1.5 segundos para que vea la bienvenida

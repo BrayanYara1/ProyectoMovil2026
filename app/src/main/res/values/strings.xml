@@ -6,6 +6,7 @@
     <string name="login_card_title">INICIAR SESIÓN</string>
     <!-- Autenticación -->
     <string name="welcome">Bienvenido</string>
+    <string name="welcome_back">¡Hola de nuevo, %1$s!</string>
     <string name="login_subtitle">Inicia sesión para gestionar tus turnos</string>
     <string name="hint_email">Correo electrónico</string>
     <string name="hint_password">Contraseña</string>
@@ -51,6 +52,7 @@
     <string name="msg_appointment_error">Error al programar el turno</string>
     <string name="title_delete_appointment">Cancelar Turno</string>
     <string name="msg_delete_confirm">¿Estás seguro de que deseas cancelar este turno? Esta acción no se puede deshacer.</string>
+    <string name="msg_delete_confirm_with_name">¿Estás seguro de que deseas cancelar el turno de %1$s? Esta acción no se puede deshacer.</string>
     <string name="btn_delete">SÍ, CANCELAR</string>
     <string name="title_appointment_detail">Detalle del Turno</string>
     <string name="btn_back_to_list">VOLVER A LA LISTA</string>
@@ -202,6 +204,7 @@
     <string name="label_study_date">Fecha del estudio</string>
     <string name="btn_attach_photo">Adjuntar Foto</string>
     <string name="msg_confirm_delete_study">¿Deseas eliminar el registro: %1$s?</string>
+    <string name="msg_confirm_delete_medication">¿Deseas eliminar %1$s de tu lista?</string>
 
     <string name="msg_error_unknown">Error desconocido</string>
     <string name="msg_user_not_found">Usuario no encontrado</string>
@@ -211,6 +214,7 @@
     <string name="msg_error_prefix">¡Ups! %1$s</string>
     <string name="msg_email_already_registered">Este correo ya está registrado</string>
     <string name="msg_password_weak">Contraseña demasiado débil</string>
+    <string name="msg_password_length">Mínimo 6 caracteres</string>
     <string name="msg_register_empty">Error al registrar: Respuesta vacía</string>
     <string name="acc_study_image">Imagen del estudio</string>
     <string name="msg_no_mail_app_found">No hay app de correo instalada</string>
@@ -226,4 +230,25 @@
     <string name="msg_verify_required">Cuenta no verificada. Revisa tu correo.</string>
     <string name="btn_resend_code">¿No recibiste el código? Reenviar</string>
     <string name="msg_code_resent">Código reenviado con éxito</string>
+
+    <string name="filter_from_date">Desde: %1$s</string>
+    <string name="filter_to_date">Hasta: %1$s</string>
+    <string name="all_dates">Todas</string>
+
+    <!-- Nuevos strings para localización -->
+    <string name="btn_call">Llamar</string>
+    <string name="msg_emergency_confirm">¿Deseas llamar a la línea de emergencias 123 (Colombia)?</string>
+    <string name="msg_about_app">Salud Activa es una plataforma integral para la gestión de tu bienestar médico, diseñada para mejorar la experiencia del paciente.</string>
+    <string name="label_help_subject">Ayuda Salud Activa - Usuario: %1$s</string>
+    <string name="label_anonymous">Anónimo</string>
+    <string name="label_assigned_doctor">Dr. Asignado</string>
+    <string name="msg_reminder_set">¡Alerta activada para 1h antes!</string>
+    <string name="msg_reminder_error">Error al configurar recordatorio</string>
+    <string name="label_share_appointment_header">📅 *Turno Salud Activa*</string>
+    <string name="label_share_patient">👤 %1$s</string>
+    <string name="label_share_date">🗓️ %1$s</string>
+    <string name="label_share_time">⏰ %1$s</string>
+    <string name="label_share_reason">🩺 %1$s</string>
+    <string name="label_calendar_event_title">Cita: %1$s</string>
+    <string name="label_calendar_event_desc">Motivo: %1$s</string>
 </resources>

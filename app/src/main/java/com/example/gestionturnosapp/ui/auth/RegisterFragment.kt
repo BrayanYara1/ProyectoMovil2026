@@ -49,23 +49,14 @@ class RegisterFragment : Fragment() {
                     binding.btnRegister.isEnabled = true
                     Toast.makeText(requireContext(), getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show()
                     
-                    // Navegamos a verificación pasando el email
-                    val email = binding.etEmail.text.toString().trim()
-                    val bundle = Bundle().apply { putString("email", email) }
-                    findNavController().navigate(R.id.action_registerFragment_to_verificationFragment, bundle)
+                    // Ya no vamos a verificación, vamos directo al login
+                    findNavController().navigate(R.id.action_registerFragment_to_loginFragment)
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
                     binding.btnRegister.isEnabled = true
                     
-                    // Si por alguna razón el ViewModel envía VERIFY_REQUIRED aquí, lo manejamos
-                    if (resource.message.startsWith("VERIFY_REQUIRED")) {
-                        val email = resource.message.split(":")[1]
-                        val bundle = Bundle().apply { putString("email", email) }
-                        findNavController().navigate(R.id.action_registerFragment_to_verificationFragment, bundle)
-                    } else {
-                        Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
-                    }
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
                 }
                 else -> {
                     binding.progressBar.isVisible = false
@@ -119,7 +110,7 @@ class RegisterFragment : Fragment() {
             }
 
             if (pass.length < 6) {
-                binding.tilPassword.error = if (pass.isEmpty()) getString(R.string.msg_complete_fields) else "Mínimo 6 caracteres"
+                binding.tilPassword.error = if (pass.isEmpty()) getString(R.string.msg_complete_fields) else getString(R.string.msg_password_length)
                 isValid = false
             }
 

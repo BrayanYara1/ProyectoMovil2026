@@ -76,13 +76,13 @@ class HomeFragment : Fragment() {
         binding.cardUrgencias.setOnClickListener {
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.label_emergency_call))
-                .setMessage("¿Deseas llamar a la línea de emergencias 123 (Colombia)?")
-                .setPositiveButton("Llamar") { _, _ ->
+                .setMessage(getString(R.string.msg_emergency_confirm))
+                .setPositiveButton(getString(R.string.btn_call)) { _, _ ->
                     val intent = android.content.Intent(android.content.Intent.ACTION_DIAL)
                     intent.data = android.net.Uri.parse("tel:123")
                     startActivity(intent)
                 }
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(getString(R.string.btn_cancel), null)
                 .show()
         }
 
@@ -102,7 +102,7 @@ class HomeFragment : Fragment() {
 
     private fun updateUI() {
         val user = UserManager.getUser(requireContext())
-        val name = user?.nombre ?: "Usuario"
+        val name = user?.nombre ?: getString(R.string.label_anonymous)
         
         // Saludo Dinámico según la hora del día
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
@@ -243,25 +243,25 @@ class HomeFragment : Fragment() {
         val user = UserManager.getUser(requireContext())
         
         val summary = StringBuilder()
-        summary.append("🏥 *Resumen de Salud - Salud Activa*\n")
-        summary.append("👤 *Paciente:* ${user?.nombre}\n\n")
+        summary.append(getString(R.string.label_share_appointment_header)).append("\n")
+        summary.append(getString(R.string.label_share_patient, user?.nombre ?: getString(R.string.label_anonymous))).append("\n\n")
         
         if (nextTurno != null) {
-            summary.append("📅 *Próxima Cita:*\n")
-            summary.append("- ${nextTurno.especialidad}: ${nextTurno.fecha} a las ${nextTurno.hora}\n")
+            summary.append(getString(R.string.title_next_appointment)).append(":\n")
+            summary.append("- ${nextTurno.especialidad}: ${nextTurno.fecha} ").append(getString(R.string.detail_date_time_format, "", nextTurno.hora).trim()).append("\n")
             summary.append("- Dr. ${nextTurno.doctor}\n\n")
         }
         
         if (meds.isNotEmpty()) {
-            summary.append("💊 *Medicamentos Actuales:*\n")
+            summary.append(getString(R.string.title_your_medications)).append(":\n")
             meds.forEach { med ->
                 summary.append("- ${med.nombre} (${med.dosis}): ${med.frecuencia}\n")
             }
         } else {
-            summary.append("💊 Sin medicamentos configurados.\n")
+            summary.append(getString(R.string.msg_no_medication)).append("\n")
         }
         
-        summary.append("\n_Enviado desde mi app Salud Activa_")
+        summary.append("\n_").append(getString(R.string.app_name)).append("_")
         
         val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
             type = "text/plain"

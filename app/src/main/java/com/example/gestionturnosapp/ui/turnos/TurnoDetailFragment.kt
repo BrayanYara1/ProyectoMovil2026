@@ -45,10 +45,10 @@ class TurnoDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val id = arguments?.getString("TURNO_ID") ?: ""
-        val paciente = arguments?.getString("PACIENTE_NOMBRE") ?: "No disponible"
+        val paciente = arguments?.getString("PACIENTE_NOMBRE") ?: getString(R.string.label_anonymous)
         val fecha = arguments?.getString("TURNO_FECHA") ?: "0000-00-00"
         val hora = arguments?.getString("TURNO_HORA") ?: "00:00"
-        val motivo = arguments?.getString("TURNO_MOTIVO") ?: "Sin motivo especificado"
+        val motivo = arguments?.getString("TURNO_MOTIVO") ?: getString(R.string.no_appointments)
         val estado = arguments?.getString("TURNO_ESTADO") ?: "Pendiente"
 
         setupUI(id, paciente, fecha, hora, motivo, estado)
@@ -238,21 +238,25 @@ class TurnoDetailFragment : Fragment() {
 
                 com.google.android.material.snackbar.Snackbar.make(
                     binding.root,
-                    "¡Alerta activada para 1h antes!",
+                    getString(R.string.msg_reminder_set),
                     com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
                 ).show()
             }
         } catch (e: Exception) {
             com.google.android.material.snackbar.Snackbar.make(
                 binding.root,
-                "Error al configurar recordatorio",
+                getString(R.string.msg_reminder_error),
                 com.google.android.material.snackbar.Snackbar.LENGTH_LONG
             ).show()
         }
     }
 
     private fun shareTurno(paciente: String, fecha: String, hora: String, motivo: String) {
-        val message = "📅 *Turno Salud Activa*\n👤 $paciente\n🗓️ $fecha\n⏰ $hora\n🩺 $motivo"
+        val message = "${getString(R.string.label_share_appointment_header)}\n" +
+                "${getString(R.string.label_share_patient, paciente)}\n" +
+                "${getString(R.string.label_share_date, fecha)}\n" +
+                "${getString(R.string.label_share_time, hora)}\n" +
+                "${getString(R.string.label_share_reason, motivo)}"
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, message)
@@ -295,8 +299,8 @@ class TurnoDetailFragment : Fragment() {
 
                 val intent = Intent(Intent.ACTION_INSERT)
                     .setData(android.provider.CalendarContract.Events.CONTENT_URI)
-                    .putExtra(android.provider.CalendarContract.Events.TITLE, "Cita: $paciente")
-                    .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, "Motivo: $motivo")
+                    .putExtra(android.provider.CalendarContract.Events.TITLE, getString(R.string.label_calendar_event_title, paciente))
+                    .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, getString(R.string.label_calendar_event_desc, motivo))
                     .putExtra(android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.timeInMillis)
                 startActivity(intent)
             }

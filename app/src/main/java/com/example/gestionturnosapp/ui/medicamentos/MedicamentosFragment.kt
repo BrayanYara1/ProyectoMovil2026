@@ -49,11 +49,11 @@ class MedicamentosFragment : Fragment() {
         adapter = MedicamentosAdapter { med ->
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.title_delete_medication))
-                .setMessage("¿Deseas eliminar ${med.nombre} de tu lista?")
-                .setPositiveButton("Eliminar") { _, _ ->
+                .setMessage(getString(R.string.msg_confirm_delete_medication, med.nombre))
+                .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
                     viewModel.eliminarMedicamento(med.id)
                 }
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
                 .show()
         }
         binding.rvMedicamentos.layoutManager = LinearLayoutManager(context)

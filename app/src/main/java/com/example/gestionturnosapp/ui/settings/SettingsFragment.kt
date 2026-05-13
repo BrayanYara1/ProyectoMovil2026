@@ -72,7 +72,7 @@ class SettingsFragment : Fragment() {
         binding.btnAbout.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.label_about))
-                .setMessage(getString(R.string.version_info) + "\n\nSalud Activa es una plataforma integral para la gestión de tu bienestar médico, diseñada para mejorar la experiencia del paciente.")
+                .setMessage(getString(R.string.version_info) + "\n\n" + getString(R.string.msg_about_app))
                 .setPositiveButton(getString(android.R.string.ok), null)
                 .show()
         }
@@ -94,7 +94,7 @@ class SettingsFragment : Fragment() {
         binding.btnHelp.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO).apply {
                 data = Uri.parse("mailto:soporte@saludactiva.com")
-                putExtra(Intent.EXTRA_SUBJECT, "Ayuda Salud Activa - Usuario: ${UserManager.usuarioActual?.nombre ?: "Anónimo"}")
+                putExtra(Intent.EXTRA_SUBJECT, getString(R.string.label_help_subject, UserManager.usuarioActual?.nombre ?: getString(R.string.label_anonymous)))
             }
             try {
                 startActivity(intent)

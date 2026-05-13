@@ -84,7 +84,7 @@ class SolicitarTurnoFragment : Fragment() {
                         viewModel.crearNuevoTurno(
                             nombre, fecha, hora, motivo, 
                             especialidad = especialidadArg,
-                            doctor = "Dr. Asignado" // Podría ser dinámico en el futuro
+                            doctor = getString(R.string.label_assigned_doctor)
                         )
                     }
                     .setNegativeButton(R.string.btn_cancel, null)

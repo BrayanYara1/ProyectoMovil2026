@@ -32,24 +32,19 @@ class AuthViewModel : ViewModel() {
                     }
                 } else {
                     val code = response.code()
-                    if (code == 403) {
-                        _authState.value = Resource.Error("VERIFY_REQUIRED:$email")
-                    } else {
-                        val errorMsg = when (code) {
-                            401 -> context.getString(R.string.msg_login_error)
-                            404 -> context.getString(R.string.msg_user_not_found)
-                            else -> {
-                                val errorBody = response.errorBody()?.string() ?: ""
-                                if (errorBody.contains("mensaje")) {
-                                    // Intento simple de extraer el mensaje si es JSON
-                                    errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
-                                } else {
-                                    context.getString(R.string.msg_server_error, code.toString())
-                                }
+                    val errorMsg = when (code) {
+                        401 -> context.getString(R.string.msg_login_error)
+                        404 -> context.getString(R.string.msg_user_not_found)
+                        else -> {
+                            val errorBody = response.errorBody()?.string() ?: ""
+                            if (errorBody.contains("mensaje")) {
+                                errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
+                            } else {
+                                context.getString(R.string.msg_server_error, code.toString())
                             }
                         }
-                        _authState.value = Resource.Error(errorMsg)
                     }
+                    _authState.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
                 _authState.value = Resource.Error(handleException(e, context))
@@ -73,45 +68,6 @@ class AuthViewModel : ViewModel() {
                         else -> context.getString(R.string.msg_server_error, response.code().toString())
                     }
                     _authState.value = Resource.Error(displayMsg)
-                }
-            } catch (e: Exception) {
-                _authState.value = Resource.Error(handleException(e, context))
-            }
-        }
-    }
-
-    fun verify(email: String, code: String, context: Context) {
-        viewModelScope.launch {
-            _authState.value = Resource.Loading
-            try {
-                val response = RetrofitClient.instance.verify(VerifyRequest(email, code))
-                if (response.isSuccessful) {
-                    _authState.value = Resource.Success(Usuario("", "", email, ""))
-                } else {
-                    val errorBody = response.errorBody()?.string() ?: ""
-                    val msg = if (errorBody.contains("mensaje")) {
-                        errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
-                    } else {
-                        context.getString(R.string.msg_verify_error)
-                    }
-                    _authState.value = Resource.Error(msg)
-                }
-            } catch (e: Exception) {
-                _authState.value = Resource.Error(handleException(e, context))
-            }
-        }
-    }
-
-    fun resendCode(email: String, context: Context) {
-        viewModelScope.launch {
-            _authState.value = Resource.Loading
-            try {
-                val response = RetrofitClient.instance.resendCode(mapOf("email" to email))
-                if (response.isSuccessful) {
-                    _authState.value = Resource.Success(Usuario("RESEND", "", email, ""))
-                } else {
-                    val errorBody = response.errorBody()?.string() ?: ""
-                    _authState.value = Resource.Error(errorBody.substringAfter("\"mensaje\":\"").substringBefore("\""))
                 }
             } catch (e: Exception) {
                 _authState.value = Resource.Error(handleException(e, context))
