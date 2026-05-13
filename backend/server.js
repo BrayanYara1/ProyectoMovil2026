@@ -13,22 +13,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 
-// Configuración de Nodemailer robusta para Render/Gmail
+// Configuración de Nodemailer con DEBUG activo para ver el error real
 const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // true para 465, false para otros puertos
+    service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
     },
-    connectionTimeout: 20000, // Aumentado a 20 segundos
-    greetingTimeout: 20000,
-    socketTimeout: 20000,
-    tls: {
-        rejectUnauthorized: false, // Ayuda en entornos como Render
-        minVersion: 'TLSv1.2'
-    }
+    logger: true, // Muestra logs internos de nodemailer
+    debug: true   // Muestra la comunicación SMTP
 });
 
 // Modelos
