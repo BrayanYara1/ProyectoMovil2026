@@ -68,11 +68,11 @@ class EstudiosFragment : Fragment() {
         adapter = EstudiosAdapter { estudio ->
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.title_delete_study))
-                .setMessage("¿Deseas eliminar el registro: ${estudio.titulo}?")
-                .setPositiveButton("Eliminar") { _, _ ->
+                .setMessage(getString(R.string.msg_confirm_delete_study, estudio.titulo))
+                .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
                     viewModel.eliminarEstudio(estudio.id)
                 }
-                .setNegativeButton("Cancelar", null)
+                .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
                 .show()
         }
         binding.rvEstudios.layoutManager = LinearLayoutManager(context)
@@ -191,11 +191,11 @@ class EstudiosFragment : Fragment() {
             setPadding(60, 20, 60, 0)
         }
 
-        val etTitulo = EditText(requireContext()).apply { hint = "Título del estudio" }
-        val etTipo = EditText(requireContext()).apply { hint = "Tipo (Análisis, Placa, etc)" }
-        val etResultado = EditText(requireContext()).apply { hint = "Resultado breve" }
+        val etTitulo = EditText(requireContext()).apply { hint = getString(R.string.hint_study_title) }
+        val etTipo = EditText(requireContext()).apply { hint = getString(R.string.label_studies_type) }
+        val etResultado = EditText(requireContext()).apply { hint = getString(R.string.label_brief_result) }
         val etFecha = EditText(requireContext()).apply {
-            hint = "Fecha del estudio"
+            hint = getString(R.string.label_study_date)
             isFocusable = false
             setText(java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Calendar.getInstance().time))
             setOnClickListener {
@@ -207,7 +207,7 @@ class EstudiosFragment : Fragment() {
         }
         
         val btnPick = Button(requireContext()).apply {
-            text = "Adjuntar Foto"
+            text = getString(R.string.btn_attach_photo)
             setOnClickListener { pickImageLauncher.launch("image/*") }
         }
 
@@ -230,7 +230,7 @@ class EstudiosFragment : Fragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.btn_upload_study))
             .setView(layout)
-            .setPositiveButton("Guardar") { _, _ ->
+            .setPositiveButton(getString(R.string.btn_save)) { _, _ ->
                 val titulo = etTitulo.text.toString()
                 val tipo = etTipo.text.toString()
                 val resultado = etResultado.text.toString()
@@ -240,7 +240,7 @@ class EstudiosFragment : Fragment() {
                     viewModel.agregarEstudio(titulo, fecha, tipo, resultado, selectedImageUri?.toString())
                 }
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
             .show()
     }
 

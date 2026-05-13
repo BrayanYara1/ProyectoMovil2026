@@ -30,6 +30,9 @@ class AuthViewModel : ViewModel() {
                     } else {
                         _authState.value = Resource.Error(context.getString(R.string.msg_user_not_found))
                     }
+                } else if (response.code() == 403) {
+                    // Manejar cuenta no verificada
+                    _authState.value = Resource.Error("VERIFY_REQUIRED:$email")
                 } else {
                     val errorMsg = when (response.code()) {
                         401 -> context.getString(R.string.msg_login_error)
@@ -57,14 +60,7 @@ class AuthViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.instance.register(request)
                 if (response.isSuccessful) {
-                    val authResponse = response.body()
-                    val usuario = authResponse?.usuario
-                    if (usuario != null) {
-                        UserManager.saveUser(appContext, usuario, authResponse.token)
-                        _authState.value = Resource.Success(usuario)
-                    } else {
-                        _authState.value = Resource.Error(context.getString(R.string.msg_register_empty))
-                    }
+                    _authState.value = Resource.Error("VERIFY_REQUIRED:${request.email}")
                 } else {
                     val errorBody = response.errorBody()?.string() ?: ""
                     val displayMsg = when {
@@ -76,6 +72,23 @@ class AuthViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 _authState.value = Resource.Error(e.localizedMessage ?: context.getString(R.string.error_connection))
+            }
+        }
+    }
+
+    fun verify(email: String, code: String, context: Context) {
+        viewModelScope.launch {
+            _authState.value = Resource.Loading
+            try {
+                val response = RetrofitClient.instance.verify(VerifyRequest(email, code))
+                if (response.isSuccessful) {
+                    _authState.value = Resource.Error("VERIFY_SUCCESS")
+                } else {
+                    val errorBody = response.errorBody()?.string() ?: ""
+                    _authState.value = Resource.Error(errorBody.ifBlank { "Código incorrecto" })
+                }
+            } catch (e: Exception) {
+                _authState.value = Resource.Error(e.localizedMessage ?: "Error de conexión")
             }
         }
     }

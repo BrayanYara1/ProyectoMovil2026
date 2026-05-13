@@ -29,7 +29,7 @@ object RetrofitClient {
             val request = builder.build()
             chain.proceed(request)
         }
-        .retryOnConnectionFailure(true)
+        .retryOnConnectionFailure(retryOnConnectionFailure = true)
         .build()
 
     val instance: ApiService by lazy {

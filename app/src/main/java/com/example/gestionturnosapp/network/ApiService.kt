@@ -15,6 +15,9 @@ interface ApiService {
     @POST("api/auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<AuthResponse>
 
+    @POST("api/auth/verify")
+    suspend fun verify(@Body request: VerifyRequest): Response<Unit>
+
     @GET("api/turnos")
     suspend fun getTurnos(): Response<List<Turno>>
 

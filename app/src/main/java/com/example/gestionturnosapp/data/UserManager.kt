@@ -35,13 +35,14 @@ object UserManager {
         this.appContext = context.applicationContext
         usuarioActual = usuario
         val prefs = getEncryptedPrefs(appContext!!)
-        val json = Gson().toJson(usuario)
-        val editor = prefs.edit().putString(KEY_USER, json)
-        if (authToken != null) {
-            token = authToken
-            editor.putString(KEY_TOKEN, authToken)
+        prefs.edit().apply {
+            putString(KEY_USER, Gson().toJson(usuario))
+            if (authToken != null) {
+                token = authToken
+                putString(KEY_TOKEN, authToken)
+            }
+            apply()
         }
-        editor.apply()
     }
 
     fun getToken(context: Context? = null): String? {
@@ -67,7 +68,7 @@ object UserManager {
         if (json != null) {
             try {
                 usuarioActual = Gson().fromJson(json, Usuario::class.java)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 usuarioActual = null
                 prefs.edit().remove(KEY_USER).apply()
             }

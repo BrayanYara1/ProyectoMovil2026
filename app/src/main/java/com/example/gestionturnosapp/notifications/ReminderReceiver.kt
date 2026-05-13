@@ -9,11 +9,12 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.gestionturnosapp.MainActivity
+import com.example.gestionturnosapp.R
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        val title = intent.getStringExtra("TITLE") ?: "Recordatorio"
-        val message = intent.getStringExtra("MESSAGE") ?: "Cita médica próxima"
+        val title = intent.getStringExtra("TITLE") ?: context.getString(R.string.welcome)
+        val message = intent.getStringExtra("MESSAGE") ?: context.getString(R.string.no_upcoming_appointments)
         val notificationId = intent.getIntExtra("NOTIFICATION_ID", 1001)
         val type = intent.getStringExtra("TYPE") ?: "TURNO"
         
@@ -22,7 +23,7 @@ class ReminderReceiver : BroadcastReceiver() {
 
     private fun showNotification(context: Context, title: String, message: String, id: Int, type: String) {
         val channelId = if (type == "MEDICAMENTO") "medication_channel" else "turno_reminder_channel"
-        val channelName = if (type == "MEDICAMENTO") "Medicación" else "Recordatorios de Citas"
+        val channelName = if (type == "MEDICAMENTO") context.getString(R.string.label_medication_channel) else context.getString(R.string.label_reminders_channel)
         
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

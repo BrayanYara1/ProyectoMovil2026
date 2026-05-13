@@ -15,3 +15,14 @@ variable "db_password" {
   type        = string
   sensitive   = true
 }
+
+variable "email_user" {
+  description = "Correo de Gmail para enviar notificaciones"
+  type        = string
+}
+
+variable "email_password" {
+  description = "Contraseña de aplicación de Gmail"
+  type        = string
+  sensitive   = true
+}

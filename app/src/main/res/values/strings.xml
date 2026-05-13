@@ -22,6 +22,7 @@
     <string name="msg_connection_error">Error de conexión: %1$s</string>
     <string name="msg_login_success">¡Bienvenido de nuevo!</string>
     <string name="msg_login_error">Correo o contraseña incorrectos</string>
+    <string name="msg_invalid_email">Ingresa un correo electrónico real y válido</string>
 
     <!-- Home -->
     <string name="home_greeting">¡Hola, %1$s!</string>
@@ -192,6 +193,16 @@
     <string name="msg_install_maps">Instala Google Maps</string>
     <string name="label_emergency_call">Llamada de Emergencia</string>
 
+    <string name="btn_save">Guardar</string>
+    <string name="btn_delete_confirm">Eliminar</string>
+    <string name="btn_cancel_dialog">Cancelar</string>
+    <string name="hint_study_title">Título del estudio</string>
+    <string name="label_studies_type">Tipo (Análisis, Placa, etc)</string>
+    <string name="label_brief_result">Resultado breve</string>
+    <string name="label_study_date">Fecha del estudio</string>
+    <string name="btn_attach_photo">Adjuntar Foto</string>
+    <string name="msg_confirm_delete_study">¿Deseas eliminar el registro: %1$s?</string>
+
     <string name="msg_error_unknown">Error desconocido</string>
     <string name="msg_user_not_found">Usuario no encontrado</string>
     <string name="msg_server_error">Error del servidor: %1$s</string>
@@ -202,4 +213,15 @@
     <string name="msg_password_weak">Contraseña demasiado débil</string>
     <string name="msg_register_empty">Error al registrar: Respuesta vacía</string>
     <string name="acc_study_image">Imagen del estudio</string>
+    <string name="msg_no_mail_app_found">No hay app de correo instalada</string>
+    <string name="label_reminders_channel">Recordatorios de Citas</string>
+    <string name="label_medication_channel">Medicación</string>
+
+    <string name="title_verify_account">Verifica tu Cuenta</string>
+    <string name="msg_verification_sent">Hemos enviado un código de 6 dígitos a tu correo. Por favor, ingrésalo a continuación.</string>
+    <string name="hint_verification_code">Código de 6 dígitos</string>
+    <string name="btn_verify">VERIFICAR</string>
+    <string name="msg_verify_success">Cuenta verificada con éxito. Inicia sesión.</string>
+    <string name="msg_verify_error">Código de verificación incorrecto</string>
+    <string name="msg_verify_required">Cuenta no verificada. Revisa tu correo.</string>
 </resources>

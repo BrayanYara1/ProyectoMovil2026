@@ -274,7 +274,9 @@ resource "aws_ecs_task_definition" "app_task" {
       { name = "DB_HOST", value = aws_db_instance.gestion_turnos_db.address },
       { name = "DB_NAME", value = aws_db_instance.gestion_turnos_db.db_name },
       { name = "DB_USER", value = aws_db_instance.gestion_turnos_db.username },
-      { name = "DB_PASS", value = var.db_password }
+      { name = "DB_PASS", value = var.db_password },
+      { name = "EMAIL_USER", value = var.email_user },
+      { name = "EMAIL_PASS", value = var.email_password }
     ]
   }])
 }

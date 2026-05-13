@@ -53,7 +53,13 @@ class RegisterFragment : Fragment() {
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
                     binding.btnRegister.isEnabled = true
-                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
+                    if (resource.message.startsWith("VERIFY_REQUIRED")) {
+                        val email = resource.message.split(":")[1]
+                        val bundle = Bundle().apply { putString("email", email) }
+                        findNavController().navigate(R.id.action_registerFragment_to_verificationFragment, bundle)
+                    } else {
+                        Toast.makeText(requireContext(), resource.message, Toast.LENGTH_LONG).show()
+                    }
                 }
                 else -> {
                     binding.progressBar.isVisible = false
@@ -96,7 +102,7 @@ class RegisterFragment : Fragment() {
             }
 
             if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                binding.tilEmail.error = if (email.isEmpty()) getString(R.string.msg_complete_fields) else "Email inválido"
+                binding.tilEmail.error = if (email.isEmpty()) getString(R.string.msg_complete_fields) else getString(R.string.msg_invalid_email)
                 isValid = false
             }
 

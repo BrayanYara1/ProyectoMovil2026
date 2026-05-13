@@ -23,6 +23,7 @@
     <string name="msg_connection_error">Connection error: %1$s</string>
     <string name="msg_login_success">Welcome back!</string>
     <string name="msg_login_error">Incorrect email or password</string>
+    <string name="msg_invalid_email">Please enter a real and valid email address</string>
 
     <!-- Home -->
     <string name="home_greeting">Hello, %1$s!</string>
@@ -186,6 +187,16 @@
     <string name="msg_install_maps">Install Google Maps</string>
     <string name="label_emergency_call">Emergency Call</string>
 
+    <string name="btn_save">Save</string>
+    <string name="btn_delete_confirm">Delete</string>
+    <string name="btn_cancel_dialog">Cancel</string>
+    <string name="hint_study_title">Study title</string>
+    <string name="label_studies_type">Type (Analysis, X-ray, etc)</string>
+    <string name="label_brief_result">Brief result</string>
+    <string name="label_study_date">Study date</string>
+    <string name="btn_attach_photo">Attach Photo</string>
+    <string name="msg_confirm_delete_study">Do you want to delete the record: %1$s?</string>
+
     <string name="msg_error_unknown">Unknown error</string>
     <string name="msg_user_not_found">User not found</string>
     <string name="msg_server_error">Server error: %1$s</string>
@@ -196,4 +207,15 @@
     <string name="msg_password_weak">Password is too weak</string>
     <string name="msg_register_empty">Registration error: Empty response</string>
     <string name="acc_study_image">Study image</string>
+    <string name="msg_no_mail_app_found">No email app installed</string>
+    <string name="label_reminders_channel">Appointment Reminders</string>
+    <string name="label_medication_channel">Medication</string>
+
+    <string name="title_verify_account">Verify your Account</string>
+    <string name="msg_verification_sent">We have sent a 6-digit code to your email. Please enter it below.</string>
+    <string name="hint_verification_code">6-digit code</string>
+    <string name="btn_verify">VERIFY</string>
+    <string name="msg_verify_success">Account verified successfully. Log in.</string>
+    <string name="msg_verify_error">Incorrect verification code</string>
+    <string name="msg_verify_required">Account not verified. Check your email.</string>
 </resources>

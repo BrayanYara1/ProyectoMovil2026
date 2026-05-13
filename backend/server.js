@@ -11,6 +11,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 
 // Modelos
 const User = require('./models/User');
@@ -25,9 +26,39 @@ const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
 app.use(cors());
 app.use(express.json());
 
+// Configuración de Nodemailer (Recomendado usar variables de entorno)
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER || 'tucorreo@gmail.com',
+        pass: process.env.EMAIL_PASS || 'tu_password_de_aplicacion'
+    }
+});
+
+// Función para enviar correo de verificación
+const sendVerificationEmail = async (email, code) => {
+    const mailOptions = {
+        from: `"Salud Activa" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Código de Verificación - Salud Activa',
+        html: `
+            <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+                <h2 style="color: #007bff;">¡Bienvenido a Salud Activa!</h2>
+                <p>Gracias por registrarte. Para activar tu cuenta, ingresa el siguiente código en la aplicación:</p>
+                <div style="background: #f4f4f4; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; border-radius: 8px; letter-spacing: 5px;">
+                    ${code}
+                </div>
+                <p>Este código expirará en 24 horas.</p>
+                <p>Si no creaste esta cuenta, puedes ignorar este correo.</p>
+            </div>
+        `
+    };
+    return transporter.sendMail(mailOptions);
+};
+
 // Ruta de estado
-app.get('/', (req, res) => res.send('🚀 Salud Activa Backend is RUNNING (v3.0.2)'));
-app.get('/api/status', (req, res) => res.json({ status: "online", version: "3.0.2", database: mongoose.connection.readyState === 1 ? "connected" : "disconnected" }));
+app.get('/', (req, res) => res.send('🚀 Salud Activa Backend is RUNNING (v3.0.3)'));
+app.get('/api/status', (req, res) => res.json({ status: "online", version: "3.0.3", database: mongoose.connection.readyState === 1 ? "connected" : "disconnected" }));
 
 // Conexión a MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -72,14 +103,52 @@ app.post('/api/auth/register', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contrasena, salt);
 
-        const nuevoUsuario = new User({ nombre, email, telefono, contrasena: hashedPassword });
+        // Generar código de 6 dígitos
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+        const nuevoUsuario = new User({
+            nombre,
+            email,
+            telefono,
+            contrasena: hashedPassword,
+            verificationCode,
+            isVerified: false
+        });
         await nuevoUsuario.save();
 
+        // Enviar correo (no bloqueamos la respuesta si falla el correo, pero avisamos)
+        try {
+            await sendVerificationEmail(email, verificationCode);
+        } catch (mailError) {
+            console.error('Error enviando correo:', mailError);
+        }
+
         const token = jwt.sign({ userId: nuevoUsuario._id, email: nuevoUsuario.email }, SECRET_KEY, { expiresIn: '30d' });
-        const userSafe = { id: nuevoUsuario._id, _id: nuevoUsuario._id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, telefono: nuevoUsuario.telefono };
+        const userSafe = { id: nuevoUsuario._id, _id: nuevoUsuario._id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, telefono: nuevoUsuario.telefono, isVerified: false };
         res.status(201).json({ mensaje: "OK", usuario: userSafe, token });
     } catch (error) {
         res.status(500).json({ mensaje: "Error en el servidor", error: error.message });
+    }
+});
+
+app.post('/api/auth/verify', async (req, res) => {
+    try {
+        const { email, code } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(404).json({ mensaje: "Usuario no encontrado" });
+        if (user.isVerified) return res.status(400).json({ mensaje: "La cuenta ya está verificada" });
+
+        if (user.verificationCode === code) {
+            user.isVerified = true;
+            user.verificationCode = null;
+            await user.save();
+            res.json({ mensaje: "Cuenta verificada con éxito" });
+        } else {
+            res.status(400).json({ mensaje: "Código de verificación incorrecto" });
+        }
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error en el servidor" });
     }
 });
 
@@ -91,6 +160,14 @@ app.post('/api/auth/login', async (req, res) => {
 
         const esValida = await bcrypt.compare(contrasena, user.contrasena);
         if (!esValida) return res.status(401).json({ mensaje: "Contraseña incorrecta" });
+
+        if (!user.isVerified) {
+            return res.status(403).json({
+                mensaje: "Cuenta no verificada. Revisa tu correo.",
+                requiresVerification: true,
+                email: user.email
+            });
+        }
 
         const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '30d' });
         const userSafe = { id: user._id, _id: user._id, nombre: user.nombre, email: user.email, telefono: user.telefono };
@@ -224,7 +301,7 @@ app.use((req, res) => {
 
 if (require.main === module) {
     app.listen(PORT, '0.0.0.0', () => {
-        console.log(`🚀 Salud Activa CLOUD Backend v3.0.2 en puerto ${PORT}`);
+        console.log(`🚀 Salud Activa CLOUD Backend v3.0.3 en puerto ${PORT}`);
     });
 }
 
