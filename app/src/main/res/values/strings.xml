@@ -224,4 +224,6 @@
     <string name="msg_verify_success">Cuenta verificada con éxito. Inicia sesión.</string>
     <string name="msg_verify_error">Código de verificación incorrecto</string>
     <string name="msg_verify_required">Cuenta no verificada. Revisa tu correo.</string>
+    <string name="btn_resend_code">¿No recibiste el código? Reenviar</string>
+    <string name="msg_code_resent">Código reenviado con éxito</string>
 </resources>

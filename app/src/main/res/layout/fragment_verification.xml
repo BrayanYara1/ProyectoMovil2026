@@ -98,6 +98,16 @@
                         android:layout_marginTop="32dp"
                         android:text="@string/btn_verify" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResendCode"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/btn_resend_code"
+                        android:textColor="@color/primary" />
+
                     <ProgressBar
                         android:id="@+id/progressBar"
                         android:layout_width="40dp"

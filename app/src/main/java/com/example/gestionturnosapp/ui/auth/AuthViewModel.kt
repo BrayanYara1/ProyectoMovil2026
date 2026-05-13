@@ -30,48 +30,52 @@ class AuthViewModel : ViewModel() {
                     } else {
                         _authState.value = Resource.Error(context.getString(R.string.msg_user_not_found))
                     }
-                } else if (response.code() == 403) {
-                    // Manejar cuenta no verificada
-                    _authState.value = Resource.Error("VERIFY_REQUIRED:$email")
                 } else {
-                    val errorMsg = when (response.code()) {
-                        401 -> context.getString(R.string.msg_login_error)
-                        404 -> context.getString(R.string.msg_user_not_found)
-                        else -> context.getString(R.string.msg_server_error, response.code().toString())
+                    val code = response.code()
+                    if (code == 403) {
+                        _authState.value = Resource.Error("VERIFY_REQUIRED:$email")
+                    } else {
+                        val errorMsg = when (code) {
+                            401 -> context.getString(R.string.msg_login_error)
+                            404 -> context.getString(R.string.msg_user_not_found)
+                            else -> {
+                                val errorBody = response.errorBody()?.string() ?: ""
+                                if (errorBody.contains("mensaje")) {
+                                    // Intento simple de extraer el mensaje si es JSON
+                                    errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
+                                } else {
+                                    context.getString(R.string.msg_server_error, code.toString())
+                                }
+                            }
+                        }
+                        _authState.value = Resource.Error(errorMsg)
                     }
-                    _authState.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                val errorMsg = e.localizedMessage ?: context.getString(R.string.error_connection)
-                val displayMsg = when {
-                    errorMsg.contains("connect", true) -> context.getString(R.string.msg_no_connection)
-                    errorMsg.contains("timeout", true) -> context.getString(R.string.msg_timeout)
-                    else -> context.getString(R.string.msg_server_error, errorMsg)
-                }
-                _authState.value = Resource.Error(displayMsg)
+                _authState.value = Resource.Error(handleException(e, context))
             }
         }
     }
 
     fun register(request: RegisterRequest, context: Context) {
-        val appContext = context.applicationContext
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
                 val response = RetrofitClient.instance.register(request)
                 if (response.isSuccessful) {
-                    _authState.value = Resource.Error("VERIFY_REQUIRED:${request.email}")
+                    _authState.value = Resource.Success(Usuario("", request.nombre, request.email, request.telefono))
                 } else {
                     val errorBody = response.errorBody()?.string() ?: ""
                     val displayMsg = when {
-                        errorBody.contains("email", true) -> context.getString(R.string.msg_email_already_registered)
-                        errorBody.contains("password", true) -> context.getString(R.string.msg_password_weak)
-                        else -> context.getString(R.string.msg_server_error, errorBody)
+                        errorBody.contains("email", true) || errorBody.contains("correo", true) -> context.getString(R.string.msg_email_already_registered)
+                        errorBody.contains("password", true) || errorBody.contains("contraseña", true) -> context.getString(R.string.msg_password_weak)
+                        errorBody.contains("mensaje") -> errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
+                        else -> context.getString(R.string.msg_server_error, response.code().toString())
                     }
                     _authState.value = Resource.Error(displayMsg)
                 }
             } catch (e: Exception) {
-                _authState.value = Resource.Error(e.localizedMessage ?: context.getString(R.string.error_connection))
+                _authState.value = Resource.Error(handleException(e, context))
             }
         }
     }
@@ -82,14 +86,46 @@ class AuthViewModel : ViewModel() {
             try {
                 val response = RetrofitClient.instance.verify(VerifyRequest(email, code))
                 if (response.isSuccessful) {
-                    _authState.value = Resource.Error("VERIFY_SUCCESS")
+                    _authState.value = Resource.Success(Usuario("", "", email, ""))
                 } else {
                     val errorBody = response.errorBody()?.string() ?: ""
-                    _authState.value = Resource.Error(errorBody.ifBlank { "Código incorrecto" })
+                    val msg = if (errorBody.contains("mensaje")) {
+                        errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
+                    } else {
+                        context.getString(R.string.msg_verify_error)
+                    }
+                    _authState.value = Resource.Error(msg)
                 }
             } catch (e: Exception) {
-                _authState.value = Resource.Error(e.localizedMessage ?: "Error de conexión")
+                _authState.value = Resource.Error(handleException(e, context))
             }
+        }
+    }
+
+    fun resendCode(email: String, context: Context) {
+        viewModelScope.launch {
+            _authState.value = Resource.Loading
+            try {
+                val response = RetrofitClient.instance.resendCode(mapOf("email" to email))
+                if (response.isSuccessful) {
+                    _authState.value = Resource.Success(Usuario("RESEND", "", email, ""))
+                } else {
+                    val errorBody = response.errorBody()?.string() ?: ""
+                    _authState.value = Resource.Error(errorBody.substringAfter("\"mensaje\":\"").substringBefore("\""))
+                }
+            } catch (e: Exception) {
+                _authState.value = Resource.Error(handleException(e, context))
+            }
+        }
+    }
+
+    private fun handleException(e: Exception, context: Context): String {
+        android.util.Log.e("AuthViewModel", "Error en autenticación", e)
+        val errorMsg = e.localizedMessage ?: ""
+        return when {
+            errorMsg.contains("connect", true) -> context.getString(R.string.msg_no_connection)
+            errorMsg.contains("timeout", true) -> context.getString(R.string.msg_timeout)
+            else -> context.getString(R.string.msg_server_error, errorMsg.ifBlank { "Error desconocido" })
         }
     }
 

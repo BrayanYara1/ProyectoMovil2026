@@ -13,25 +13,15 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 
-// Modelos
-const User = require('./models/User');
-const Turno = require('./models/Turno');
-const Medicamento = require('./models/Medicamento');
-const Estudio = require('./models/Estudio');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-const SECRET_KEY = process.env.JWT_SECRET || 'SaludActiva_Secret_Key_2024';
-
-app.use(cors());
-app.use(express.json());
-
-// Configuración de Nodemailer mejorada con logs
+// Configuración de Nodemailer simplificada para Render
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -172,6 +162,26 @@ app.post('/api/auth/verify', async (req, res) => {
         }
     } catch (error) {
         res.status(500).json({ mensaje: "Error en el servidor" });
+    }
+});
+
+app.post('/api/auth/resend-code', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(404).json({ mensaje: "Usuario no encontrado" });
+        if (user.isVerified) return res.status(400).json({ mensaje: "La cuenta ya está verificada" });
+
+        const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+        user.verificationCode = newCode;
+        await user.save();
+
+        sendVerificationEmail(email, newCode).catch(e => console.error("Error re-envío:", e.message));
+
+        res.json({ mensaje: "Código reenviado con éxito" });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al reenviar código" });
     }
 });
 

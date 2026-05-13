@@ -48,11 +48,17 @@ class RegisterFragment : Fragment() {
                     binding.progressBar.isVisible = false
                     binding.btnRegister.isEnabled = true
                     Toast.makeText(requireContext(), getString(R.string.msg_register_success), Toast.LENGTH_SHORT).show()
-                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                    
+                    // Navegamos a verificación pasando el email
+                    val email = binding.etEmail.text.toString().trim()
+                    val bundle = Bundle().apply { putString("email", email) }
+                    findNavController().navigate(R.id.action_registerFragment_to_verificationFragment, bundle)
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
                     binding.btnRegister.isEnabled = true
+                    
+                    // Si por alguna razón el ViewModel envía VERIFY_REQUIRED aquí, lo manejamos
                     if (resource.message.startsWith("VERIFY_REQUIRED")) {
                         val email = resource.message.split(":")[1]
                         val bundle = Bundle().apply { putString("email", email) }
@@ -76,9 +82,10 @@ class RegisterFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 val text = s.toString()
                 if (text.isNotEmpty() && !text.startsWith("+57 ")) {
-                    val clean = text.replace("+57 ", "")
-                    binding.etTelefono.setText("+57 $clean")
-                    binding.etTelefono.setSelection(binding.etTelefono.text?.length ?: 0)
+                    val clean = text.replace("+57", "").trim()
+                    val formatted = "+57 $clean"
+                    binding.etTelefono.setText(formatted)
+                    binding.etTelefono.setSelection(binding.etTelefono.length())
                 }
             }
         })
@@ -117,7 +124,6 @@ class RegisterFragment : Fragment() {
             }
 
             if (isValid) {
-                binding.btnRegister.isEnabled = false
                 viewModel.register(RegisterRequest(name, email, phone, pass), requireContext())
             }
         }

@@ -48,6 +48,10 @@ class VerificationFragment : Fragment() {
                 binding.tilCode.error = getString(R.string.hint_verification_code)
             }
         }
+
+        binding.btnResendCode.setOnClickListener {
+            viewModel.resendCode(email, requireContext())
+        }
     }
 
     private fun setupObservers() {
@@ -56,22 +60,30 @@ class VerificationFragment : Fragment() {
                 is Resource.Loading -> {
                     binding.progressBar.isVisible = true
                     binding.btnVerify.isEnabled = false
+                    binding.btnResendCode.isEnabled = false
+                }
+                is Resource.Success -> {
+                    binding.progressBar.isVisible = false
+                    binding.btnVerify.isEnabled = true
+                    binding.btnResendCode.isEnabled = true
+                    
+                    if (resource.data.id == "RESEND") {
+                        Toast.makeText(requireContext(), getString(R.string.msg_code_resent), Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(), getString(R.string.msg_verify_success), Toast.LENGTH_LONG).show()
+                        findNavController().navigate(R.id.action_verificationFragment_to_loginFragment)
+                    }
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
                     binding.btnVerify.isEnabled = true
-                    if (resource.message == "VERIFY_SUCCESS") {
-                        Toast.makeText(requireContext(), getString(R.string.msg_verify_success), Toast.LENGTH_LONG).show()
-                        findNavController().navigate(R.id.action_verificationFragment_to_loginFragment)
-                    } else if (resource.message.startsWith("VERIFY_REQUIRED")) {
-                        // Ya estamos aquí
-                    } else {
-                        Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
-                    }
+                    binding.btnResendCode.isEnabled = true
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
                 }
                 else -> {
                     binding.progressBar.isVisible = false
                     binding.btnVerify.isEnabled = true
+                    binding.btnResendCode.isEnabled = true
                 }
             }
         }
