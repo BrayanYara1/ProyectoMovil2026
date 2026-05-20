@@ -76,7 +76,7 @@ class UserProfileFragment : Fragment() {
         if (usuario != null) {
             binding.tvProfileName.text = usuario.nombre
             binding.tvProfileEmail.text = usuario.email
-            binding.tvProfilePhone.text = usuario.telefono ?: "---"
+            binding.tvProfilePhone.text = usuario.telefono ?: getString(R.string.label_not_specified)
         } else {
             binding.tvProfileName.text = getString(R.string.loading_user)
         }
@@ -113,6 +113,19 @@ class UserProfileFragment : Fragment() {
 
         inputNombre.setText(usuario?.nombre)
         inputPhone.setText(usuario?.telefono)
+
+        inputPhone.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val text = s.toString()
+                if (text.isNotEmpty() && !text.startsWith("+57 ")) {
+                    val clean = text.replace("+57", "").trim()
+                    inputPhone.setText("+57 $clean")
+                    inputPhone.setSelection(inputPhone.length())
+                }
+            }
+        })
 
         builder.setView(viewInflated)
 

@@ -24,6 +24,12 @@ interface ApiService {
     @GET("api/turnos")
     suspend fun getTurnos(): Response<List<Turno>>
 
+    @GET("api/turnos/check-availability")
+    suspend fun checkAvailability(
+        @Query("fecha") fecha: String,
+        @Query("hora") hora: String
+    ): Response<Map<String, Boolean>>
+
     @POST("api/turnos")
     suspend fun crearTurno(@Body request: NuevoTurnoRequest): Response<Turno>
 

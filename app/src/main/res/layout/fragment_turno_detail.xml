@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background">
@@ -120,7 +121,7 @@
                         android:id="@+id/tvDetailFechaHora"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="20 Octubre, 2023 - 10:30 AM"
+                        tools:text="20 Octubre, 2023 - 10:30 AM"
                         android:textColor="@color/text_primary"
                         android:textSize="18sp"
                         android:layout_marginTop="4dp"
@@ -145,7 +146,7 @@
                         android:id="@+id/tvDetailMotivo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Chequeo general preventivo de rutina."
+                        tools:text="Chequeo general preventivo de rutina."
                         android:textColor="@color/text_primary"
                         android:textSize="16sp"
                         android:layout_marginTop="4dp" />

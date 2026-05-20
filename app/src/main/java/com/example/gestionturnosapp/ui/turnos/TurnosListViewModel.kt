@@ -161,14 +161,9 @@ class TurnosListViewModel : ViewModel() {
         availabilityJob?.cancel()
         availabilityJob = viewModelScope.launch {
             try {
-                val lista = repository.getTurnos()
-                _turnos.value = lista
-                val ocupado = lista.any { 
-                    it.fecha.replace("/", "-").trim() == fLimpia && 
-                    normalizeTime(it.hora.trim()) == hLimpia &&
-                    it.estado.lowercase() !in listOf("cancelado", "cancelled")
-                }
-                _isSlotAvailable.value = !ocupado
+                // Verificar disponibilidad REAL contra el servidor (todos los usuarios)
+                val disponible = repository.checkAvailability(fLimpia, hLimpia)
+                _isSlotAvailable.value = disponible
             } catch (e: Exception) {
                 if (_isSlotAvailable.value == null) _isSlotAvailable.value = true
             }

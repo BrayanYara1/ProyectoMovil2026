@@ -33,7 +33,7 @@ class TurnosAdapter(
         private val onDeleteClick: (Turno) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         
-        private val displayTimeFormat = SimpleDateFormat("hh:mm a", Locale.US)
+        private val displayTimeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
         private val isoDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         private val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
         private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")

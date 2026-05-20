@@ -3,7 +3,7 @@
     <item
         android:id="@+id/homeFragment"
         android:icon="@drawable/ic_nav_home"
-        android:title="Inicio" />
+        android:title="@string/menu_home" />
     <item
         android:id="@+id/especialidadesFragment"
         android:icon="@drawable/ic_nav_search"

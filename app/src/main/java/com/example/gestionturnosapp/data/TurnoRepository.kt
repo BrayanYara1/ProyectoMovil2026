@@ -40,6 +40,20 @@ class TurnoRepository {
         }
     }
 
+    suspend fun checkAvailability(fecha: String, hora: String): Boolean {
+        return try {
+            val response = apiService.checkAvailability(fecha, hora)
+            if (response.isSuccessful) {
+                response.body()?.get("disponible") ?: true
+            } else {
+                // Si falla la red, permitimos intentar agendar y que el servidor valide el POST
+                true 
+            }
+        } catch (e: Exception) {
+            true
+        }
+    }
+
     suspend fun crearTurno(request: NuevoTurnoRequest): Turno? {
         val response = apiService.crearTurno(request)
         if (response.isSuccessful) {

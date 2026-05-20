@@ -31,6 +31,7 @@
     <string name="home_subtitle">What do you need today?</string>
     <string name="menu_request_appointment">Book Appointment</string>
     <string name="menu_my_appointments">My Appointments</string>
+    <string name="menu_home">Home</string>
     <string name="menu_profile">My Profile</string>
     <string name="menu_settings">Settings</string>
 
@@ -228,6 +229,12 @@
     <string name="filter_from_date">From: %1$s</string>
     <string name="filter_to_date">To: %1$s</string>
     <string name="all_dates">All</string>
+
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="label_default_specialty">Consultation</string>
+    <string name="label_default_doctor">Dr. Pending</string>
+    <string name="label_not_specified">Not specified</string>
 
     <string name="title_recommendation">Recommendation of the day</string>
     <string name="title_next_appointment">NEXT APPOINTMENT</string>

@@ -168,8 +168,8 @@ class HomeFragment : Fragment() {
                 
                 binding.tvNextAppointName.text = getString(
                     R.string.label_next_appointment_format,
-                    turno.especialidad ?: "Consulta",
-                    turno.doctor ?: "Dr. Pendiente"
+                    turno.especialidad ?: getString(R.string.label_default_specialty),
+                    turno.doctor ?: getString(R.string.label_default_doctor)
                 )
                 binding.tvNextAppointName.setTextColor(requireContext().getColor(R.color.white))
                 
@@ -178,13 +178,13 @@ class HomeFragment : Fragment() {
                     var dateObj: java.util.Date? = null
                     for (fmt in inputFormats) {
                         try {
-                            val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
+                            val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
                             dateObj = sdf.parse(turno.hora)
                             if (dateObj != null) break
                         } catch (e: Exception) {}
                     }
                     if (dateObj != null) {
-                        java.text.SimpleDateFormat("hh:mm a", java.util.Locale.US).format(dateObj)
+                        java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(dateObj)
                     } else turno.hora
                 } catch (e: Exception) {
                     turno.hora
@@ -202,9 +202,9 @@ class HomeFragment : Fragment() {
                         
                         val sdfDay = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
                         when (sdfDay.format(date)) {
-                            sdfDay.format(today) -> getString(R.string.filter_all).replace("Todos", "Hoy") // O un string específico
-                            sdfDay.format(tomorrow) -> "Mañana"
-                            else -> java.text.SimpleDateFormat("EEE, d MMM", java.util.Locale("es", "ES")).format(date).replaceFirstChar { it.uppercase() }
+                            sdfDay.format(today) -> getString(R.string.today)
+                            sdfDay.format(tomorrow) -> getString(R.string.tomorrow)
+                            else -> java.text.SimpleDateFormat("EEE, d MMM", java.util.Locale.getDefault()).format(date).replaceFirstChar { it.uppercase() }
                         }
                     } else turno.fecha
                 } catch (e: Exception) {

@@ -156,7 +156,7 @@ class SolicitarTurnoFragment : Fragment() {
             } else {
                 "yyyy-MM-dd HH:mm"
             }
-            val sdf = java.text.SimpleDateFormat(formatStr, Locale.US)
+            val sdf = java.text.SimpleDateFormat(formatStr, Locale.getDefault())
             val fechaSeleccionada = sdf.parse("$fecha $hora")
             val ahora = Calendar.getInstance().time
             fechaSeleccionada?.before(ahora) ?: true
@@ -182,7 +182,7 @@ class SolicitarTurnoFragment : Fragment() {
                 calendar.set(Calendar.HOUR_OF_DAY, hour)
                 calendar.set(Calendar.MINUTE, minute)
                 
-                val sdf = java.text.SimpleDateFormat("hh:mm a", Locale.US)
+                val sdf = java.text.SimpleDateFormat("hh:mm a", Locale.getDefault())
                 val formattedTime = sdf.format(calendar.time)
                 
                 binding.etHora.setText(formattedTime)

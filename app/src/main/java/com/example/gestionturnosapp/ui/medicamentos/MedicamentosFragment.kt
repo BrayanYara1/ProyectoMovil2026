@@ -82,7 +82,7 @@ class MedicamentosFragment : Fragment() {
         binding.etMedNext.setOnClickListener {
             val c = java.util.Calendar.getInstance()
             android.app.TimePickerDialog(requireContext(), { _, hour, minute ->
-                binding.etMedNext.setText(String.format(java.util.Locale.US, "%02d:%02d", hour, minute))
+                binding.etMedNext.setText(String.format(java.util.Locale.getDefault(), "%02d:%02d", hour, minute))
             }, c.get(java.util.Calendar.HOUR_OF_DAY), c.get(java.util.Calendar.MINUTE), true).show()
         }
     }

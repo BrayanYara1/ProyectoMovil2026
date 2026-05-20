@@ -65,13 +65,13 @@ class TurnoDetailFragment : Fragment() {
                 var dateObj: java.util.Date? = null
                 for (fmt in inputFormats) {
                     try {
-                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
+                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
                         dateObj = sdf.parse(hora)
                         if (dateObj != null) break
                     } catch (e: Exception) {}
                 }
                 if (dateObj != null) {
-                    java.text.SimpleDateFormat("hh:mm a", java.util.Locale.US).format(dateObj)
+                    java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(dateObj)
                 } else hora
             } catch (e: Exception) {
                 hora
@@ -189,7 +189,7 @@ class TurnoDetailFragment : Fragment() {
             var timeDate: java.util.Date? = null
             for (fmt in inputFormats) {
                 try {
-                    val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
+                    val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
                     timeDate = sdf.parse(hora)
                     if (timeDate != null) break
                 } catch (e: Exception) {}
@@ -284,7 +284,7 @@ class TurnoDetailFragment : Fragment() {
             var timeDate: java.util.Date? = null
             for (fmt in inputFormats) {
                 try {
-                    val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
+                    val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
                     timeDate = sdf.parse(hora)
                     if (timeDate != null) break
                 } catch (e: Exception) {}

@@ -13,16 +13,25 @@ app.use(cors());
 app.use(express.json());
 
 // --- MIDDLEWARE DE AUTENTICACIÓN ---
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) return res.status(401).json({ mensaje: "Token no proporcionado" });
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
+    jwt.verify(token, SECRET_KEY, async (err, decoded) => {
         if (err) return res.status(403).json({ mensaje: "Token inválido o expirado" });
-        req.userId = user.userId;
-        next();
+
+        try {
+            const user = await User.findById(decoded.userId);
+            if (!user) return res.status(401).json({ mensaje: "Usuario ya no existe" });
+
+            req.userId = decoded.userId;
+            req.user = user;
+            next();
+        } catch (error) {
+            res.status(500).json({ mensaje: "Error de servidor en autenticación" });
+        }
     });
 };
 
@@ -33,32 +42,43 @@ const Medicamento = require('./models/Medicamento');
 const Estudio = require('./models/Estudio');
 
 // --- CONEXIÓN MONGODB ---
+if (!process.env.MONGODB_URI) {
+    console.error('❌ ERROR: MONGODB_URI no definida en .env');
+    process.exit(1);
+}
+
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('✅ MongoDB Atlas conectado'))
-    .catch(err => console.error('❌ Error MongoDB:', err.message));
+    .then(() => console.log('✅ MongoDB Atlas conectado a:', mongoose.connection.name))
+    .catch(err => {
+        console.error('❌ Error MongoDB:', err.message);
+        process.exit(1);
+    });
 
 // --- RUTAS DE AUTENTICACIÓN ---
 
 app.post('/api/auth/register', async (req, res) => {
     try {
         const { nombre, email, telefono, contrasena } = req.body;
+        if (!nombre || !email || !contrasena) {
+            return res.status(400).json({ mensaje: "Faltan datos obligatorios" });
+        }
+
         const existe = await User.findOne({ email });
         if (existe) return res.status(400).json({ mensaje: "El email ya está registrado" });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(contrasena, salt);
 
-        // Registro directo sin código de verificación
         const nuevoUsuario = new User({
             nombre, email, telefono, contrasena: hashedPassword, verificationCode: null, isVerified: true
         });
         await nuevoUsuario.save();
 
         console.log(`👤 Usuario registrado: ${email}`);
-
         res.status(201).json({ mensaje: "OK", email: nuevoUsuario.email });
     } catch (error) {
-        res.status(500).json({ mensaje: "Error en el servidor" });
+        console.error("Error en register:", error);
+        res.status(500).json({ mensaje: "Error en el servidor durante el registro" });
     }
 });
 
@@ -82,6 +102,7 @@ app.post('/api/auth/login', async (req, res) => {
             token
         });
     } catch (error) {
+        console.error("Error en login:", error);
         res.status(500).json({ mensaje: "Error en el servidor" });
     }
 });
@@ -90,6 +111,7 @@ app.put('/api/auth/profile', authenticateToken, async (req, res) => {
     try {
         const { nombre, telefono } = req.body;
         const user = await User.findByIdAndUpdate(req.userId, { nombre, telefono }, { new: true });
+        if (!user) return res.status(404).json({ mensaje: "Usuario no encontrado" });
         res.json({ id: user._id, nombre: user.nombre, email: user.email, telefono: user.telefono });
     } catch (error) {
         res.status(500).json({ mensaje: "Error al actualizar perfil" });
@@ -106,20 +128,52 @@ app.post('/api/auth/fcm-token', authenticateToken, async (req, res) => {
     }
 });
 
+// Rutas Mock para compatibilidad con el Frontend (Si se requiere verificación luego)
+app.post('/api/auth/verify', async (req, res) => res.status(200).json({ mensaje: "OK" }));
+app.post('/api/auth/resend-code', async (req, res) => res.status(200).json({ mensaje: "OK" }));
+
 // --- RUTAS DE TURNOS ---
 
 app.get('/api/turnos', authenticateToken, async (req, res) => {
     try {
-        const turnos = await Turno.find({ usuarioId: req.userId });
+        const turnos = await Turno.find({ usuarioId: req.userId }).sort({ fecha: 1, hora: 1 });
         res.json(turnos);
     } catch (error) {
         res.status(500).json({ mensaje: "Error al obtener turnos" });
     }
 });
 
+app.get('/api/turnos/check-availability', authenticateToken, async (req, res) => {
+    try {
+        const { fecha, hora } = req.query;
+        // Buscamos cualquier turno (de cualquier usuario) que coincida en fecha y hora
+        // Excepto los cancelados
+        const turnoExistente = await Turno.findOne({
+            fecha,
+            hora,
+            estado: { $nin: ["Cancelado", "cancelled", "CANCELADO"] }
+        });
+        res.json({ disponible: !turnoExistente });
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error al verificar disponibilidad" });
+    }
+});
+
 app.post('/api/turnos', authenticateToken, async (req, res) => {
     try {
-        console.log("Creando turno con body:", req.body);
+        const { fecha, hora } = req.body;
+
+        // Verificación de seguridad en Backend (evitar solapamientos reales)
+        const ocupado = await Turno.findOne({
+            fecha,
+            hora,
+            estado: { $nin: ["Cancelado", "cancelled", "CANCELADO"] }
+        });
+
+        if (ocupado) {
+            return res.status(400).json({ mensaje: "Este horario ya fue tomado por otro paciente" });
+        }
+
         const nuevoTurno = new Turno({ ...req.body, usuarioId: req.userId });
         await nuevoTurno.save();
         res.status(201).json(nuevoTurno);
@@ -131,7 +185,8 @@ app.post('/api/turnos', authenticateToken, async (req, res) => {
 
 app.delete('/api/turnos/:id', authenticateToken, async (req, res) => {
     try {
-        await Turno.findOneAndDelete({ _id: req.params.id, usuarioId: req.userId });
+        const result = await Turno.findOneAndDelete({ _id: req.params.id, usuarioId: req.userId });
+        if (!result) return res.status(404).json({ mensaje: "Turno no encontrado" });
         res.status(200).send();
     } catch (error) {
         res.status(500).json({ mensaje: "Error al eliminar" });
@@ -218,5 +273,5 @@ app.delete('/api/admin/reset-database', async (req, res) => {
     }
 });
 
-app.get('/', (req, res) => res.send('🚀 Backend Online y Funcional (Sin Verificación)'));
-app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Puerto ${PORT}`));
+app.get('/', (req, res) => res.send('🚀 Salud Activa Backend Online (v1.1)'));
+app.listen(PORT, '0.0.0.0', () => console.log(`🚀 Servidor corriendo en el puerto ${PORT}`));

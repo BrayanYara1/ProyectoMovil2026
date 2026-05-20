@@ -30,6 +30,7 @@
     <string name="home_subtitle">¿Qué necesitas hoy?</string>
     <string name="menu_request_appointment">Solicitar Turno</string>
     <string name="menu_my_appointments">Mis Turnos</string>
+    <string name="menu_home">Inicio</string>
     <string name="menu_profile">Mi Perfil</string>
     <string name="menu_settings">Ajustes</string>
 
@@ -234,6 +235,12 @@
     <string name="filter_from_date">Desde: %1$s</string>
     <string name="filter_to_date">Hasta: %1$s</string>
     <string name="all_dates">Todas</string>
+
+    <string name="today">Hoy</string>
+    <string name="tomorrow">Mañana</string>
+    <string name="label_default_specialty">Consulta</string>
+    <string name="label_default_doctor">Dr. Pendiente</string>
+    <string name="label_not_specified">No especificado</string>
 
     <!-- Nuevos strings para localización -->
     <string name="btn_call">Llamar</string>
