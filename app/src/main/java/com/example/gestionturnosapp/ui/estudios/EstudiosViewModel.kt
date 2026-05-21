@@ -46,7 +46,7 @@ class EstudiosViewModel : ViewModel() {
     val estudios: LiveData<Resource<List<EstudioMedico>>> = _estudiosResource
 
     init {
-        loadEstudios()
+        // Carga iniciada desde Fragment para soporte Offline
     }
 
     fun setSearchQuery(query: String) {
@@ -65,35 +65,71 @@ class EstudiosViewModel : ViewModel() {
         _createResource.value = Resource.Idle
     }
 
-    fun loadEstudios() {
+    fun loadEstudios(context: android.content.Context? = null) {
         viewModelScope.launch {
             _estudiosResource.value = Resource.Loading
+            
+            // Offline Cache First
+            context?.let {
+                val cached = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedEstudios(it)
+                if (cached.isNotEmpty()) {
+                    _allEstudios.value = cached
+                    _estudiosResource.value = Resource.Success(cached)
+                }
+            }
+
             try {
                 val list = repository.getEstudios()
                 _allEstudios.value = list
+                
+                // Save to Cache
+                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveEstudios(it, list) }
             } catch (e: Exception) {
-                _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al cargar")
+                if (_allEstudios.value.isNullOrEmpty()) {
+                    _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al cargar")
+                }
             }
         }
     }
 
-    fun agregarEstudio(titulo: String, fecha: String, tipo: String, resultado: String, photoUrl: String? = null) {
+    fun agregarEstudio(context: android.content.Context, titulo: String, fecha: String, tipo: String, resultado: String, photoUrl: String? = null) {
         viewModelScope.launch {
             _createResource.value = Resource.Loading
+            val nuevo = EstudioMedico("", titulo, fecha, tipo, resultado, urlDocumento = photoUrl)
             try {
-                val nuevo = EstudioMedico("", titulo, fecha, tipo, resultado, urlDocumento = photoUrl)
                 val response = repository.agregarEstudioConDetalle(nuevo)
                 
                 if (response.isSuccessful && response.body() != null) {
                     _createResource.value = Resource.Success(response.body()!!)
-                    loadEstudios()
+                    loadEstudios(context)
                 } else {
                     val errorMsg = response.errorBody()?.string() ?: "Error desconocido del servidor"
                     _createResource.value = Resource.Error("Error ${response.code()}: $errorMsg")
                 }
             } catch (e: Exception) {
-                _createResource.value = Resource.Error("Error de conexión: ${e.localizedMessage}")
+                if (com.example.gestionturnosapp.data.OfflineCacheManager.isNetworkError(e)) {
+                    com.example.gestionturnosapp.data.OfflineCacheManager.addPendingEstudio(context, nuevo)
+                    _createResource.value = Resource.Success(nuevo.copy(id = "pending"))
+                    loadEstudios(context)
+                } else {
+                    _createResource.value = Resource.Error("Error de conexión: ${e.localizedMessage}")
+                }
             }
+        }
+    }
+
+    fun syncPendingEstudios(context: android.content.Context) {
+        val pending = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingEstudios(context)
+        if (pending.isEmpty()) return
+
+        viewModelScope.launch {
+            pending.forEach { estudio ->
+                try {
+                    repository.agregarEstudio(estudio)
+                } catch (e: Exception) { return@launch }
+            }
+            com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingEstudios(context)
+            loadEstudios(context)
         }
     }
 

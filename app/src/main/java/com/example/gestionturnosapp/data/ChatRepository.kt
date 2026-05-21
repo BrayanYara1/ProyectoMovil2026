@@ -1,11 +1,12 @@
 package com.example.gestionturnosapp.data
 
 import com.example.gestionturnosapp.network.RetrofitClient
+import retrofit2.Response
 
-class EstudioRepository {
+class ChatRepository {
     private val apiService = RetrofitClient.instance
 
-    private fun parseError(response: retrofit2.Response<*>): String {
+    private fun parseError(response: Response<*>): String {
         return try {
             val errorBody = response.errorBody()?.string()
             if (!errorBody.isNullOrEmpty()) {
@@ -24,8 +25,8 @@ class EstudioRepository {
         }
     }
 
-    suspend fun getEstudios(): List<EstudioMedico> {
-        val response = apiService.getEstudios()
+    suspend fun getMensajes(): List<Mensaje> {
+        val response = apiService.getMensajes()
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
         } else {
@@ -33,23 +34,12 @@ class EstudioRepository {
         }
     }
 
-    suspend fun agregarEstudio(estudio: EstudioMedico): EstudioMedico? {
-        val response = apiService.agregarEstudio(estudio)
+    suspend fun enviarMensaje(texto: String): Mensaje? {
+        val response = apiService.enviarMensaje(mapOf("texto" to texto))
         if (response.isSuccessful) {
             return response.body()
         } else {
             throw Exception(parseError(response))
         }
-    }
-
-    suspend fun eliminarEstudio(id: String) {
-        val response = apiService.eliminarEstudio(id)
-        if (!response.isSuccessful) {
-            throw Exception(parseError(response))
-        }
-    }
-
-    suspend fun agregarEstudioConDetalle(estudio: EstudioMedico): retrofit2.Response<EstudioMedico> {
-        return apiService.agregarEstudio(estudio)
     }
 }

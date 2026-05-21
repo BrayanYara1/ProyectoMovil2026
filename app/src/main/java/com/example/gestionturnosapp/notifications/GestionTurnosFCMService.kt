@@ -74,7 +74,9 @@ class GestionTurnosFCMService : FirebaseMessagingService() {
             .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH) // Mayor prioridad
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body)) // Soporte para textos largos
             .build()
 
         val notificationId = (title.hashCode() + body.hashCode() + System.currentTimeMillis().toInt() % 10000)

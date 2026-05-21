@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
 
+    private val repository = AuthRepository()
     private val _authState = MutableLiveData<Resource<Usuario>>(Resource.Idle)
     val authState: LiveData<Resource<Usuario>> = _authState
 
@@ -20,7 +21,7 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
-                val response = RetrofitClient.instance.login(LoginRequest(email, contrasena))
+                val response = repository.login(LoginRequest(email, contrasena))
                 if (response.isSuccessful) {
                     val authResponse = response.body()
                     val usuario = authResponse?.usuario
@@ -35,14 +36,7 @@ class AuthViewModel : ViewModel() {
                     val errorMsg = when (code) {
                         401 -> context.getString(R.string.msg_login_error)
                         404 -> context.getString(R.string.msg_user_not_found)
-                        else -> {
-                            val errorBody = response.errorBody()?.string() ?: ""
-                            if (errorBody.contains("mensaje")) {
-                                errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
-                            } else {
-                                context.getString(R.string.msg_server_error, code.toString())
-                            }
-                        }
+                        else -> repository.getErrorMessage(response)
                     }
                     _authState.value = Resource.Error(errorMsg)
                 }
@@ -56,16 +50,15 @@ class AuthViewModel : ViewModel() {
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
-                val response = RetrofitClient.instance.register(request)
+                val response = repository.register(request)
                 if (response.isSuccessful) {
                     _authState.value = Resource.Success(Usuario("", request.nombre, request.email, request.telefono))
                 } else {
-                    val errorBody = response.errorBody()?.string() ?: ""
+                    val errorMsg = repository.getErrorMessage(response)
                     val displayMsg = when {
-                        errorBody.contains("email", true) || errorBody.contains("correo", true) -> context.getString(R.string.msg_email_already_registered)
-                        errorBody.contains("password", true) || errorBody.contains("contraseña", true) -> context.getString(R.string.msg_password_weak)
-                        errorBody.contains("mensaje") -> errorBody.substringAfter("\"mensaje\":\"").substringBefore("\"")
-                        else -> context.getString(R.string.msg_server_error, response.code().toString())
+                        errorMsg.contains("email", true) || errorMsg.contains("correo", true) -> context.getString(R.string.msg_email_already_registered)
+                        errorMsg.contains("password", true) || errorMsg.contains("contraseña", true) -> context.getString(R.string.msg_password_weak)
+                        else -> errorMsg
                     }
                     _authState.value = Resource.Error(displayMsg)
                 }

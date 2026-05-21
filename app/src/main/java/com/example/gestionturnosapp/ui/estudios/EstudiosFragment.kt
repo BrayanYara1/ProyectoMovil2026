@@ -64,6 +64,12 @@ class EstudiosFragment : Fragment() {
         setupObservers()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.syncPendingEstudios(requireContext())
+        viewModel.loadEstudios(requireContext())
+    }
+
     private fun setupRecyclerView() {
         adapter = EstudiosAdapter { estudio ->
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
@@ -93,7 +99,7 @@ class EstudiosFragment : Fragment() {
         })
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadEstudios()
+            viewModel.loadEstudios(requireContext())
         }
 
         binding.fabAddEstudio.setOnClickListener {
@@ -237,7 +243,7 @@ class EstudiosFragment : Fragment() {
                 val fecha = etFecha.text.toString()
                 
                 if (titulo.isNotBlank()) {
-                    viewModel.agregarEstudio(titulo, fecha, tipo, resultado, selectedImageUri?.toString())
+                    viewModel.agregarEstudio(requireContext(), titulo, fecha, tipo, resultado, selectedImageUri?.toString())
                 }
             }
             .setNegativeButton(getString(R.string.btn_cancel_dialog), null)

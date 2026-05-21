@@ -1,11 +1,12 @@
 package com.example.gestionturnosapp.data
 
 import com.example.gestionturnosapp.network.RetrofitClient
+import retrofit2.Response
 
-class MedicamentoRepository {
+class AuthRepository {
     private val apiService = RetrofitClient.instance
 
-    private fun parseError(response: retrofit2.Response<*>): String {
+    private fun parseError(response: Response<*>): String {
         return try {
             val errorBody = response.errorBody()?.string()
             if (!errorBody.isNullOrEmpty()) {
@@ -24,28 +25,15 @@ class MedicamentoRepository {
         }
     }
 
-    suspend fun getMedicamentos(): List<Medicamento> {
-        val response = apiService.getMedicamentos()
-        if (response.isSuccessful) {
-            return response.body() ?: emptyList()
-        } else {
-            throw Exception(parseError(response))
-        }
+    suspend fun login(request: LoginRequest): Response<AuthResponse> {
+        return apiService.login(request)
     }
 
-    suspend fun agregarMedicamento(med: Medicamento): Medicamento? {
-        val response = apiService.agregarMedicamento(med)
-        if (response.isSuccessful) {
-            return response.body()
-        } else {
-            throw Exception(parseError(response))
-        }
+    suspend fun register(request: RegisterRequest): Response<AuthResponse> {
+        return apiService.register(request)
     }
 
-    suspend fun eliminarMedicamento(id: String) {
-        val response = apiService.eliminarMedicamento(id)
-        if (!response.isSuccessful) {
-            throw Exception(parseError(response))
-        }
+    fun getErrorMessage(response: Response<*>): String {
+        return parseError(response)
     }
 }

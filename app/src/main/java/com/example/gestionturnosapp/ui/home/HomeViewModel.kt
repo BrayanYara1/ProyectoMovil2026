@@ -36,39 +36,78 @@ class HomeViewModel : ViewModel() {
 
     init {
         loadRandomHealthTip()
-        refreshData()
     }
 
-    fun refreshData() {
+    fun refreshData(context: android.content.Context? = null) {
         loadRandomHealthTip()
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
-            try {
-                // Cargar Turnos
-                val turnos = turnoRepository.getTurnos()
-                _turnosCount.value = turnos.size
-                
-                _nextTurno.value = turnos.filter { it.estado.lowercase() in listOf("pendiente", "pending") }
-                    .sortedBy { "${it.fecha} ${it.hora}" }
-                    .firstOrNull()
+            
+            // 1. Carga desde Caché (Respuesta instantánea)
+            context?.let {
+                val cachedTurnos = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedTurnos(it)
+                if (cachedTurnos.isNotEmpty()) {
+                    updateTurnosUI(cachedTurnos)
+                }
+                val cachedMeds = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedMedicamentos(it)
+                if (cachedMeds.isNotEmpty()) {
+                    _medicamentos.value = cachedMeds
+                }
+            }
 
-                // Cargar Medicamentos
+            try {
+                // 2. Carga desde Servidor
+                val turnos = turnoRepository.getTurnos()
+                updateTurnosUI(turnos)
+                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveTurnos(it, turnos) }
+
                 val meds = medRepository.getMedicamentos()
                 _medicamentos.value = meds
+                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveMedicamentos(it, meds) }
 
             } catch (e: Exception) {
-                _turnosCount.value = 0
-                _nextTurno.value = null
-                _medicamentos.value = emptyList()
-                _errorMessage.value = e.localizedMessage ?: "Error al conectar con el servidor"
+                // Si no hay nada en LiveData aún, mostramos error
+                if (_nextTurno.value == null && _medicamentos.value.isNullOrEmpty()) {
+                    _turnosCount.value = 0
+                    _nextTurno.value = null
+                    _medicamentos.value = emptyList()
+                    _errorMessage.value = e.localizedMessage ?: "Error al conectar con el servidor"
+                }
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    fun refreshTurnosCount() = refreshData()
+    private fun updateTurnosUI(turnos: List<Turno>) {
+        _turnosCount.value = turnos.size
+        _nextTurno.value = turnos.filter { it.estado.lowercase() in listOf("pendiente", "pending") }
+            .sortedBy { "${it.fecha} ${it.hora}" }
+            .firstOrNull()
+    }
+
+    fun refreshTurnosCount(context: android.content.Context) = refreshData(context)
+
+    fun syncAll(context: android.content.Context) {
+        viewModelScope.launch {
+            // Sincronizar Turnos
+            val pendingTurnos = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingTurnos(context)
+            if (pendingTurnos.isNotEmpty()) {
+                pendingTurnos.forEach { try { turnoRepository.crearTurno(it) } catch (e: Exception) {} }
+                com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingTurnos(context)
+            }
+
+            // Sincronizar Meds
+            val pendingMeds = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingMeds(context)
+            if (pendingMeds.isNotEmpty()) {
+                pendingMeds.forEach { try { medRepository.agregarMedicamento(it) } catch (e: Exception) {} }
+                com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingMeds(context)
+            }
+
+            refreshData(context)
+        }
+    }
 
     private fun loadRandomHealthTip() {
         val tips = listOf(

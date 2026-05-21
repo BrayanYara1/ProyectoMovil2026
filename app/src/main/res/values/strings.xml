@@ -236,6 +236,10 @@
     <string name="filter_to_date">Hasta: %1$s</string>
     <string name="all_dates">Todas</string>
 
+    <string name="hint_type_message">Escribe un mensaje…</string>
+    <string name="label_doctor_reply">Respuesta del Doctor</string>
+    <string name="msg_chat_welcome">Bienvenido al chat de asistencia médica. ¿En qué podemos ayudarte?</string>
+
     <string name="today">Hoy</string>
     <string name="tomorrow">Mañana</string>
     <string name="label_default_specialty">Consulta</string>

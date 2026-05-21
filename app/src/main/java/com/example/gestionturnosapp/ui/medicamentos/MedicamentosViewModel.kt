@@ -23,48 +23,83 @@ class MedicamentosViewModel : ViewModel() {
     val operationResource: LiveData<Resource<Medicamento>> = _operationResource
 
     init {
-        loadMedicamentos()
+        // Se carga desde el Fragment con contexto para usar caché
     }
 
-    fun loadMedicamentos() {
+    fun loadMedicamentos(context: android.content.Context? = null) {
         viewModelScope.launch {
             _medicamentosResource.value = Resource.Loading
             _isLoading.value = true
+            
+            // Offline Cache First
+            context?.let {
+                val cached = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedMedicamentos(it)
+                if (cached.isNotEmpty()) {
+                    _medicamentosResource.value = Resource.Success(cached)
+                }
+            }
+
             try {
                 val list = repository.getMedicamentos()
                 _medicamentosResource.value = Resource.Success(list)
+                
+                // Save to Cache
+                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveMedicamentos(it, list) }
             } catch (e: Exception) {
-                _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
+                if (_medicamentosResource.value !is Resource.Success) {
+                    _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
+                }
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    fun agregarMedicamento(nombre: String, dosis: String, frecuencia: String, proximaToma: String) {
+    fun agregarMedicamento(context: android.content.Context, nombre: String, dosis: String, frecuencia: String, proximaToma: String) {
         viewModelScope.launch {
             _operationResource.value = Resource.Loading
             _isLoading.value = true
+            val nuevoMed = Medicamento(
+                id = "", 
+                nombre = nombre,
+                dosis = dosis,
+                frecuencia = frecuencia,
+                proximaToma = proximaToma
+            )
             try {
-                val nuevoMed = Medicamento(
-                    id = "", // El backend debería generar el ID
-                    nombre = nombre,
-                    dosis = dosis,
-                    frecuencia = frecuencia,
-                    proximaToma = proximaToma
-                )
                 val result = repository.agregarMedicamento(nuevoMed)
                 if (result != null) {
                     _operationResource.value = Resource.Success(result)
-                    loadMedicamentos()
+                    loadMedicamentos(context)
                 } else {
                     _operationResource.value = Resource.Error("Error al guardar")
                 }
             } catch (e: Exception) {
-                _operationResource.value = Resource.Error(e.localizedMessage ?: "Error de red")
+                if (com.example.gestionturnosapp.data.OfflineCacheManager.isNetworkError(e)) {
+                    com.example.gestionturnosapp.data.OfflineCacheManager.addPendingMed(context, nuevoMed)
+                    _operationResource.value = Resource.Success(nuevoMed.copy(id = "pending"))
+                    loadMedicamentos(context)
+                } else {
+                    _operationResource.value = Resource.Error(e.localizedMessage ?: "Error de red")
+                }
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    fun syncPendingMeds(context: android.content.Context) {
+        val pending = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingMeds(context)
+        if (pending.isEmpty()) return
+
+        viewModelScope.launch {
+            pending.forEach { med ->
+                try {
+                    repository.agregarMedicamento(med)
+                } catch (e: Exception) { return@launch }
+            }
+            com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingMeds(context)
+            loadMedicamentos(context)
         }
     }
 

@@ -264,6 +264,26 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardChat"
+                        style="@style/Widget.App.Card"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_columnWeight="1"
+                        android:layout_margin="8dp">
+
+                        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical" android:padding="20dp">
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@drawable/bg_icon_container_blue"
+                                android:padding="10dp"
+                                android:src="@android:drawable/ic_menu_help"
+                                app:tint="@color/primary" />
+                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/menu_help" android:textStyle="bold" android:textSize="@dimen/text_size_caption" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
                 </GridLayout>
 
                 <!-- SECCIÓN: MI MEDICACIÓN -->

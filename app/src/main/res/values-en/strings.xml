@@ -230,6 +230,10 @@
     <string name="filter_to_date">To: %1$s</string>
     <string name="all_dates">All</string>
 
+    <string name="hint_type_message">Type a message…</string>
+    <string name="label_doctor_reply">Doctor\'s Reply</string>
+    <string name="msg_chat_welcome">Welcome to the medical assistance chat. How can we help you?</string>
+
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="label_default_specialty">Consultation</string>

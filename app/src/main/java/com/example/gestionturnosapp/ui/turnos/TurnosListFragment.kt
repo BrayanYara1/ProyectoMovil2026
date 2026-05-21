@@ -41,6 +41,7 @@ class TurnosListFragment : Fragment() {
         setupObservers()
         setupFab()
         
+        viewModel.syncPendingTurnos(requireContext())
         viewModel.fetchTurnos(requireContext())
     }
 

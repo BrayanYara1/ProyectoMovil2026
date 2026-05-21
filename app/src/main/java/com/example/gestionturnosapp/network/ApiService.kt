@@ -59,4 +59,11 @@ interface ApiService {
 
     @DELETE("api/estudios/{id}")
     suspend fun eliminarEstudio(@Path("id") id: String): Response<Unit>
+
+    // Chat Médico
+    @GET("api/chat")
+    suspend fun getMensajes(): Response<List<Mensaje>>
+
+    @POST("api/chat")
+    suspend fun enviarMensaje(@Body request: Map<String, String>): Response<Mensaje>
 }

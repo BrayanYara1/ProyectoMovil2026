@@ -40,7 +40,7 @@ class HomeFragment : Fragment() {
         updateUI()
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refreshData()
+            viewModel.refreshData(requireContext())
         }
 
         binding.cardHomeProfile.setOnClickListener {
@@ -71,6 +71,11 @@ class HomeFragment : Fragment() {
         binding.cardEstudios.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_estudiosFragment)
+        }
+
+        binding.cardChat.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            findNavController().navigate(R.id.action_homeFragment_to_chatFragment)
         }
 
         binding.cardUrgencias.setOnClickListener {
@@ -321,7 +326,7 @@ class HomeFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshData()
+        viewModel.syncAll(requireContext())
         updateUI()
     }
 

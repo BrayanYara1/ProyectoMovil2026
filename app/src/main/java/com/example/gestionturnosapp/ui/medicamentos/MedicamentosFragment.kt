@@ -45,6 +45,12 @@ class MedicamentosFragment : Fragment() {
         setupObservers()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.syncPendingMeds(requireContext())
+        viewModel.loadMedicamentos(requireContext())
+    }
+
     private fun setupRecyclerView() {
         adapter = MedicamentosAdapter { med ->
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
@@ -73,7 +79,7 @@ class MedicamentosFragment : Fragment() {
 
             if (nombre.isNotBlank() && dosis.isNotBlank()) {
                 binding.btnSaveMed.isEnabled = false // Prevenir duplicados
-                viewModel.agregarMedicamento(nombre, dosis, frecuencia, proxima)
+                viewModel.agregarMedicamento(requireContext(), nombre, dosis, frecuencia, proxima)
             } else {
                 Toast.makeText(context, getString(R.string.msg_complete_name_dosis), Toast.LENGTH_SHORT).show()
             }

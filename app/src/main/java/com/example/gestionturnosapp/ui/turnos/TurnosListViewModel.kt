@@ -107,12 +107,11 @@ class TurnosListViewModel : ViewModel() {
         }
     }
 
-    fun crearNuevoTurno(nombre: String, fecha: String, hora: String, motivo: String, especialidad: String? = null, doctor: String? = null) {
+    fun crearNuevoTurno(context: android.content.Context, nombre: String, fecha: String, hora: String, motivo: String, especialidad: String? = null, doctor: String? = null) {
         viewModelScope.launch {
             _createTurnoResource.value = Resource.Loading
             _isLoading.value = true
 
-            // Normalizar fecha y hora antes de enviar al servidor
             val fechaNormalizada = fecha.replace("/", "-").trim()
             val horaNormalizada = normalizeTime(hora.trim())
 
@@ -128,15 +127,40 @@ class TurnosListViewModel : ViewModel() {
                 val nuevoTurno = repository.crearTurno(request)
                 if (nuevoTurno != null) {
                     _createTurnoResource.value = Resource.Success(nuevoTurno)
-                    fetchTurnos()
+                    fetchTurnos(context)
                 } else {
                     _createTurnoResource.value = Resource.Error("Error")
                 }
             } catch (e: Exception) {
-                _createTurnoResource.value = Resource.Error(e.localizedMessage ?: "Error")
+                if (OfflineCacheManager.isNetworkError(e)) {
+                    // MODO OFFLINE: Guardar para sincronizar después
+                    OfflineCacheManager.addPendingTurno(context, request)
+                    _createTurnoResource.value = Resource.Success(Turno("pending", nombre, fechaNormalizada, horaNormalizada, motivo, "Pendiente (Offline)", especialidad, doctor))
+                    fetchTurnos(context)
+                } else {
+                    _createTurnoResource.value = Resource.Error(e.localizedMessage ?: "Error")
+                }
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    fun syncPendingTurnos(context: android.content.Context) {
+        val pending = OfflineCacheManager.getPendingTurnos(context)
+        if (pending.isEmpty()) return
+
+        viewModelScope.launch {
+            pending.forEach { request ->
+                try {
+                    repository.crearTurno(request)
+                } catch (e: Exception) {
+                    // Si falla de nuevo, se queda en la lista para el próximo intento
+                    return@launch 
+                }
+            }
+            OfflineCacheManager.clearPendingTurnos(context)
+            fetchTurnos(context)
         }
     }
 
@@ -177,7 +201,7 @@ class TurnosListViewModel : ViewModel() {
             
             for (format in inputFormats) {
                 try {
-                    val sdf = java.text.SimpleDateFormat(format, java.util.Locale.US)
+                    val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
                     sdf.isLenient = false
                     date = sdf.parse(time)
                     if (date != null) break
