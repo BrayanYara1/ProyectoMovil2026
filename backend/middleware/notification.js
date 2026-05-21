@@ -4,7 +4,15 @@ const admin = require('firebase-admin');
 if (!admin.apps.length) {
     try {
         if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            let jsonString = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
+
+            // Eliminar comillas simples o dobles accidentales al principio y al final
+            if ((jsonString.startsWith("'") && jsonString.endsWith("'")) ||
+                (jsonString.startsWith('"') && jsonString.endsWith('"'))) {
+                jsonString = jsonString.slice(1, -1);
+            }
+
+            const serviceAccount = JSON.parse(jsonString);
 
             // CORRECCIÓN: Reemplazar saltos de línea literales para que Node.js los entienda
             if (serviceAccount.private_key) {
