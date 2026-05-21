@@ -94,14 +94,14 @@ class HomeViewModel : ViewModel() {
             // Sincronizar Turnos
             val pendingTurnos = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingTurnos(context)
             if (pendingTurnos.isNotEmpty()) {
-                pendingTurnos.forEach { try { turnoRepository.crearTurno(it) } catch (e: Exception) {} }
+                pendingTurnos.forEach { try { turnoRepository.crearTurno(it) } catch (_: Exception) {} }
                 com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingTurnos(context)
             }
 
             // Sincronizar Meds
             val pendingMeds = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingMeds(context)
             if (pendingMeds.isNotEmpty()) {
-                pendingMeds.forEach { try { medRepository.agregarMedicamento(it) } catch (e: Exception) {} }
+                pendingMeds.forEach { try { medRepository.agregarMedicamento(it) } catch (_: Exception) {} }
                 com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingMeds(context)
             }
 

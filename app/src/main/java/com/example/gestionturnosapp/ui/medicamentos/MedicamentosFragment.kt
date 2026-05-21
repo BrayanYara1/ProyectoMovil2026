@@ -77,12 +77,20 @@ class MedicamentosFragment : Fragment() {
             val frecuencia = binding.etMedFreq.text.toString()
             val proxima = binding.etMedNext.text.toString()
 
-            if (nombre.isNotBlank() && dosis.isNotBlank()) {
-                binding.btnSaveMed.isEnabled = false // Prevenir duplicados
-                viewModel.agregarMedicamento(requireContext(), nombre, dosis, frecuencia, proxima)
-            } else {
-                Toast.makeText(context, getString(R.string.msg_complete_name_dosis), Toast.LENGTH_SHORT).show()
+            binding.tilMedName.error = null
+            binding.tilMedDose.error = null
+
+            if (nombre.isBlank()) {
+                binding.tilMedName.error = getString(R.string.msg_complete_fields)
+                return@setOnClickListener
             }
+            if (dosis.isBlank()) {
+                binding.tilMedDose.error = getString(R.string.msg_complete_fields)
+                return@setOnClickListener
+            }
+
+            binding.btnSaveMed.isEnabled = false // Prevenir duplicados
+            viewModel.agregarMedicamento(requireContext(), nombre, dosis, frecuencia, proxima)
         }
 
         binding.etMedNext.setOnClickListener {

@@ -48,4 +48,8 @@
     <color name="icon_container_cyan">#E0F7FA</color>
     <color name="icon_container_purple">#F3E5F5</color>
     <color name="icon_container_red">#FFEBEE</color>
+
+    <!-- Chat Colors -->
+    <color name="chat_bubble_other">#E9E9EB</color>
+    <color name="chat_text_other">#172B4D</color>
 </resources>

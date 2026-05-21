@@ -15,7 +15,7 @@
         android:background="@drawable/bg_chat_other"
         android:padding="12dp"
         tools:text="Hola, ¿en qué puedo ayudarte?"
-        android:textColor="@color/text_primary"
+        android:textColor="@color/chat_text_other"
         android:textSize="15sp" />
 
     <TextView

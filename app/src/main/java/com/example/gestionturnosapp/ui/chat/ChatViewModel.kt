@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.data.Mensaje
 import com.example.gestionturnosapp.data.Resource
-import com.example.gestionturnosapp.network.RetrofitClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
