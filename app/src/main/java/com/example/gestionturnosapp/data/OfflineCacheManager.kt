@@ -159,6 +159,15 @@ object OfflineCacheManager {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().remove(KEY_PENDING_ESTUDIOS).apply()
     }
 
+    fun clearCache(context: Context) {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .remove(KEY_TURNOS)
+            .remove(KEY_MEDICAMENTOS)
+            .remove(KEY_ESTUDIOS)
+            .apply()
+    }
+
     fun removePendingEstudios(context: Context, synced: List<EstudioMedico>) {
         val current = getPendingEstudios(context).toMutableList()
         current.removeAll(synced)

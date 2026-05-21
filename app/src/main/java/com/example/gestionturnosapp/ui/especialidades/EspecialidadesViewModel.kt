@@ -14,6 +14,7 @@ class EspecialidadesViewModel(application: Application) : AndroidViewModel(appli
     private val repository = EspecialidadRepository()
     private val _allEspecialidades = MutableLiveData<List<Especialidad>>()
     private val _searchQuery = MutableLiveData<String>("")
+    private val _localeTrigger = MutableLiveData<Long>(System.currentTimeMillis())
 
     val filteredEspecialidades = MediatorLiveData<List<Especialidad>>().apply {
         val observer = { _: Any? ->
@@ -23,29 +24,34 @@ class EspecialidadesViewModel(application: Application) : AndroidViewModel(appli
             if (query.isEmpty()) {
                 value = list
             } else {
+                // Usamos el locale actual para las comparaciones de texto
                 val context = getApplication<Application>().applicationContext
                 value = list.filter { especialidad ->
                     val name = context.getString(especialidad.nombreRes).lowercase(Locale.getDefault())
                     val desc = context.getString(especialidad.descripcionRes).lowercase(Locale.getDefault())
                     
-                    // Búsqueda robusta: coincide con nombre o descripción
                     name.contains(query) || desc.contains(query)
                 }
             }
         }
         addSource(_allEspecialidades, observer)
         addSource(_searchQuery, observer)
+        addSource(_localeTrigger, observer)
     }
 
     init {
         loadEspecialidades()
     }
 
-    private fun loadEspecialidades() {
+    fun loadEspecialidades() {
         _allEspecialidades.value = repository.getEspecialidades()
     }
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    fun refreshForLocale() {
+        _localeTrigger.value = System.currentTimeMillis()
     }
 }

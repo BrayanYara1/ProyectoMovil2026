@@ -72,8 +72,10 @@ class AuthViewModel : ViewModel() {
         android.util.Log.e("AuthViewModel", "Error en autenticación", e)
         val errorMsg = e.localizedMessage ?: ""
         return when {
-            errorMsg.contains("connect", true) -> context.getString(R.string.msg_no_connection)
-            errorMsg.contains("timeout", true) -> context.getString(R.string.msg_timeout)
+            errorMsg.contains("resolve host", true) || errorMsg.contains("connect", true) -> 
+                context.getString(R.string.msg_no_connection)
+            errorMsg.contains("timeout", true) -> 
+                context.getString(R.string.msg_timeout)
             else -> context.getString(R.string.msg_server_error, errorMsg.ifBlank { "Error desconocido" })
         }
     }

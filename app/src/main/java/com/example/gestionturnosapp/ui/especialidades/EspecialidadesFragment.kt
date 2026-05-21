@@ -28,6 +28,7 @@ class EspecialidadesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.refreshForLocale()
         setupRecyclerView()
         setupSearchView()
         setupObservers()

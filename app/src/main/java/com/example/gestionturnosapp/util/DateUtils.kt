@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object DateUtils {
-    private val isoDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
-    private val displayTimeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
+    private val isoDateFormat get() = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+    private fun getDisplayTimeFormat() = SimpleDateFormat("hh:mm a", Locale.getDefault())
     private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm", "H:mm")
 
     fun formatDisplayTime(time: String?): String {
@@ -32,7 +32,7 @@ object DateUtils {
             }
         }
 
-        return if (dateObj != null) displayTimeFormat.format(dateObj) else time
+        return if (dateObj != null) getDisplayTimeFormat().format(dateObj) else time
     }
 
     fun formatDisplayDate(context: android.content.Context, dateStr: String?): String {

@@ -58,12 +58,8 @@ class SettingsFragment : Fragment() {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.label_language))
                 .setItems(options) { _, which ->
-                    val appLocale: LocaleListCompat = if (which == 0) {
-                        LocaleListCompat.forLanguageTags("es")
-                    } else {
-                        LocaleListCompat.forLanguageTags("en")
-                    }
-                    AppCompatDelegate.setApplicationLocales(appLocale)
+                    val langTag = if (which == 0) "es" else "en"
+                    PreferenceManager.setLocale(requireContext(), langTag)
                 }
                 .show()
         }

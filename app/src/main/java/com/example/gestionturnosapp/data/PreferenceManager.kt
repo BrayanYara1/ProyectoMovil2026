@@ -8,9 +8,24 @@ object PreferenceManager {
     private const val PREF_NAME = "app_settings_prefs"
     private const val KEY_DARK_MODE = "dark_mode"
     private const val KEY_NOTIFICATIONS = "notifications_enabled"
+    private const val KEY_LOCALE = "app_locale"
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    }
+
+    fun getLocale(context: Context): String {
+        return getPrefs(context).getString(KEY_LOCALE, "es") ?: "es"
+    }
+
+    fun setLocale(context: Context, localeTag: String) {
+        getPrefs(context).edit().putString(KEY_LOCALE, localeTag).apply()
+        
+        // Limpiamos el caché para que los datos del servidor se recarguen en el nuevo idioma
+        OfflineCacheManager.clearCache(context)
+
+        val appLocale: androidx.core.os.LocaleListCompat = androidx.core.os.LocaleListCompat.forLanguageTags(localeTag)
+        AppCompatDelegate.setApplicationLocales(appLocale)
     }
 
     fun isDarkMode(context: Context): Boolean {

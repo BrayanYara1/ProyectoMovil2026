@@ -25,7 +25,7 @@ object RetrofitClient {
             token?.let {
                 builder.addHeader("Authorization", "Bearer $it")
             }
-            
+
             val request = builder.build()
             chain.proceed(request)
         }

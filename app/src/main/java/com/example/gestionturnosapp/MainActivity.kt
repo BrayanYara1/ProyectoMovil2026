@@ -33,14 +33,14 @@ class MainActivity : AppCompatActivity() {
     ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Pantalla de Inicio (Splash Screen) - Debe llamarse antes de super.onCreate
+        installSplashScreen()
+
         // Habilitar Edge-to-Edge para un diseño inmersivo
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         // Aplicar Tema antes de crear la actividad
         PreferenceManager.applyTheme(PreferenceManager.isDarkMode(this))
-
-        // Pantalla de Inicio (Splash Screen) - Debe llamarse antes de super.onCreate
-        installSplashScreen()
         
         super.onCreate(savedInstanceState)
         

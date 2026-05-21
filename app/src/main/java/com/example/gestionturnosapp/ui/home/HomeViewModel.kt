@@ -76,7 +76,12 @@ class HomeViewModel : ViewModel() {
                     _turnosCount.value = 0
                     _nextTurno.value = null
                     _medicamentos.value = emptyList()
-                    _errorMessage.value = e.localizedMessage ?: "Error al conectar con el servidor"
+                    val msg = e.localizedMessage ?: ""
+                    _errorMessage.value = if (msg.contains("resolve host", true) || msg.contains("connect", true)) {
+                        context?.getString(R.string.msg_no_connection) ?: "Sin conexión a internet"
+                    } else {
+                        msg.ifBlank { "Error al conectar con el servidor" }
+                    }
                 }
             } finally {
                 _isLoading.value = false
