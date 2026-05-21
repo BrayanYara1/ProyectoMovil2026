@@ -248,6 +248,7 @@
     <string name="schedule_appointment_prompt">Secure your next medical consultation today.</string>
     <string name="label_medication_format">%1$s %2$s</string>
     <string name="label_next_dose"> - Next: %1$s</string>
+    <string name="title_medication">My Medication</string>
     <string name="title_add_medication">Add Medication</string>
     <string name="btn_save_medication">SAVE MEDICATION</string>
     <string name="title_your_medications">Your Medications</string>

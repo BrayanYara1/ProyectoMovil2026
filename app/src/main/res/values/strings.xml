@@ -99,6 +99,7 @@
     <string name="title_next_appointment">PRÓXIMA CITA</string>
     <string name="no_upcoming_appointments">Sin citas pendientes</string>
     <string name="schedule_appointment_prompt">Asegura tu próxima consulta médica hoy mismo.</string>
+    <string name="title_medication">Mi Medicación</string>
     <string name="label_medication_format">%1$s %2$s</string>
     <string name="label_next_dose"> - Próxima: %1$s</string>
     <string name="title_add_medication">Agregar Medicamento</string>

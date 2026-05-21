@@ -5,6 +5,12 @@ if (!admin.apps.length) {
     try {
         if (process.env.FIREBASE_SERVICE_ACCOUNT) {
             const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+
+            // CORRECCIÓN: Reemplazar saltos de línea literales para que Node.js los entienda
+            if (serviceAccount.private_key) {
+                serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+            }
+
             if (!serviceAccount.project_id || !serviceAccount.private_key) {
                 throw new Error("El JSON de Firebase no tiene el formato correcto.");
             }
