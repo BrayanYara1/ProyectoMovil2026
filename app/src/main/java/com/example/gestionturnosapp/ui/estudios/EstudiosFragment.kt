@@ -243,7 +243,13 @@ class EstudiosFragment : Fragment() {
                 val fecha = etFecha.text.toString()
                 
                 if (titulo.isNotBlank()) {
-                    viewModel.agregarEstudio(requireContext(), titulo, fecha, tipo, resultado, selectedImageUri?.toString())
+                    // PERSISTENCIA DE IMAGEN: Copiar a almacenamiento interno antes de guardar
+                    var finalPhotoPath: String? = null
+                    selectedImageUri?.let { uri ->
+                        finalPhotoPath = com.example.gestionturnosapp.data.ImageStorageManager.saveStudyImage(requireContext(), uri)
+                    }
+                    
+                    viewModel.agregarEstudio(requireContext(), titulo, fecha, tipo, resultado, finalPhotoPath)
                 }
             }
             .setNegativeButton(getString(R.string.btn_cancel_dialog), null)

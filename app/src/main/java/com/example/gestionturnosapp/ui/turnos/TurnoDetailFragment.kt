@@ -59,10 +59,12 @@ class TurnoDetailFragment : Fragment() {
         binding.apply {
             tvDetailNombre.text = paciente
             
-            // Formatear hora para mostrar AM/PM
+            // Formatear hora para mostrar AM/PM siempre (Resiliente)
             val displayTime = try {
                 val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
                 var dateObj: java.util.Date? = null
+                
+                // 1. Intentar con Locale actual
                 for (fmt in inputFormats) {
                     try {
                         val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
@@ -70,6 +72,18 @@ class TurnoDetailFragment : Fragment() {
                         if (dateObj != null) break
                     } catch (e: Exception) {}
                 }
+                
+                // 2. Fallback a US
+                if (dateObj == null) {
+                    for (fmt in inputFormats) {
+                        try {
+                            val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
+                            dateObj = sdf.parse(hora)
+                            if (dateObj != null) break
+                        } catch (e: Exception) {}
+                    }
+                }
+
                 if (dateObj != null) {
                     java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(dateObj)
                 } else hora
@@ -184,15 +198,26 @@ class TurnoDetailFragment : Fragment() {
         try {
             val dateParts = fecha.split("-")
             
-            // Usar SimpleDateFormat para parsear la hora AM/PM correctamente
+            // Usar SimpleDateFormat para parsear la hora AM/PM correctamente (Resiliente)
             val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
             var timeDate: java.util.Date? = null
+            
             for (fmt in inputFormats) {
                 try {
                     val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
                     timeDate = sdf.parse(hora)
                     if (timeDate != null) break
                 } catch (e: Exception) {}
+            }
+            
+            if (timeDate == null) {
+                for (fmt in inputFormats) {
+                    try {
+                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
+                        timeDate = sdf.parse(hora)
+                        if (timeDate != null) break
+                    } catch (e: Exception) {}
+                }
             }
 
             if (dateParts.size == 3 && timeDate != null) {
@@ -288,6 +313,16 @@ class TurnoDetailFragment : Fragment() {
                     timeDate = sdf.parse(hora)
                     if (timeDate != null) break
                 } catch (e: Exception) {}
+            }
+            
+            if (timeDate == null) {
+                for (fmt in inputFormats) {
+                    try {
+                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
+                        timeDate = sdf.parse(hora)
+                        if (timeDate != null) break
+                    } catch (e: Exception) {}
+                }
             }
 
             if (d.size == 3 && timeDate != null) {

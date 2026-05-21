@@ -123,11 +123,7 @@ class HomeFragment : Fragment() {
             else -> R.string.welcome
         }
         
-        binding.tvGreeting.text = if (greetingRes == R.string.welcome) {
-            getString(greetingRes) + ", " + name
-        } else {
-            getString(greetingRes, name)
-        }
+        binding.tvGreeting.text = getString(greetingRes, name)
         updateAvatar()
     }
 
@@ -283,15 +279,44 @@ class HomeFragment : Fragment() {
         summary.append(getString(R.string.label_share_patient, user?.nombre ?: getString(R.string.label_anonymous))).append("\n\n")
         
         if (nextTurno != null) {
+            val displayTime = try {
+                val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
+                var dateObj: java.util.Date? = null
+                for (fmt in inputFormats) {
+                    try {
+                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
+                        dateObj = sdf.parse(nextTurno.hora)
+                        if (dateObj != null) break
+                    } catch (e: Exception) {}
+                }
+                if (dateObj != null) {
+                    java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(dateObj)
+                } else nextTurno.hora
+            } catch (e: Exception) {
+                nextTurno.hora
+            }
+
+            val displayDate = try {
+                val sdfInput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                val date = sdfInput.parse(nextTurno.fecha)
+                if (date != null) {
+                    java.text.SimpleDateFormat("EEE, d MMM", java.util.Locale.getDefault()).format(date).replaceFirstChar { it.uppercase() }
+                } else nextTurno.fecha
+            } catch (e: Exception) {
+                nextTurno.fecha
+            }
+
             summary.append(getString(R.string.title_next_appointment)).append(":\n")
-            summary.append("- ${nextTurno.especialidad}: ${nextTurno.fecha} ").append(getString(R.string.detail_date_time_format, "", nextTurno.hora).trim()).append("\n")
-            summary.append("- Dr. ${nextTurno.doctor}\n\n")
+            summary.append("- ${nextTurno.especialidad ?: getString(R.string.label_default_specialty)}: ")
+            summary.append(getString(R.string.detail_date_time_format, displayDate, displayTime)).append("\n")
+            summary.append("- Dr. ${nextTurno.doctor ?: getString(R.string.label_default_doctor)}\n\n")
         }
         
         if (meds.isNotEmpty()) {
             summary.append(getString(R.string.title_your_medications)).append(":\n")
             meds.forEach { med ->
-                summary.append("- ${med.nombre} (${med.dosis}): ${med.frecuencia}\n")
+                summary.append("- ").append(getString(R.string.label_medication_format, med.nombre, med.dosis))
+                summary.append(": ${med.frecuencia}\n")
             }
         } else {
             summary.append(getString(R.string.msg_no_medication)).append("\n")
@@ -316,8 +341,8 @@ class HomeFragment : Fragment() {
         // Mostrar solo los 2-3 primeros para no saturar el home
         meds.take(3).forEach { med ->
             val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, binding.layoutMedication, false)
-            medView.findViewById<android.widget.TextView>(R.id.tvMedName).text = "${med.nombre} ${med.dosis}"
-            medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = "${med.frecuencia}"
+            medView.findViewById<android.widget.TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
+            medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = med.frecuencia
             
             medView.findViewById<android.view.View>(R.id.btnDeleteMed).visibility = android.view.View.GONE
             binding.layoutMedication.addView(medView)

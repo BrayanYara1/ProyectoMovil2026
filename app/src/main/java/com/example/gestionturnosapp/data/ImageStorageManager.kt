@@ -60,4 +60,25 @@ object ImageStorageManager {
         val user = UserManager.getUser(context)
         return getProfileImageUri(context, user?.id)
     }
+
+    /**
+     * Copia una imagen de estudio médico al almacenamiento interno para persistencia.
+     */
+    fun saveStudyImage(context: Context, uri: Uri): String? {
+        return try {
+            val fileName = "study_${System.currentTimeMillis()}.jpg"
+            val file = File(context.filesDir, fileName)
+            
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(file).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            
+            file.absolutePath
+        } catch (e: Exception) {
+            android.util.Log.e("ImageStorage", "Error saving study photo", e)
+            null
+        }
+    }
 }

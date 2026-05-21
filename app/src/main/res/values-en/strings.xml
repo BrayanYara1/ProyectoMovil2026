@@ -6,7 +6,7 @@
     <string name="login_card_title">LOG IN</string>
 
     <!-- Login & Register -->
-    <string name="welcome">Welcome</string>
+    <string name="welcome">Welcome, %1$s</string>
     <string name="welcome_back">Hello again, %1$s!</string>
     <string name="login_subtitle">Log in to manage your appointments</string>
     <string name="hint_email">Email address</string>
@@ -196,6 +196,7 @@
     <string name="hint_study_title">Study title</string>
     <string name="label_studies_type">Type (Analysis, X-ray, etc)</string>
     <string name="label_brief_result">Brief result</string>
+    <string name="label_study_result">Result: %1$s</string>
     <string name="label_study_date">Study date</string>
     <string name="btn_attach_photo">Attach Photo</string>
     <string name="msg_confirm_delete_study">Do you want to delete the record: %1$s?</string>
@@ -233,6 +234,7 @@
     <string name="hint_type_message">Type a message…</string>
     <string name="label_doctor_reply">Doctor\'s Reply</string>
     <string name="msg_chat_welcome">Welcome to the medical assistance chat. How can we help you?</string>
+    <string name="status_pending_offline">Pending (Offline)</string>
 
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
@@ -244,7 +246,8 @@
     <string name="title_next_appointment">NEXT APPOINTMENT</string>
     <string name="no_upcoming_appointments">No pending appointments</string>
     <string name="schedule_appointment_prompt">Secure your next medical consultation today.</string>
-    <string name="title_medication">My Medication</string>
+    <string name="label_medication_format">%1$s %2$s</string>
+    <string name="label_next_dose"> - Next: %1$s</string>
     <string name="title_add_medication">Add Medication</string>
     <string name="btn_save_medication">SAVE MEDICATION</string>
     <string name="title_your_medications">Your Medications</string>

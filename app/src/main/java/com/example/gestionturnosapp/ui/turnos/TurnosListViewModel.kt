@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MediatorLiveData
+import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.data.TurnoRepository
 import com.example.gestionturnosapp.data.NuevoTurnoRequest
@@ -135,7 +136,7 @@ class TurnosListViewModel : ViewModel() {
                 if (OfflineCacheManager.isNetworkError(e)) {
                     // MODO OFFLINE: Guardar para sincronizar después
                     OfflineCacheManager.addPendingTurno(context, request)
-                    _createTurnoResource.value = Resource.Success(Turno("pending", nombre, fechaNormalizada, horaNormalizada, motivo, "Pendiente (Offline)", especialidad, doctor))
+                    _createTurnoResource.value = Resource.Success(Turno("pending", nombre, fechaNormalizada, horaNormalizada, motivo, context.getString(R.string.status_pending_offline), especialidad, doctor))
                     fetchTurnos(context)
                 } else {
                     _createTurnoResource.value = Resource.Error(e.localizedMessage ?: "Error")
@@ -199,22 +200,35 @@ class TurnosListViewModel : ViewModel() {
             val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
             var date: java.util.Date? = null
             
+            // 1. Intentar con Locale Default (idioma actual del sistema)
             for (format in inputFormats) {
                 try {
                     val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
                     sdf.isLenient = false
                     date = sdf.parse(time)
                     if (date != null) break
-                } catch (e: Exception) {
-                    continue
-                }
+                } catch (e: Exception) {}
             }
             
+            // 2. Intentar con Locale US (formato estándar AM/PM) si falló el anterior
+            if (date == null) {
+                for (format in inputFormats) {
+                    try {
+                        val sdf = java.text.SimpleDateFormat(format, java.util.Locale.US)
+                        sdf.isLenient = false
+                        date = sdf.parse(time)
+                        if (date != null) break
+                    } catch (e: Exception) {}
+                }
+            }
+
+            // 3. Normalizar a formato 24h para la base de datos
             if (date != null) {
                 java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(date)
             } else {
-                // Fallback manual mejorado si fallan los parsers
-                val parts = time.split(":")
+                // Fallback manual: limpiar caracteres y formatear HH:mm
+                val cleanTime = time.uppercase().replace("A. M.", "AM").replace("P. M.", "PM")
+                val parts = cleanTime.split(":", " ")
                 if (parts.size >= 2) {
                     val h = parts[0].trim().padStart(2, '0')
                     val m = parts[1].trim().take(2).padStart(2, '0')

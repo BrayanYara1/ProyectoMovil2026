@@ -31,7 +31,7 @@ class EstudiosAdapter(
             binding.apply {
                 tvEstudioTitulo.text = estudio.titulo
                 tvEstudioTipo.text = estudio.tipo.uppercase()
-                tvEstudioResultado.text = "Resultado: ${estudio.resultadoBreve}"
+                tvEstudioResultado.text = root.context.getString(com.example.gestionturnosapp.R.string.label_study_result, estudio.resultadoBreve)
                 tvEstudioFecha.text = estudio.fecha
                 
                 if (!estudio.urlDocumento.isNullOrEmpty()) {

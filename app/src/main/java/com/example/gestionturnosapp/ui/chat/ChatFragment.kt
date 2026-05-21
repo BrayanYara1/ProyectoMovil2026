@@ -62,6 +62,14 @@ class ChatFragment : Fragment() {
                 adapter.submitList(resource.data) {
                     binding.rvChat.scrollToPosition(adapter.itemCount - 1)
                 }
+                binding.layoutEmptyChat.isVisible = resource.data.isEmpty()
+            }
+        }
+
+        viewModel.isDoctorTyping.observe(viewLifecycleOwner) { isTyping ->
+            binding.tvTypingIndicator.isVisible = isTyping
+            if (isTyping) {
+                binding.rvChat.scrollToPosition(adapter.itemCount - 1)
             }
         }
 

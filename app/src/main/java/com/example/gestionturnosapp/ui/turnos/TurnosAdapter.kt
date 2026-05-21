@@ -43,15 +43,27 @@ class TurnosAdapter(
                 tvItemNombre.text = turno.pacienteNombre
                 tvItemMotivo.text = turno.motivo
 
-                // Formatear Hora para mostrar AM/PM siempre
+                // Formatear Hora para mostrar AM/PM siempre (Resiliente a Locales)
                 try {
                     var dateHora: Date? = null
                     for (format in inputFormats) {
                         try {
-                            val sdf = SimpleDateFormat(format, Locale.US)
+                            // Intentar con Locale actual
+                            val sdf = SimpleDateFormat(format, Locale.getDefault())
                             dateHora = sdf.parse(turno.hora)
                             if (dateHora != null) break
                         } catch (e: Exception) {}
+                    }
+                    
+                    if (dateHora == null) {
+                        for (format in inputFormats) {
+                            try {
+                                // Fallback a Locale US
+                                val sdf = SimpleDateFormat(format, Locale.US)
+                                dateHora = sdf.parse(turno.hora)
+                                if (dateHora != null) break
+                            } catch (e: Exception) {}
+                        }
                     }
                     
                     if (dateHora != null) {

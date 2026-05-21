@@ -5,7 +5,7 @@
     <string name="login_welcome_subtitle">Tu salud, en un solo toque</string>
     <string name="login_card_title">INICIAR SESIÓN</string>
     <!-- Autenticación -->
-    <string name="welcome">Bienvenido</string>
+    <string name="welcome">Bienvenido, %1$s</string>
     <string name="welcome_back">¡Hola de nuevo, %1$s!</string>
     <string name="login_subtitle">Inicia sesión para gestionar tus turnos</string>
     <string name="hint_email">Correo electrónico</string>
@@ -99,7 +99,8 @@
     <string name="title_next_appointment">PRÓXIMA CITA</string>
     <string name="no_upcoming_appointments">Sin citas pendientes</string>
     <string name="schedule_appointment_prompt">Asegura tu próxima consulta médica hoy mismo.</string>
-    <string name="title_medication">Mi Medicación</string>
+    <string name="label_medication_format">%1$s %2$s</string>
+    <string name="label_next_dose"> - Próxima: %1$s</string>
     <string name="title_add_medication">Agregar Medicamento</string>
     <string name="btn_save_medication">GUARDAR MEDICACIÓN</string>
     <string name="title_your_medications">Tus Medicamentos</string>
@@ -202,6 +203,7 @@
     <string name="hint_study_title">Título del estudio</string>
     <string name="label_studies_type">Tipo (Análisis, Placa, etc)</string>
     <string name="label_brief_result">Resultado breve</string>
+    <string name="label_study_result">Resultado: %1$s</string>
     <string name="label_study_date">Fecha del estudio</string>
     <string name="btn_attach_photo">Adjuntar Foto</string>
     <string name="msg_confirm_delete_study">¿Deseas eliminar el registro: %1$s?</string>
@@ -239,6 +241,7 @@
     <string name="hint_type_message">Escribe un mensaje…</string>
     <string name="label_doctor_reply">Respuesta del Doctor</string>
     <string name="msg_chat_welcome">Bienvenido al chat de asistencia médica. ¿En qué podemos ayudarte?</string>
+    <string name="status_pending_offline">Pendiente (Offline)</string>
 
     <string name="today">Hoy</string>
     <string name="tomorrow">Mañana</string>

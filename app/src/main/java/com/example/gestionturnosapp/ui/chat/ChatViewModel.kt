@@ -20,6 +20,9 @@ class ChatViewModel : ViewModel() {
     private val _mensajeEnviado = MutableLiveData<Resource<Mensaje>>()
     val mensajeEnviado: LiveData<Resource<Mensaje>> = _mensajeEnviado
 
+    private val _isDoctorTyping = MutableLiveData<Boolean>(false)
+    val isDoctorTyping: LiveData<Boolean> = _isDoctorTyping
+
     fun fetchMensajes() {
         viewModelScope.launch {
             _mensajes.value = Resource.Loading
@@ -41,7 +44,12 @@ class ChatViewModel : ViewModel() {
                 val mensaje = repository.enviarMensaje(texto)
                 if (mensaje != null) {
                     _mensajeEnviado.value = Resource.Success(mensaje)
+                    
+                    // Simular que el doctor está escribiendo
+                    _isDoctorTyping.value = true
                     delay(2500)
+                    _isDoctorTyping.value = false
+
                     fetchMensajes()
                 } else {
                     _mensajeEnviado.value = Resource.Error("Error al enviar")

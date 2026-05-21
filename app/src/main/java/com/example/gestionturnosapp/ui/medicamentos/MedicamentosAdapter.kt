@@ -26,8 +26,9 @@ class MedicamentosAdapter(
         private val onDeleteClick: (Medicamento) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(med: Medicamento) {
-            binding.tvMedName.text = "${med.nombre} ${med.dosis}"
-            binding.tvMedSchedule.text = "${med.frecuencia} - Próxima: ${med.proximaToma}"
+            val context = binding.root.context
+            binding.tvMedName.text = context.getString(com.example.gestionturnosapp.R.string.label_medication_format, med.nombre, med.dosis)
+            binding.tvMedSchedule.text = med.frecuencia + context.getString(com.example.gestionturnosapp.R.string.label_next_dose, med.proximaToma)
             
             // Mostrar botón de borrar solo si es el adaptador de la lista completa (no en Home)
             // Para simplificar, lo hacemos visible siempre si estamos en este adaptador
