@@ -5,22 +5,26 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Escudo Circular de Brillo Sutil -->
+    <!-- Círculo de fondo sutil -->
     <path
-        android:fillColor="#1AFFFFFF"
-        android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0" />
+        android:fillColor="#15FFFFFF"
+        android:pathData="M54,54m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0" />
 
-    <!-- Logotipo Care-Pulse Minimalista -->
+    <!-- Forma Orgánica Base (Cuidado) -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M54,38.39c-2.31,-2.45 -5.83,-3.39 -8.84,-2.23c-4.43,1.71 -6.44,6.77 -4.49,11.13c1.33,2.97 4.14,4.92 6.51,6.86c2.09,1.72 4.25,3.46 6.13,5.32c0.23,0.23 0.45,0.46 0.69,0.69c0.24,-0.23 0.46,-0.46 0.69,-0.69c1.88,-1.86 4.04,-3.6 6.13,-5.32c2.37,-1.94 5.18,-3.89 6.51,-6.86c1.95,-4.36 -0.06,-9.42 -4.49,-11.13c-3.01,-1.16 -6.53,-0.22 -8.84,2.23Z" />
+        android:pathData="M54,28 C69,28 79,43 79,58 C79,78 54,88 54,88 C54,88 29,78 29,58 C29,43 39,28 54,28 Z" />
 
-    <!-- Línea de Vida Integrada -->
+    <!-- Acento Interior (Cálido) -->
     <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="2.5"
+        android:fillColor="#F2B28C"
+        android:pathData="M54,48m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0" />
+
+    <!-- Línea Humana (Sonrisa/Abrazo) -->
+    <path
+        android:strokeColor="#5B9A7A"
+        android:strokeWidth="4"
         android:strokeLineCap="round"
-        android:strokeLineJoin="round"
-        android:pathData="M32,65 L44,65 L49,58 L54,72 L59,62 L64,65 L76,65" />
+        android:pathData="M42,65 Q54,75 66,65" />
 
 </vector>

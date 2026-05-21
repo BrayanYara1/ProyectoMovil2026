@@ -32,9 +32,12 @@
         <item name="colorError">@color/error</item>
         <item name="colorOnError">@color/white</item>
 
-        <!-- Barra de estado moderna y clara -->
-        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <!-- Barra de estado Transparente y Premium -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
 
         <!-- Typography System -->
         <item name="textAppearanceHeadlineLarge">@style/TextAppearance.App.HeadlineLarge</item>
@@ -51,10 +54,11 @@
     </style>
 
     <style name="Widget.App.Card" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">28dp</item> <!-- Súper redondeado -->
-        <item name="cardElevation">0dp</item>
-        <item name="strokeColor">@color/outline</item>
+        <item name="cardCornerRadius">32dp</item>
+        <item name="cardElevation">4dp</item> <!-- Sombra sutil para profundidad -->
+        <item name="strokeColor">#15000000</item> <!-- Borde ultra fino y translúcido -->
         <item name="strokeWidth">1dp</item>
+        <item name="cardBackgroundColor">#CCFFFFFF</item> <!-- Glassmorphism: Blanco 80% opaco -->
     </style>
 
     <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">

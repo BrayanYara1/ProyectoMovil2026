@@ -29,6 +29,9 @@ class MainActivity : AppCompatActivity() {
     ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Habilitar Edge-to-Edge para un diseño inmersivo
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+
         // Aplicar Tema antes de crear la actividad
         com.example.gestionturnosapp.data.PreferenceManager.applyTheme(
             com.example.gestionturnosapp.data.PreferenceManager.isDarkMode(this)

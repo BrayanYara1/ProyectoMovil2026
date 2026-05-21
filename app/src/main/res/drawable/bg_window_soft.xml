@@ -1,44 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Fondo Base Sólido (Crema muy suave) -->
+    <!-- 1. Lienzo Base (Un blanco roto muy limpio) -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#F8F9FA" />
+            <solid android:color="#F9FAFB" />
         </shape>
     </item>
 
-    <!-- Gradiente sutil superior para profundidad -->
+    <!-- 2. "Luz de la Esperanza" (Gran aura verde esmeralda en el centro-superior) -->
+    <item android:top="-200dp">
+        <shape android:shape="oval">
+            <size android:width="800dp" android:height="800dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400dp"
+                android:centerX="0.5"
+                android:centerY="0.2"
+                android:startColor="#255B9A7A"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+
+    <!-- 3. "Calidez Humana" (Aura arena en la esquina inferior izquierda) -->
+    <item android:bottom="-150dp" android:left="-150dp">
+        <shape android:shape="oval">
+            <size android:width="600dp" android:height="600dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="300dp"
+                android:startColor="#30F2B28C"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+
+    <!-- 4. "Serenidad" (Aura azul claro en la esquina inferior derecha) -->
+    <item android:bottom="-100dp" android:right="-100dp">
+        <shape android:shape="oval">
+            <size android:width="500dp" android:height="500dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="250dp"
+                android:startColor="#20A5C4C7"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+
+    <!-- 5. "Textura Orgánica" (Círculo difuminado flotando a la derecha) -->
+    <item android:top="200dp" android:right="-200dp">
+        <shape android:shape="oval">
+            <size android:width="450dp" android:height="450dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="225dp"
+                android:startColor="#125B9A7A"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+
+    <!-- 6. Capa de "Brillo de Cristal" (Gradiente lineal para un efecto de profundidad) -->
     <item>
         <shape android:shape="rectangle">
             <gradient
-                android:startColor="#EEF5F0"
-                android:endColor="#00F8F9FA"
-                android:angle="270"
+                android:angle="315"
+                android:startColor="#15FFFFFF"
+                android:endColor="#00FFFFFF"
                 android:type="linear" />
-        </shape>
-    </item>
-
-    <!-- Mancha decorativa orgánica superior derecha (muy tenue) -->
-    <item android:top="-100dp" android:right="-100dp">
-        <shape android:shape="oval">
-            <size android:width="300dp" android:height="300dp" />
-            <gradient
-                android:type="radial"
-                android:gradientRadius="150dp"
-                android:startColor="#155B9A7A"
-                android:endColor="#00FFFFFF" />
-        </shape>
-    </item>
-
-    <!-- Mancha decorativa orgánica inferior izquierda (muy tenue) -->
-    <item android:bottom="-50dp" android:left="-150dp">
-        <shape android:shape="oval">
-            <size android:width="400dp" android:height="400dp" />
-            <gradient
-                android:type="radial"
-                android:gradientRadius="200dp"
-                android:startColor="#10F2B28C"
-                android:endColor="#00FFFFFF" />
         </shape>
     </item>
 </layer-list>

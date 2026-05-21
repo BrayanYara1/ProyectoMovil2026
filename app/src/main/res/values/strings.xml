@@ -26,8 +26,18 @@
     <string name="msg_invalid_email">Ingresa un correo electrónico real y válido</string>
 
     <!-- Home -->
+    <!-- Home Dashboard (Cortos y precisos) -->
+    <string name="dash_request_appointment">Nueva Cita</string>
+    <string name="dash_emergencies">Urgencias</string>
+    <string name="dash_share">Compartir</string>
+    <string name="dash_search_hint">Busca doctores, especialidades…</string>
+
     <string name="home_greeting">Hola de nuevo, %1$s</string>
     <string name="home_subtitle">¿Cómo te sientes hoy?</string>
+    <string name="hint_search_home">Buscar doctores o especialidades…</string>
+    <string name="title_quick_actions">Acciones Rápidas</string>
+    <string name="label_share_health">Compartir Salud</string>
+    <string name="title_my_services">Mis Servicios</string>
     <string name="menu_request_appointment">Agendar una cita</string>
     <string name="menu_my_appointments">Mi Cuidado</string>
     <string name="menu_home">Inicio</string>
@@ -254,7 +264,7 @@
     <string name="reason_consultation_for">Motivo de consulta: %1$s</string>
     <string name="label_medication_format">%1$s %2$s</string>
     <string name="label_next_dose"> - Próxima: %1$s</string>
-    <string name="label_next_appointment_format">%1$s - %2$s</string>
+    <string name="label_next_appointment_format">%1$s con %2$s</string>
 
     <string name="name_cardiology">Cardiología</string>
     <string name="desc_cardiology">Corazón y vasos sanguíneos</string>

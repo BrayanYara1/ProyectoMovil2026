@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Paleta "Human & Organic" - Versión Bright & Fresh -->
-    <color name="primary">#5B9A7A</color> <!-- Verde Salvia más luminoso -->
-    <color name="primary_variant">#4A7C59</color>
+    <!-- Paleta "Human & Organic" - Versión Vibrant & Premium -->
+    <color name="primary">#42A17B</color> <!-- Verde Esmeralda Suave -->
+    <color name="primary_variant">#368064</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <color name="accent">#F2B28C</color> <!-- Arena Cálida más vibrante -->
-    <color name="secondary">#A5C4C7</color> <!-- Azul Aire más claro -->
+    <color name="accent">#FF9D66</color> <!-- Melocotón Cálido -->
+    <color name="secondary">#81C4C7</color> <!-- Turquesa Aire -->
     <color name="on_secondary">#FFFFFF</color>
 
     <!-- Fondos "Crema" y Soft UI -->

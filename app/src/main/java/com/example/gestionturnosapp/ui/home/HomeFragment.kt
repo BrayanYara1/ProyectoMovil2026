@@ -48,6 +48,11 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_userProfileFragment)
         }
 
+        binding.cardSearch.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            findNavController().navigate(R.id.action_homeFragment_to_especialidadesFragment)
+        }
+
         binding.cardSolicitarTurno.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_solicitarTurnoFragment)
@@ -218,7 +223,8 @@ class HomeFragment : Fragment() {
                     displayTime
                 )
                 binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.white))
-                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.white))
+                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary))
+                binding.ivNextAppointIconContainer.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.white)))
                 
                 binding.cardNextAppointment.setOnClickListener {
                     it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
@@ -243,7 +249,8 @@ class HomeFragment : Fragment() {
                 
                 binding.tvNextAppointDate.text = getString(R.string.menu_request_appointment)
                 binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.primary))
-                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary))
+                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.white))
+                binding.ivNextAppointIconContainer.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary)))
 
                 binding.cardNextAppointment.setOnClickListener {
                     it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
