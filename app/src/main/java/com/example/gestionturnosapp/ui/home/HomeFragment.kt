@@ -167,17 +167,17 @@ class HomeFragment : Fragment() {
 
         viewModel.nextTurno.observe(viewLifecycleOwner) { turno ->
             if (turno != null) {
-                // Estado con cita
-                binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.primary))
+                // Estado con cita: Diseño limpio sobre fondo blanco
+                binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.white))
                 binding.tvNextAppointLabel.text = getString(R.string.title_next_appointment)
-                binding.tvNextAppointLabel.setTextColor(android.graphics.Color.parseColor("#B3FFFFFF"))
+                binding.tvNextAppointLabel.setTextColor(requireContext().getColor(R.color.text_secondary))
                 
                 binding.tvNextAppointName.text = getString(
                     R.string.label_next_appointment_format,
                     turno.especialidad ?: getString(R.string.label_default_specialty),
                     turno.doctor ?: getString(R.string.label_default_doctor)
                 )
-                binding.tvNextAppointName.setTextColor(requireContext().getColor(R.color.white))
+                binding.tvNextAppointName.setTextColor(requireContext().getColor(R.color.text_primary))
                 
                 val displayTime = try {
                     val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
@@ -196,7 +196,6 @@ class HomeFragment : Fragment() {
                     turno.hora
                 }
 
-                // Formatear fecha de forma más amigable
                 val displayDate = try {
                     val sdfInput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
                     val date = sdfInput.parse(turno.fecha)
@@ -222,9 +221,9 @@ class HomeFragment : Fragment() {
                     displayDate,
                     displayTime
                 )
-                binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.white))
+                binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.primary))
                 binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary))
-                binding.ivNextAppointIconContainer.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.white)))
+                binding.ivNextAppointIconContainer.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary_container)))
                 
                 binding.cardNextAppointment.setOnClickListener {
                     it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
@@ -239,7 +238,7 @@ class HomeFragment : Fragment() {
                     findNavController().navigate(R.id.action_homeFragment_to_turnoDetailFragment, bundle)
                 }
             } else {
-                // Estado vacío: Invitar a agendar
+                // Estado vacío: Invitar a agendar con estilo suave
                 binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.primary_container))
                 binding.tvNextAppointLabel.text = getString(R.string.no_upcoming_appointments).uppercase()
                 binding.tvNextAppointLabel.setTextColor(requireContext().getColor(R.color.primary))
