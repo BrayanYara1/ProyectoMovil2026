@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.gestionturnosapp"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.2"
+        versionCode = 2
+        versionName = "1.0.3-PREMIUM"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

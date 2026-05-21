@@ -32,6 +32,7 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        android.widget.Toast.makeText(context, "MODO PREMIUM ACTIVADO", android.widget.Toast.LENGTH_LONG).show()
         setupUI()
         setupObservers()
     }

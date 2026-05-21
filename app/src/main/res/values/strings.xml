@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Salud Activa</string>
+    <string name="app_name">Salud Activa Pro</string>
 
     <string name="login_welcome_subtitle">Tu salud, en un solo toque</string>
     <string name="login_card_title">INICIAR SESIÓN</string>
