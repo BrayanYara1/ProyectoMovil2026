@@ -2,98 +2,84 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Widget.App.Card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
     android:layout_marginVertical="8dp"
-    app:cardElevation="2dp">
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/outline"
+    app:strokeWidth="1dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <ImageView
-            android:id="@+id/dateIconCard"
-            android:layout_width="52dp"
-            android:layout_height="52dp"
-            android:background="@drawable/bg_icon_container_blue"
-            android:padding="0dp"
-            android:scaleType="centerInside"
-            android:transitionName="date_container_shared"
+        <!-- Date Badge -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/dateContainer"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@color/primary_container"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:id="@+id/layoutDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elevation="1dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintBottom_toBottomOf="@id/dateIconCard"
-            app:layout_constraintEnd_toEndOf="@id/dateIconCard"
-            app:layout_constraintStart_toStartOf="@id/dateIconCard"
-            app:layout_constraintTop_toTopOf="@id/dateIconCard">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvItemDiaMes"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/primary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="15" />
+                <TextView
+                    android:id="@+id/tvItemDiaMes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    tools:text="24" />
 
-            <TextView
-                android:id="@+id/tvItemMesCorta"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/primary"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                tools:text="OCT" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvItemMesCorta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/primary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    tools:text="MAY" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- Content -->
         <TextView
             android:id="@+id/tvItemNombre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:textColor="@color/text_primary"
-            android:textSize="16sp"
+            android:textSize="17sp"
             android:textStyle="bold"
-            android:transitionName="patient_name"
-            app:layout_constraintEnd_toStartOf="@id/tvItemHora"
-            app:layout_constraintStart_toEndOf="@id/dateIconCard"
-            app:layout_constraintTop_toTopOf="@id/dateIconCard"
-            tools:text="Dr. Juan Pérez" />
+            app:layout_constraintEnd_toStartOf="@+id/tvItemHora"
+            app:layout_constraintStart_toEndOf="@id/dateContainer"
+            app:layout_constraintTop_toTopOf="@id/dateContainer"
+            tools:text="Cardiología" />
 
         <TextView
             android:id="@+id/tvItemMotivo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:textColor="@color/text_secondary"
-            android:textSize="13sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="@id/tvItemNombre"
             app:layout_constraintStart_toStartOf="@id/tvItemNombre"
             app:layout_constraintTop_toBottomOf="@id/tvItemNombre"
-            tools:text="Consulta General - Chequeo anual" />
-
-        <TextView
-            android:id="@+id/tvItemHora"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/primary"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tvItemNombre"
-            tools:text="09:30 AM" />
+            tools:text="Chequeo Anual" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/tvItemStatus"
@@ -101,27 +87,38 @@
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_marginTop="8dp"
-            android:textColor="@color/white"
+            android:textColor="@color/on_primary_container"
             android:textSize="11sp"
             android:textStyle="bold"
-            app:chipBackgroundColor="@color/status_pending_bg"
+            app:chipBackgroundColor="@color/primary_container"
             app:chipCornerRadius="8dp"
             app:chipStrokeWidth="0dp"
             app:layout_constraintStart_toStartOf="@id/tvItemNombre"
             app:layout_constraintTop_toBottomOf="@id/tvItemMotivo"
             tools:text="PENDIENTE" />
 
+        <!-- Time and Delete -->
+        <TextView
+            android:id="@+id/tvItemHora"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvItemNombre"
+            tools:text="10:30 AM" />
+
         <ImageButton
             android:id="@+id/btnDeleteItem"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/btn_delete"
-            android:padding="8dp"
             android:src="@drawable/ic_delete"
+            app:tint="@color/text_tertiary"
+            android:contentDescription="@string/btn_delete"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:tint="@color/error" />
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>

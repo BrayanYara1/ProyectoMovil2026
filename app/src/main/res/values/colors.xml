@@ -1,58 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Paleta "High-End Medical" -->
-    <color name="primary">#0D9488</color> <!-- Esmeralda Profundo Teal -->
-    <color name="primary_variant">#0F766E</color>
+    <!-- Paleta "Professional Indigo & Slate" -->
+    <color name="primary">#2563EB</color> <!-- Blue Indigo (Trust & Clarity) -->
+    <color name="primary_variant">#1E40AF</color>
     <color name="on_primary">#FFFFFF</color>
 
-    <color name="accent">#F97316</color> <!-- Naranja Energía -->
-    <color name="secondary">#38BDF8</color> <!-- Azul Cielo -->
+    <color name="accent">#F59E0B</color> <!-- Amber (Action & Warmth) -->
+    <color name="secondary">#64748B</color> <!-- Slate (Professional Neutral) -->
     <color name="on_secondary">#FFFFFF</color>
 
-    <!-- Fondos Ultra-Clean -->
-    <color name="background">#F1F5F9</color>
+    <!-- Backgrounds -->
+    <color name="background">#F8FAFC</color> <!-- Very light slate -->
     <color name="surface">#FFFFFF</color>
     <color name="on_background">#0F172A</color>
     <color name="on_surface">#1E293B</color>
 
-    <!-- Estados -->
+    <!-- States -->
     <color name="success">#10B981</color>
     <color name="warning">#F59E0B</color>
     <color name="error">#EF4444</color>
     <color name="outline">#E2E8F0</color>
 
-    <!-- Texto Profesional -->
+    <!-- Typography -->
     <color name="text_primary">#0F172A</color>
-    <color name="text_secondary">#64748B</color>
+    <color name="text_secondary">#475569</color>
     <color name="text_tertiary">#94A3B8</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
-    <!-- Contenedores Soft -->
-    <color name="primary_container">#CCF2F4</color>
-    <color name="on_primary_container">#134E4A</color>
-    <color name="secondary_container">#E0F2FE</color>
-    <color name="on_secondary_container">#1E293B</color>
-    <color name="accent_container">#FFEDD5</color>
-    <color name="on_accent_container">#7C2D12</color>
+    <!-- Containers -->
+    <color name="primary_container">#DBEAFE</color>
+    <color name="on_primary_container">#1E40AF</color>
+    <color name="secondary_container">#F1F5F9</color>
+    <color name="on_secondary_container">#334155</color>
+    <color name="accent_container">#FEF3C7</color>
+    <color name="on_accent_container">#92400E</color>
     <color name="on_error">#FFFFFF</color>
 
-    <color name="icon_container_blue">#F0F9FF</color>
+    <color name="icon_container_blue">#EFF6FF</color>
     <color name="icon_container_cyan">#ECFEFF</color>
     <color name="icon_container_purple">#FAF5FF</color>
     <color name="icon_container_red">#FEF2F2</color>
 
     <!-- Chat -->
-    <color name="chat_bubble_me">#0D9488</color>
+    <color name="chat_bubble_me">#2563EB</color>
     <color name="chat_bubble_other">#F1F5F9</color>
-    <color name="chat_text_other">#1E293B</color>
+    <color name="chat_text_other">#0F172A</color>
 
-    <!-- Estados de Turnos -->
+    <!-- Appointment Status -->
     <color name="status_pending_bg">#FEF3C7</color>
     <color name="status_pending_text">#92400E</color>
-    <color name="status_completed_bg">#D1FAE5</color>
-    <color name="status_completed_text">#065F46</color>
+    <color name="status_completed_bg">#DCFCE7</color>
+    <color name="status_completed_text">#166534</color>
     <color name="status_cancelled_bg">#FEE2E2</color>
     <color name="status_cancelled_text">#991B1B</color>
 </resources>

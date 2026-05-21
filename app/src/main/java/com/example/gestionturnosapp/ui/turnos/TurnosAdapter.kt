@@ -123,7 +123,7 @@ class TurnosAdapter(
 
                 root.transitionName = "card_${turno.id}"
                 tvItemNombre.transitionName = "name_${turno.id}"
-                dateIconCard.transitionName = "date_${turno.id}"
+                dateContainer.transitionName = "date_${turno.id}"
 
                 root.setOnClickListener { 
                     it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)

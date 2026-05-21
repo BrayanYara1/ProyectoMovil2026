@@ -1,38 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Dark Mode "Slate & Emerald" -->
-    <color name="primary">#3B82F6</color> <!-- Azul Brillante para Oscuro -->
-    <color name="primary_variant">#60A5FA</color>
-    <color name="on_primary">#0F172A</color>
+    <!-- Luxury Dark "Midnight Emerald" -->
+    <color name="primary">#42A17B</color> <!-- Mantenemos el Verde Esmeralda pero más vibrante en oscuro -->
+    <color name="primary_variant">#52C49A</color>
+    <color name="on_primary">#FFFFFF</color>
 
-    <color name="accent">#10B981</color> <!-- Esmeralda -->
-    <color name="secondary">#94A3B8</color>
+    <color name="accent">#FF9D66</color>
+    <color name="secondary">#81C4C7</color>
 
-    <!-- Fondos Oscuros Profundos -->
-    <color name="background">#0F172A</color>
-    <color name="surface">#1E293B</color>
-    <color name="on_background">#F8FAFC</color>
-    <color name="on_surface">#F1F5F9</color>
+    <!-- Fondos Oscuros Premium (No negros puros) -->
+    <color name="background">#0A0F0D</color> <!-- Negro Verdoso Profundo -->
+    <color name="surface">#141C18</color> <!-- Superficie Elevada -->
+    <color name="on_background">#E8F3E9</color>
+    <color name="on_surface">#FFFFFF</color>
 
-    <color name="error">#F87171</color>
-    <color name="outline">#334155</color>
+    <color name="error">#FF6B6B</color>
+    <color name="outline">#1F2B26</color>
 
-    <!-- Texto Dark -->
-    <color name="text_primary">#F1F5F9</color>
-    <color name="text_secondary">#94A3B8</color>
-    <color name="text_tertiary">#64748B</color>
+    <!-- Texto Dark High-Contrast -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#A0B0AA</color>
+    <color name="text_tertiary">#5A6B65</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 
-    <color name="status_pending_bg">#451A03</color>
-    <color name="status_pending_text">#FDE68A</color>
-    <color name="status_completed_bg">#064E3B</color>
-    <color name="status_completed_text">#A7F3D0</color>
-    <color name="status_cancelled_bg">#450A0A</color>
-    <color name="status_cancelled_text">#FECACA</color>
+    <color name="primary_container">#1A2B24</color>
+    <color name="on_primary_container">#42A17B</color>
+    <color name="secondary_container">#1A2829</color>
+    <color name="on_secondary_container">#81C4C7</color>
+    <color name="accent_container">#2B211A</color>
+    <color name="on_accent_container">#FF9D66</color>
+    <color name="on_error">#FFFFFF</color>
 
-    <color name="chat_bubble_me">#3B82F6</color>
-    <color name="chat_bubble_other">#334155</color>
-    <color name="chat_text_other">#F1F5F9</color>
+    <!-- Chat Dark -->
+    <color name="chat_bubble_me">#42A17B</color>
+    <color name="chat_bubble_other">#1F2B26</color>
+    <color name="chat_text_other">#E8F3E9</color>
 </resources>

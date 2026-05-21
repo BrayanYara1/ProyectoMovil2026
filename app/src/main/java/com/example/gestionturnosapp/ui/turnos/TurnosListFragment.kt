@@ -80,7 +80,7 @@ class TurnosListFragment : Fragment() {
                 }
                 
                 val extras = androidx.navigation.fragment.FragmentNavigatorExtras(
-                    bindingItems.dateIconCard to "date_container_shared"
+                    bindingItems.dateContainer to "date_container_shared"
                 )
                 
                 findNavController().navigate(

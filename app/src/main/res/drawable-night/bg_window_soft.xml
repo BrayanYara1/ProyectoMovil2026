@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 1. Lienzo Base (Negro Esmeralda profundo) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#0A0F0D" />
+        </shape>
+    </item>
+
+    <!-- 2. "Aura de Medianoche" (Verde esmeralda oscuro en el centro-superior) -->
+    <item android:top="-200dp">
+        <shape android:shape="oval">
+            <size android:width="800dp" android:height="800dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="400dp"
+                android:centerX="0.5"
+                android:centerY="0.2"
+                android:startColor="#1542A17B"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+
+    <!-- 3. "Calidez Sombría" (Tono melocotón muy sutil abajo a la izquierda) -->
+    <item android:bottom="-150dp" android:left="-150dp">
+        <shape android:shape="oval">
+            <size android:width="600dp" android:height="600dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="300dp"
+                android:startColor="#10FF9D66"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+
+    <!-- 4. Brillo de pantalla (Un gradiente lineal muy tenue) -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="315"
+                android:startColor="#05FFFFFF"
+                android:endColor="#00000000"
+                android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme for Dark Mode -->
+    <!-- Base application theme for Dark Mode - Luxury Midnight Edition -->
     <style name="Theme.GestionTurnosApp" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Colores de Marca -->
         <item name="colorPrimary">@color/primary</item>
@@ -9,24 +9,39 @@
         <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
 
         <item name="colorSecondary">@color/secondary</item>
-        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
         <item name="colorSecondaryContainer">@color/secondary_container</item>
         <item name="colorOnSecondaryContainer">@color/on_secondary_container</item>
 
         <item name="colorTertiary">@color/accent</item>
 
-        <!-- Colores de Fondo -->
-        <item name="android:windowBackground">@color/background</item>
+        <!-- Colores de Fondo Premium -->
+        <item name="android:windowBackground">@drawable/bg_window_soft</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/on_surface</item>
         <item name="colorOutline">@color/outline</item>
 
         <!-- Errores -->
         <item name="colorError">@color/error</item>
-        <item name="colorOnError">@color/on_error</item>
+        <item name="colorOnError">@color/white</item>
 
-        <!-- Barra de estado moderna para modo oscuro -->
-        <item name="android:statusBarColor">@color/background</item>
+        <!-- Barra de estado Transparente -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <!-- Typography System -->
+        <item name="textAppearanceHeadlineLarge">@style/TextAppearance.App.HeadlineLarge</item>
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.App.TitleLarge</item>
+        <item name="textAppearanceTitleMedium">@style/TextAppearance.App.TitleMedium</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.App.BodyLarge</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.App.BodyMedium</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.App.LabelLarge</item>
+
+        <!-- Component Styles -->
+        <item name="materialCardViewStyle">@style/Widget.App.Card</item>
+        <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
+        <item name="materialButtonStyle">@style/Widget.App.Button</item>
     </style>
 </resources>
