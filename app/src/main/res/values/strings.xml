@@ -32,7 +32,17 @@
     <string name="dash_share">Compartir</string>
     <string name="dash_search_hint">Busca doctores, especialidades…</string>
 
-    <string name="home_greeting">Hola de nuevo, %1$s</string>
+    <string name="home_greeting">¡Hola de nuevo, %1$s!</string>
+    <string name="title_featured_services">Servicios Destacados</string>
+    <string name="label_share_health_question">¿Quieres compartir tu salud?</string>
+    <string name="subtitle_share_health">Envía un resumen de tus citas y medicamentos.</string>
+    <string name="title_medical_recommendation">Recomendación Médica</string>
+    <string name="title_today_medication">Medicación de Hoy</string>
+    <string name="label_specialists">Especialistas</string>
+    <string name="label_studies_short">Estudios</string>
+    <string name="label_help_short">Ayuda</string>
+    <string name="label_emergencies_short">Urgencias</string>
+    <string name="label_care_short">Mi Cuidado</string>
     <string name="home_subtitle">¿Cómo te sientes hoy?</string>
     <string name="hint_search_home">Buscar doctores o especialidades…</string>
     <string name="title_quick_actions">Acciones Rápidas</string>

@@ -167,7 +167,7 @@ class HomeFragment : Fragment() {
 
         viewModel.nextTurno.observe(viewLifecycleOwner) { turno ->
             if (turno != null) {
-                // Estado con cita: Diseño limpio sobre fondo blanco
+                // Estado con cita: Ticket Premium
                 binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.white))
                 binding.tvNextAppointLabel.text = getString(R.string.title_next_appointment)
                 binding.tvNextAppointLabel.setTextColor(requireContext().getColor(R.color.text_secondary))
@@ -221,7 +221,7 @@ class HomeFragment : Fragment() {
                     displayDate,
                     displayTime
                 )
-                binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.primary))
+                binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.text_secondary))
                 binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary))
                 binding.ivNextAppointIconContainer.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary_container)))
                 
@@ -238,7 +238,7 @@ class HomeFragment : Fragment() {
                     findNavController().navigate(R.id.action_homeFragment_to_turnoDetailFragment, bundle)
                 }
             } else {
-                // Estado vacío: Invitar a agendar con estilo suave
+                // Estado vacío: Invitar a agendar con estilo Dashboard
                 binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.primary_container))
                 binding.tvNextAppointLabel.text = getString(R.string.no_upcoming_appointments).uppercase()
                 binding.tvNextAppointLabel.setTextColor(requireContext().getColor(R.color.primary))
