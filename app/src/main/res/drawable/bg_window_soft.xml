@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo Base Sólido (Crema muy suave) -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F8F9FA" />
+        </shape>
+    </item>
+
+    <!-- Gradiente sutil superior para profundidad -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#EEF5F0"
+                android:endColor="#00F8F9FA"
+                android:angle="270"
+                android:type="linear" />
+        </shape>
+    </item>
+
+    <!-- Mancha decorativa orgánica superior derecha (muy tenue) -->
+    <item android:top="-100dp" android:right="-100dp">
+        <shape android:shape="oval">
+            <size android:width="300dp" android:height="300dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="150dp"
+                android:startColor="#155B9A7A"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+
+    <!-- Mancha decorativa orgánica inferior izquierda (muy tenue) -->
+    <item android:bottom="-50dp" android:left="-150dp">
+        <shape android:shape="oval">
+            <size android:width="400dp" android:height="400dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="200dp"
+                android:startColor="#10F2B28C"
+                android:endColor="#00FFFFFF" />
+        </shape>
+    </item>
+</layer-list>
