@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.databinding.ItemTurnoBinding
+import com.example.gestionturnosapp.util.DateUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -33,47 +34,18 @@ class TurnosAdapter(
         private val onDeleteClick: (Turno) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         
-        private val displayTimeFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
         private val isoDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         private val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
-        private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
 
         fun bind(turno: Turno) {
             binding.apply {
-                tvItemNombre.text = turno.pacienteNombre
+                tvItemEspecialidad.text = turno.especialidad ?: root.context.getString(R.string.label_default_specialty)
+                tvItemDoctor.text = turno.doctor ?: root.context.getString(R.string.label_default_doctor)
                 tvItemMotivo.text = turno.motivo
+                tvItemNombre.text = turno.pacienteNombre // Mantenemos para compatibilidad si se necesita
 
-                // Formatear Hora para mostrar AM/PM siempre (Resiliente a Locales)
-                try {
-                    var dateHora: Date? = null
-                    for (format in inputFormats) {
-                        try {
-                            // Intentar con Locale actual
-                            val sdf = SimpleDateFormat(format, Locale.getDefault())
-                            dateHora = sdf.parse(turno.hora)
-                            if (dateHora != null) break
-                        } catch (e: Exception) {}
-                    }
-                    
-                    if (dateHora == null) {
-                        for (format in inputFormats) {
-                            try {
-                                // Fallback a Locale US
-                                val sdf = SimpleDateFormat(format, Locale.US)
-                                dateHora = sdf.parse(turno.hora)
-                                if (dateHora != null) break
-                            } catch (e: Exception) {}
-                        }
-                    }
-                    
-                    if (dateHora != null) {
-                        tvItemHora.text = displayTimeFormat.format(dateHora)
-                    } else {
-                        tvItemHora.text = turno.hora
-                    }
-                } catch (e: Exception) {
-                    tvItemHora.text = turno.hora
-                }
+                // Formatear Hora
+                tvItemHora.text = DateUtils.formatDisplayTime(turno.hora)
 
                 // Formatear Fecha para el Icono de Calendario
                 try {

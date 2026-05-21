@@ -1,9 +1,12 @@
 package com.example.gestionturnosapp.ui
 
 import android.os.Bundle
+import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -34,12 +37,12 @@ class WelcomeFragment : Fragment() {
             setupUI()
             
             // Animación de entrada
-            val animation = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in_up)
+            val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in_up)
             if (_binding != null) {
                 binding.logoCard.startAnimation(animation)
             }
         } catch (e: Exception) {
-            android.util.Log.e("WelcomeFragment", "Error en onViewCreated", e)
+            Log.e("WelcomeFragment", "Error en onViewCreated", e)
         }
     }
 
@@ -60,7 +63,7 @@ class WelcomeFragment : Fragment() {
             }
             
             binding.btnGetStarted.setOnClickListener {
-                it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 findNavController().navigate(R.id.action_welcomeFragment_to_homeFragment)
             }
         } else {
@@ -69,12 +72,12 @@ class WelcomeFragment : Fragment() {
             binding.btnGetStarted.isVisible = false
             
             binding.btnLoginWelcome.setOnClickListener {
-                it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 findNavController().navigate(R.id.action_welcomeFragment_to_loginFragment)
             }
 
             binding.btnRegisterWelcome.setOnClickListener {
-                it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                 findNavController().navigate(R.id.action_welcomeFragment_to_registerFragment)
             }
         }

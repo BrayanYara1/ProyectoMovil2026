@@ -1,10 +1,12 @@
 package com.example.gestionturnosapp.ui.auth
 
 import android.os.Bundle
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -30,23 +32,34 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        android.widget.Toast.makeText(context, "MODO PREMIUM ACTIVADO", android.widget.Toast.LENGTH_SHORT).show()
         setupObservers()
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        // Limpiar errores mientras el usuario escribe
+        binding.etEmail.doAfterTextChanged { binding.tilEmail.error = null }
+        binding.etPassword.doAfterTextChanged { binding.tilPassword.error = null }
 
         binding.btnLogin.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
             val password = binding.etPassword.text.toString().trim()
 
-            binding.tilEmail.error = null
-            binding.tilPassword.error = null
-            
             var isValid = true
+            
             if (email.isEmpty()) {
                 binding.tilEmail.error = getString(R.string.msg_complete_fields)
                 isValid = false
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.error = getString(R.string.msg_invalid_email)
+                isValid = false
             }
+
             if (password.isEmpty()) {
                 binding.tilPassword.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            } else if (password.length < 6) {
+                binding.tilPassword.error = getString(R.string.msg_password_length)
                 isValid = false
             }
 

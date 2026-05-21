@@ -41,9 +41,7 @@ class EspecialidadesFragment : Fragment() {
         binding.searchViewEspecialidades.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Aquí filtramos localmente para simplificar con los recursos de strings
-                val adapter = binding.rvEspecialidades.adapter as? EspecialidadesAdapter
-                adapter?.filter(newText ?: "", requireContext())
+                viewModel.setSearchQuery(newText ?: "")
                 return true
             }
         })

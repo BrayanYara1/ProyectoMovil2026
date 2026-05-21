@@ -1,9 +1,14 @@
 package com.example.gestionturnosapp.ui.home
 
+import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
+import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -14,6 +19,10 @@ import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.ImageStorageManager
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentHomeBinding
+import com.example.gestionturnosapp.util.DateUtils
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import java.util.Calendar
 
 class HomeFragment : Fragment() {
 
@@ -32,7 +41,6 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        android.widget.Toast.makeText(context, "MODO PREMIUM ACTIVADO", android.widget.Toast.LENGTH_LONG).show()
         setupUI()
         setupObservers()
     }
@@ -45,52 +53,52 @@ class HomeFragment : Fragment() {
         }
 
         binding.cardHomeProfile.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_userProfileFragment)
         }
 
         binding.cardSearch.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_especialidadesFragment)
         }
 
         binding.cardSolicitarTurno.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_solicitarTurnoFragment)
         }
 
         binding.cardMisTurnos.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_turnosListFragment)
         }
 
         binding.cardEspecialidades.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_especialidadesFragment)
         }
 
         binding.cardMedication.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_medicamentosFragment)
         }
 
         binding.cardEstudios.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_estudiosFragment)
         }
 
         binding.cardChat.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             findNavController().navigate(R.id.action_homeFragment_to_chatFragment)
         }
 
         binding.cardUrgencias.setOnClickListener {
-            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            MaterialAlertDialogBuilder(requireContext())
                 .setTitle(getString(R.string.label_emergency_call))
                 .setMessage(getString(R.string.msg_emergency_confirm))
                 .setPositiveButton(getString(R.string.btn_call)) { _, _ ->
-                    val intent = android.content.Intent(android.content.Intent.ACTION_DIAL)
-                    intent.data = android.net.Uri.parse("tel:123")
+                    val intent = Intent(Intent.ACTION_DIAL)
+                    intent.data = "tel:123".toUri()
                     startActivity(intent)
                 }
                 .setNegativeButton(getString(R.string.btn_cancel), null)
@@ -98,15 +106,15 @@ class HomeFragment : Fragment() {
         }
 
         binding.cardUrgencias.setOnLongClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
-            val intent = android.content.Intent(android.content.Intent.ACTION_DIAL)
-            intent.data = android.net.Uri.parse("tel:123")
+            it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            val intent = Intent(Intent.ACTION_DIAL)
+            intent.data = "tel:123".toUri()
             startActivity(intent)
             true
         }
 
         binding.cardShareSummary.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
             shareHealthSummary()
         }
     }
@@ -121,7 +129,7 @@ class HomeFragment : Fragment() {
                    .trim()
         
         // Saludo Dinámico según la hora del día
-        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val greetingRes = when (hour) {
             in 6..11 -> R.string.greeting_morning
             in 12..18 -> R.string.greeting_afternoon
@@ -156,7 +164,7 @@ class HomeFragment : Fragment() {
                 if (it.contains("401") || it.contains("token", true)) {
                     handleSessionExpired()
                 } else {
-                    com.google.android.material.snackbar.Snackbar.make(binding.root, it, com.google.android.material.snackbar.Snackbar.LENGTH_LONG).show()
+                    Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
                 }
             }
         }
@@ -169,7 +177,7 @@ class HomeFragment : Fragment() {
         viewModel.nextTurno.observe(viewLifecycleOwner) { turno ->
             if (turno != null) {
                 // Estado con cita: Ticket Premium
-                binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.white))
+                binding.cardNextAppointment.setCardBackgroundColor(requireContext().getColor(R.color.surface))
                 binding.tvNextAppointLabel.text = getString(R.string.title_next_appointment)
                 binding.tvNextAppointLabel.setTextColor(requireContext().getColor(R.color.text_secondary))
                 
@@ -180,42 +188,8 @@ class HomeFragment : Fragment() {
                 )
                 binding.tvNextAppointName.setTextColor(requireContext().getColor(R.color.text_primary))
                 
-                val displayTime = try {
-                    val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
-                    var dateObj: java.util.Date? = null
-                    for (fmt in inputFormats) {
-                        try {
-                            val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
-                            dateObj = sdf.parse(turno.hora)
-                            if (dateObj != null) break
-                        } catch (e: Exception) {}
-                    }
-                    if (dateObj != null) {
-                        java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(dateObj)
-                    } else turno.hora
-                } catch (e: Exception) {
-                    turno.hora
-                }
-
-                val displayDate = try {
-                    val sdfInput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-                    val date = sdfInput.parse(turno.fecha)
-                    if (date != null) {
-                        val calendar = java.util.Calendar.getInstance()
-                        val today = calendar.time
-                        calendar.add(java.util.Calendar.DAY_OF_YEAR, 1)
-                        val tomorrow = calendar.time
-                        
-                        val sdfDay = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-                        when (sdfDay.format(date)) {
-                            sdfDay.format(today) -> getString(R.string.today)
-                            sdfDay.format(tomorrow) -> getString(R.string.tomorrow)
-                            else -> java.text.SimpleDateFormat("EEE, d MMM", java.util.Locale.getDefault()).format(date).replaceFirstChar { it.uppercase() }
-                        }
-                    } else turno.fecha
-                } catch (e: Exception) {
-                    turno.fecha
-                }
+                val displayTime = DateUtils.formatDisplayTime(turno.hora)
+                val displayDate = DateUtils.formatDisplayDate(requireContext(), turno.fecha)
 
                 binding.tvNextAppointDate.text = getString(
                     R.string.detail_date_time_format,
@@ -223,11 +197,11 @@ class HomeFragment : Fragment() {
                     displayTime
                 )
                 binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.text_secondary))
-                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary))
-                binding.ivNextAppointIconContainer.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary_container)))
+                binding.ivNextAppointIcon.imageTintList = ColorStateList.valueOf(requireContext().getColor(R.color.primary))
+                binding.ivNextAppointIconContainer.setCardBackgroundColor(ColorStateList.valueOf(requireContext().getColor(R.color.primary_container)))
                 
                 binding.cardNextAppointment.setOnClickListener {
-                    it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                     val bundle = Bundle().apply {
                         putString("TURNO_ID", turno.id)
                         putString("PACIENTE_NOMBRE", turno.pacienteNombre)
@@ -249,11 +223,11 @@ class HomeFragment : Fragment() {
                 
                 binding.tvNextAppointDate.text = getString(R.string.menu_request_appointment)
                 binding.tvNextAppointDate.setTextColor(requireContext().getColor(R.color.primary))
-                binding.ivNextAppointIcon.imageTintList = android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.white))
-                binding.ivNextAppointIconContainer.setCardBackgroundColor(android.content.res.ColorStateList.valueOf(requireContext().getColor(R.color.primary)))
+                binding.ivNextAppointIcon.imageTintList = ColorStateList.valueOf(requireContext().getColor(R.color.white))
+                binding.ivNextAppointIconContainer.setCardBackgroundColor(ColorStateList.valueOf(requireContext().getColor(R.color.primary)))
 
                 binding.cardNextAppointment.setOnClickListener {
-                    it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                    it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
                     findNavController().navigate(R.id.action_homeFragment_to_solicitarTurnoFragment)
                 }
             }
@@ -286,32 +260,8 @@ class HomeFragment : Fragment() {
         summary.append(getString(R.string.label_share_patient, user?.nombre ?: getString(R.string.label_anonymous))).append("\n\n")
         
         if (nextTurno != null) {
-            val displayTime = try {
-                val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
-                var dateObj: java.util.Date? = null
-                for (fmt in inputFormats) {
-                    try {
-                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
-                        dateObj = sdf.parse(nextTurno.hora)
-                        if (dateObj != null) break
-                    } catch (e: Exception) {}
-                }
-                if (dateObj != null) {
-                    java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(dateObj)
-                } else nextTurno.hora
-            } catch (e: Exception) {
-                nextTurno.hora
-            }
-
-            val displayDate = try {
-                val sdfInput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
-                val date = sdfInput.parse(nextTurno.fecha)
-                if (date != null) {
-                    java.text.SimpleDateFormat("EEE, d MMM", java.util.Locale.getDefault()).format(date).replaceFirstChar { it.uppercase() }
-                } else nextTurno.fecha
-            } catch (e: Exception) {
-                nextTurno.fecha
-            }
+            val displayTime = DateUtils.formatDisplayTime(nextTurno.hora)
+            val displayDate = DateUtils.formatDisplayDate(requireContext(), nextTurno.fecha)
 
             summary.append(getString(R.string.title_next_appointment)).append(":\n")
             summary.append("- ${nextTurno.especialidad ?: getString(R.string.label_default_specialty)}: ")
@@ -331,11 +281,11 @@ class HomeFragment : Fragment() {
         
         summary.append("\n_").append(getString(R.string.app_name)).append("_")
         
-        val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+        val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(android.content.Intent.EXTRA_TEXT, summary.toString())
+            putExtra(Intent.EXTRA_TEXT, summary.toString())
         }
-        startActivity(android.content.Intent.createChooser(intent, getString(R.string.label_share_via)))
+        startActivity(Intent.createChooser(intent, getString(R.string.label_share_via)))
     }
 
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {
@@ -348,10 +298,10 @@ class HomeFragment : Fragment() {
         // Mostrar solo los 2-3 primeros para no saturar el home
         meds.take(3).forEach { med ->
             val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, binding.layoutMedication, false)
-            medView.findViewById<android.widget.TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
-            medView.findViewById<android.widget.TextView>(R.id.tvMedSchedule).text = med.frecuencia
+            medView.findViewById<TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
+            medView.findViewById<TextView>(R.id.tvMedSchedule).text = med.frecuencia
             
-            medView.findViewById<android.view.View>(R.id.btnDeleteMed).visibility = android.view.View.GONE
+            medView.findViewById<View>(R.id.btnDeleteMed).visibility = View.GONE
             binding.layoutMedication.addView(medView)
         }
     }

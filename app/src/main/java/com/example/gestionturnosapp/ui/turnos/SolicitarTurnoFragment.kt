@@ -18,6 +18,7 @@ import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentSolicitarTurnoBinding
+import com.example.gestionturnosapp.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
@@ -69,7 +70,7 @@ class SolicitarTurnoFragment : Fragment() {
                 val hora = binding.etHora.text.toString()
                 val motivo = binding.etMotivo.text.toString()
 
-                if (esFechaPasada(fecha, hora)) {
+                if (DateUtils.isPastDateTime(fecha, hora)) {
                     Snackbar.make(binding.root, R.string.msg_past_date, Snackbar.LENGTH_LONG).show()
                     return@setOnClickListener
                 }
@@ -147,21 +148,6 @@ class SolicitarTurnoFragment : Fragment() {
             esValido = false
         } else { binding.tilMotivo.error = null }
         return esValido
-    }
-
-    private fun esFechaPasada(fecha: String, hora: String): Boolean {
-        return try {
-            // Soportar ambos formatos por si acaso
-            val formatStr = if (hora.contains("AM", ignoreCase = true) || hora.contains("PM", ignoreCase = true)) {
-                "yyyy-MM-dd hh:mm a"
-            } else {
-                "yyyy-MM-dd HH:mm"
-            }
-            val sdf = java.text.SimpleDateFormat(formatStr, Locale.getDefault())
-            val fechaSeleccionada = sdf.parse("$fecha $hora")
-            val ahora = Calendar.getInstance().time
-            fechaSeleccionada?.before(ahora) ?: true
-        } catch (_: Exception) { true }
     }
 
     private fun setupPickers() {

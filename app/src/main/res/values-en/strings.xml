@@ -216,6 +216,8 @@
     <string name="msg_no_mail_app_found">No email app installed</string>
     <string name="label_reminders_channel">Appointment Reminders</string>
     <string name="label_medication_channel">Medication</string>
+    <string name="label_general_channel">General Notifications</string>
+    <string name="label_chat_channel">Messages</string>
 
     <string name="title_verify_account">Verify your Account</string>
     <string name="msg_verification_sent">We have sent a 6-digit code to your email. Please enter it below.</string>

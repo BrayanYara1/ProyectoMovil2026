@@ -4,7 +4,19 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Fondo Gradiente Sutil Simulado con Capas -->
     <path
-        android:fillColor="#F8F9FA"
+        android:fillColor="#2563EB"
         android:pathData="M0,0h108v108h-108z" />
+
+    <!-- Círculos de "Pulso" Sutiles -->
+    <path
+        android:fillColor="#10FFFFFF"
+        android:pathData="M54,54m-45,0a45,45 0,1 1,90 0a45,45 0,1 1,-90 0" />
+
+    <path
+        android:fillColor="#08FFFFFF"
+        android:pathData="M54,54m-65,0a65,65 0,1 1,130 0a65,65 0,1 1,-130 0" />
+
 </vector>

@@ -17,6 +17,7 @@ import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentTurnoDetailBinding
 import com.example.gestionturnosapp.notifications.ReminderReceiver
+import com.example.gestionturnosapp.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.util.Calendar
 
@@ -59,37 +60,20 @@ class TurnoDetailFragment : Fragment() {
         binding.apply {
             tvDetailNombre.text = paciente
             
-            // Formatear hora para mostrar AM/PM siempre (Resiliente)
-            val displayTime = try {
-                val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
-                var dateObj: java.util.Date? = null
-                
-                // 1. Intentar con Locale actual
-                for (fmt in inputFormats) {
-                    try {
-                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
-                        dateObj = sdf.parse(hora)
-                        if (dateObj != null) break
-                    } catch (e: Exception) {}
+            // Llenar Badge de Fecha (Shared Element)
+            try {
+                val sdfInput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
+                val date = sdfInput.parse(fecha)
+                if (date != null) {
+                    val cal = java.util.Calendar.getInstance()
+                    cal.time = date
+                    tvDetailDia.text = cal.get(java.util.Calendar.DAY_OF_MONTH).toString()
+                    tvDetailMes.text = java.text.SimpleDateFormat("MMM", java.util.Locale.getDefault()).format(date).uppercase()
                 }
-                
-                // 2. Fallback a US
-                if (dateObj == null) {
-                    for (fmt in inputFormats) {
-                        try {
-                            val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
-                            dateObj = sdf.parse(hora)
-                            if (dateObj != null) break
-                        } catch (e: Exception) {}
-                    }
-                }
+            } catch (e: Exception) {}
 
-                if (dateObj != null) {
-                    java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault()).format(dateObj)
-                } else hora
-            } catch (e: Exception) {
-                hora
-            }
+            // Formatear hora para mostrar AM/PM siempre (Resiliente)
+            val displayTime = DateUtils.formatDisplayTime(hora)
 
             tvDetailFechaHora.text = getString(R.string.detail_date_time_format, fecha, displayTime)
             tvDetailMotivo.text = motivo

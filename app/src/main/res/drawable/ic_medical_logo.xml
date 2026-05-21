@@ -5,26 +5,19 @@
     android:viewportWidth="100"
     android:viewportHeight="100">
 
-    <!-- Círculo de fondo sutil (Halo de luz) -->
-    <path
-        android:fillColor="#155B9A7A"
-        android:pathData="M50,50m-48,0a48,48 0,1 1,96 0a48,48 0,1 1,-96 0" />
-
-    <!-- Forma Orgánica Base (Representa Cuidado/Hoja/Vida) -->
+    <!-- Forma de Corazón Médica (Cuidado y Pasión) -->
     <path
         android:fillColor="@color/primary"
-        android:pathData="M50,25 C65,25 75,40 75,55 C75,75 50,85 50,85 C50,85 25,75 25,55 C25,40 35,25 50,25 Z" />
+        android:pathData="M50,85 C50,85 15,65 15,40 C15,25 28,18 38,25 L50,35 L62,25 C72,18 85,25 85,40 C85,65 50,85 50,85 Z" />
 
-    <!-- El "Sol" o Corazón Interior (Afecto/Humano) -->
+    <!-- Cruz Médica Central (Salud) -->
+    <path
+        android:fillColor="@color/white"
+        android:pathData="M44,38 L56,38 L56,44 L62,44 L62,56 L56,56 L56,62 L44,62 L44,56 L38,56 L38,44 L44,44 Z" />
+
+    <!-- Acento en la cruz (Detalle Premium) -->
     <path
         android:fillColor="@color/accent"
-        android:pathData="M50,45m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0" />
-
-    <!-- Línea de sonrisa/abrazo fluida (Humano) -->
-    <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="3.5"
-        android:strokeLineCap="round"
-        android:pathData="M38,62 Q50,72 62,62" />
+        android:pathData="M48,48 L52,48 L52,52 L48,52 Z" />
 
 </vector>

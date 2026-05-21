@@ -80,6 +80,7 @@ class TurnosListFragment : Fragment() {
                 }
                 
                 val extras = androidx.navigation.fragment.FragmentNavigatorExtras(
+                    bindingItems.tvItemNombre to "patient_name_detail",
                     bindingItems.dateContainer to "date_container_shared"
                 )
                 

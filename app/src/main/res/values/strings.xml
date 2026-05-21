@@ -171,6 +171,8 @@
     <string name="msg_no_mail_app_found">No hay app de correo instalada</string>
     <string name="label_reminders_channel">Recordatorios de Citas</string>
     <string name="label_medication_channel">Medicación</string>
+    <string name="label_general_channel">Notificaciones Generales</string>
+    <string name="label_chat_channel">Mensajes</string>
 
     <string name="title_verify_account">Verifica tu Cuenta</string>
     <string name="msg_verification_sent">Hemos enviado un código de 6 dígitos a tu correo. Por favor, ingrésalo a continuación.</string>

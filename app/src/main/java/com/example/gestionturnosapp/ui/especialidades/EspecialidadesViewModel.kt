@@ -1,13 +1,15 @@
 package com.example.gestionturnosapp.ui.especialidades
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.example.gestionturnosapp.data.Especialidad
 import com.example.gestionturnosapp.data.EspecialidadRepository
 import java.util.Locale
 
-class EspecialidadesViewModel : ViewModel() {
+class EspecialidadesViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EspecialidadRepository()
     private val _allEspecialidades = MutableLiveData<List<Especialidad>>()
@@ -21,12 +23,14 @@ class EspecialidadesViewModel : ViewModel() {
             if (query.isEmpty()) {
                 value = list
             } else {
-                // Como los nombres son recursos, necesitamos el contexto para filtrar, 
-                // pero en el ViewModel no lo tenemos. 
-                // Alternativa: El repositorio podría proveer strings o filtramos en el Fragment.
-                // O mejor, el repositorio ya tiene los datos hardcodeados, filtramos por IDs o 
-                // asumimos que el usuario conoce el nombre.
-                value = list // Temporalmente devolvemos todo si no podemos acceder a strings aquí
+                val context = getApplication<Application>().applicationContext
+                value = list.filter { especialidad ->
+                    val name = context.getString(especialidad.nombreRes).lowercase(Locale.getDefault())
+                    val desc = context.getString(especialidad.descripcionRes).lowercase(Locale.getDefault())
+                    
+                    // Búsqueda robusta: coincide con nombre o descripción
+                    name.contains(query) || desc.contains(query)
+                }
             }
         }
         addSource(_allEspecialidades, observer)

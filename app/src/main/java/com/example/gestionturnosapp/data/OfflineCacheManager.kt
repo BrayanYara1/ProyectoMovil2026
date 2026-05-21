@@ -57,6 +57,17 @@ object OfflineCacheManager {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().remove(KEY_PENDING_TURNOS).apply()
     }
 
+    fun removePendingTurnos(context: Context, synced: List<NuevoTurnoRequest>) {
+        val current = getPendingTurnos(context).toMutableList()
+        current.removeAll(synced)
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        if (current.isEmpty()) {
+            prefs.edit().remove(KEY_PENDING_TURNOS).apply()
+        } else {
+            prefs.edit().putString(KEY_PENDING_TURNOS, gson.toJson(current)).apply()
+        }
+    }
+
     // --- MEDICAMENTOS ---
     fun saveMedicamentos(context: Context, meds: List<Medicamento>) {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -97,6 +108,17 @@ object OfflineCacheManager {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().remove(KEY_PENDING_MEDS).apply()
     }
 
+    fun removePendingMeds(context: Context, synced: List<Medicamento>) {
+        val current = getPendingMeds(context).toMutableList()
+        current.removeAll(synced)
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        if (current.isEmpty()) {
+            prefs.edit().remove(KEY_PENDING_MEDS).apply()
+        } else {
+            prefs.edit().putString(KEY_PENDING_MEDS, gson.toJson(current)).apply()
+        }
+    }
+
     // --- ESTUDIOS ---
     fun saveEstudios(context: Context, estudios: List<EstudioMedico>) {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -135,6 +157,17 @@ object OfflineCacheManager {
 
     fun clearPendingEstudios(context: Context) {
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().remove(KEY_PENDING_ESTUDIOS).apply()
+    }
+
+    fun removePendingEstudios(context: Context, synced: List<EstudioMedico>) {
+        val current = getPendingEstudios(context).toMutableList()
+        current.removeAll(synced)
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        if (current.isEmpty()) {
+            prefs.edit().remove(KEY_PENDING_ESTUDIOS).apply()
+        } else {
+            prefs.edit().putString(KEY_PENDING_ESTUDIOS, gson.toJson(current)).apply()
+        }
     }
 
     // --- UTIL ---

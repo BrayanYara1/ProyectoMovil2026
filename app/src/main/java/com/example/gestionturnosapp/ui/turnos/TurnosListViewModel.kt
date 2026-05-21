@@ -11,6 +11,7 @@ import com.example.gestionturnosapp.data.TurnoRepository
 import com.example.gestionturnosapp.data.NuevoTurnoRequest
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.data.OfflineCacheManager
+import com.example.gestionturnosapp.util.DateUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
@@ -114,7 +115,7 @@ class TurnosListViewModel : ViewModel() {
             _isLoading.value = true
 
             val fechaNormalizada = fecha.replace("/", "-").trim()
-            val horaNormalizada = normalizeTime(hora.trim())
+            val horaNormalizada = DateUtils.formatTo24h(hora.trim())
 
             val request = NuevoTurnoRequest(
                 nombre, 
@@ -152,16 +153,20 @@ class TurnosListViewModel : ViewModel() {
         if (pending.isEmpty()) return
 
         viewModelScope.launch {
+            val synced = mutableListOf<NuevoTurnoRequest>()
             pending.forEach { request ->
                 try {
                     repository.crearTurno(request)
+                    synced.add(request)
                 } catch (e: Exception) {
-                    // Si falla de nuevo, se queda en la lista para el próximo intento
-                    return@launch 
+                    // Si falla uno, paramos pero guardamos los que sí se sincronizaron
+                    return@forEach
                 }
             }
-            OfflineCacheManager.clearPendingTurnos(context)
-            fetchTurnos(context)
+            if (synced.isNotEmpty()) {
+                OfflineCacheManager.removePendingTurnos(context, synced)
+                fetchTurnos(context)
+            }
         }
     }
 
@@ -176,7 +181,7 @@ class TurnosListViewModel : ViewModel() {
 
     fun verificarDisponibilidad(fecha: String, hora: String) {
         val fLimpia = fecha.replace("/", "-").trim()
-        val hLimpia = normalizeTime(hora.trim())
+        val hLimpia = DateUtils.formatTo24h(hora.trim())
 
         if (fLimpia.isEmpty() || hLimpia.isEmpty()) {
             _isSlotAvailable.value = null
@@ -192,51 +197,6 @@ class TurnosListViewModel : ViewModel() {
             } catch (e: Exception) {
                 if (_isSlotAvailable.value == null) _isSlotAvailable.value = true
             }
-        }
-    }
-
-    private fun normalizeTime(time: String): String {
-        return try {
-            val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
-            var date: java.util.Date? = null
-            
-            // 1. Intentar con Locale Default (idioma actual del sistema)
-            for (format in inputFormats) {
-                try {
-                    val sdf = java.text.SimpleDateFormat(format, java.util.Locale.getDefault())
-                    sdf.isLenient = false
-                    date = sdf.parse(time)
-                    if (date != null) break
-                } catch (e: Exception) {}
-            }
-            
-            // 2. Intentar con Locale US (formato estándar AM/PM) si falló el anterior
-            if (date == null) {
-                for (format in inputFormats) {
-                    try {
-                        val sdf = java.text.SimpleDateFormat(format, java.util.Locale.US)
-                        sdf.isLenient = false
-                        date = sdf.parse(time)
-                        if (date != null) break
-                    } catch (e: Exception) {}
-                }
-            }
-
-            // 3. Normalizar a formato 24h para la base de datos
-            if (date != null) {
-                java.text.SimpleDateFormat("HH:mm", java.util.Locale.US).format(date)
-            } else {
-                // Fallback manual: limpiar caracteres y formatear HH:mm
-                val cleanTime = time.uppercase().replace("A. M.", "AM").replace("P. M.", "PM")
-                val parts = cleanTime.split(":", " ")
-                if (parts.size >= 2) {
-                    val h = parts[0].trim().padStart(2, '0')
-                    val m = parts[1].trim().take(2).padStart(2, '0')
-                    "$h:$m"
-                } else time
-            }
-        } catch (e: Exception) {
-            time
         }
     }
 

@@ -1,24 +1,28 @@
 package com.example.gestionturnosapp
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import com.example.gestionturnosapp.network.RetrofitClient
-import kotlinx.coroutines.launch
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.example.gestionturnosapp.data.PreferenceManager
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.ActivityMainBinding
+import com.example.gestionturnosapp.network.RetrofitClient
+import com.example.gestionturnosapp.notifications.NotificationHelper
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -30,12 +34,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Habilitar Edge-to-Edge para un diseño inmersivo
-        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         // Aplicar Tema antes de crear la actividad
-        com.example.gestionturnosapp.data.PreferenceManager.applyTheme(
-            com.example.gestionturnosapp.data.PreferenceManager.isDarkMode(this)
-        )
+        PreferenceManager.applyTheme(PreferenceManager.isDarkMode(this))
 
         // Pantalla de Inicio (Splash Screen) - Debe llamarse antes de super.onCreate
         installSplashScreen()
@@ -84,6 +86,22 @@ class MainActivity : AppCompatActivity() {
         
         pedirPermisoNotificaciones()
         sincronizarFcmToken()
+        NotificationHelper.createNotificationChannels(this)
+        handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val type = intent.getStringExtra("type")
+        if (type == "chat") {
+            navController?.navigate(R.id.chatFragment)
+        } else if (type == "turno") {
+            navController?.navigate(R.id.turnosListFragment)
+        }
     }
 
     private fun sincronizarFcmToken() {
@@ -95,7 +113,7 @@ class MainActivity : AppCompatActivity() {
                         RetrofitClient.instance.updateFcmToken(mapOf("token" to it))
                         UserManager.markFcmAsSynced(this@MainActivity)
                     } catch (e: Exception) {
-                        android.util.Log.e("FCM", "Sync error", e)
+                        Log.e("FCM", "Sync error", e)
                     }
                 }
             }

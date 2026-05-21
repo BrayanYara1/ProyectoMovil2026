@@ -93,13 +93,19 @@ class MedicamentosViewModel : ViewModel() {
         if (pending.isEmpty()) return
 
         viewModelScope.launch {
+            val synced = mutableListOf<Medicamento>()
             pending.forEach { med ->
                 try {
                     repository.agregarMedicamento(med)
-                } catch (e: Exception) { return@launch }
+                    synced.add(med)
+                } catch (e: Exception) {
+                    return@forEach
+                }
             }
-            com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingMeds(context)
-            loadMedicamentos(context)
+            if (synced.isNotEmpty()) {
+                com.example.gestionturnosapp.data.OfflineCacheManager.removePendingMeds(context, synced)
+                loadMedicamentos(context)
+            }
         }
     }
 

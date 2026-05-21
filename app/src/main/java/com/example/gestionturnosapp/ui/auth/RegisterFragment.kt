@@ -1,13 +1,13 @@
 package com.example.gestionturnosapp.ui.auth
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -67,30 +67,27 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setupRegisterActions() {
-        binding.etTelefono.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                val text = s.toString()
-                if (text.isNotEmpty() && !text.startsWith("+57 ")) {
-                    val clean = text.replace("+57", "").trim()
-                    val formatted = "+57 $clean"
-                    binding.etTelefono.setText(formatted)
-                    binding.etTelefono.setSelection(binding.etTelefono.length())
-                }
+        // Limpiar errores mientras el usuario escribe
+        binding.etNombre.doAfterTextChanged { binding.tilNombre.error = null }
+        binding.etEmail.doAfterTextChanged { binding.tilEmail.error = null }
+        binding.etTelefono.doAfterTextChanged { binding.tilTelefono.error = null }
+        binding.etPassword.doAfterTextChanged { binding.tilPassword.error = null }
+
+        binding.etTelefono.doAfterTextChanged { s ->
+            val text = s.toString()
+            if (text.isNotEmpty() && !text.startsWith("+57 ")) {
+                val clean = text.replace("+57", "").trim()
+                val formatted = "+57 $clean"
+                binding.etTelefono.setText(formatted)
+                binding.etTelefono.setSelection(binding.etTelefono.length())
             }
-        })
+        }
 
         binding.btnRegister.setOnClickListener {
             val name = binding.etNombre.text.toString().trim()
             val email = binding.etEmail.text.toString().trim()
             val phone = binding.etTelefono.text.toString().trim()
             val pass = binding.etPassword.text.toString().trim()
-
-            binding.tilNombre.error = null
-            binding.tilEmail.error = null
-            binding.tilTelefono.error = null
-            binding.tilPassword.error = null
 
             var isValid = true
 
@@ -99,18 +96,27 @@ class RegisterFragment : Fragment() {
                 isValid = false
             }
 
-            if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                binding.tilEmail.error = if (email.isEmpty()) getString(R.string.msg_complete_fields) else getString(R.string.msg_invalid_email)
+            if (email.isEmpty()) {
+                binding.tilEmail.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                binding.tilEmail.error = getString(R.string.msg_invalid_email)
                 isValid = false
             }
 
-            if (phone.length < 10) {
+            if (phone.isEmpty()) {
+                binding.tilTelefono.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            } else if (phone.length < 10) {
                 binding.tilTelefono.error = getString(R.string.msg_invalid_phone)
                 isValid = false
             }
 
-            if (pass.length < 6) {
-                binding.tilPassword.error = if (pass.isEmpty()) getString(R.string.msg_complete_fields) else getString(R.string.msg_password_length)
+            if (pass.isEmpty()) {
+                binding.tilPassword.error = getString(R.string.msg_complete_fields)
+                isValid = false
+            } else if (pass.length < 6) {
+                binding.tilPassword.error = getString(R.string.msg_password_length)
                 isValid = false
             }
 

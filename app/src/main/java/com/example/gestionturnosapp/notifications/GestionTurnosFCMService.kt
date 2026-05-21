@@ -1,13 +1,5 @@
 package com.example.gestionturnosapp.notifications
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import com.example.gestionturnosapp.MainActivity
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.network.RetrofitClient
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -44,43 +36,24 @@ class GestionTurnosFCMService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         
-        val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "GestionTurnos"
+        val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "Salud Activa"
         val body = remoteMessage.notification?.body ?: remoteMessage.data["body"] ?: "Tienes una nueva actualización"
+        val type = remoteMessage.data["type"] ?: "general"
         
-        showNotification(title, body)
-    }
-
-    private fun showNotification(title: String, body: String) {
-        val channelId = "fcm_default_channel"
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(channelId, "Notificaciones Generales", NotificationManager.IMPORTANCE_DEFAULT)
-            notificationManager.createNotificationChannel(channel)
+        val channelId = when (type) {
+            "chat" -> NotificationHelper.CHANNEL_CHAT
+            "turno" -> NotificationHelper.CHANNEL_REMINDERS
+            "medicamento" -> NotificationHelper.CHANNEL_MEDICATION
+            else -> NotificationHelper.CHANNEL_GENERAL
         }
 
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        NotificationHelper.showNotification(
+            context = applicationContext,
+            title = title,
+            body = body,
+            channelId = channelId,
+            data = remoteMessage.data
         )
-
-        val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle(title)
-            .setContentText(body)
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // Mayor prioridad
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body)) // Soporte para textos largos
-            .build()
-
-        val notificationId = (title.hashCode() + body.hashCode() + System.currentTimeMillis().toInt() % 10000)
-        notificationManager.notify(notificationId, notification)
     }
 
     override fun onDestroy() {

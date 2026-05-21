@@ -123,13 +123,19 @@ class EstudiosViewModel : ViewModel() {
         if (pending.isEmpty()) return
 
         viewModelScope.launch {
+            val synced = mutableListOf<EstudioMedico>()
             pending.forEach { estudio ->
                 try {
                     repository.agregarEstudio(estudio)
-                } catch (e: Exception) { return@launch }
+                    synced.add(estudio)
+                } catch (e: Exception) {
+                    return@forEach
+                }
             }
-            com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingEstudios(context)
-            loadEstudios(context)
+            if (synced.isNotEmpty()) {
+                com.example.gestionturnosapp.data.OfflineCacheManager.removePendingEstudios(context, synced)
+                loadEstudios(context)
+            }
         }
     }
 

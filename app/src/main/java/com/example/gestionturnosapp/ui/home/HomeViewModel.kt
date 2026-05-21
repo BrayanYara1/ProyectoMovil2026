@@ -1,15 +1,19 @@
 package com.example.gestionturnosapp.ui.home
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.data.Medicamento
-import com.example.gestionturnosapp.data.TurnoRepository
 import com.example.gestionturnosapp.data.MedicamentoRepository
+import com.example.gestionturnosapp.data.NuevoTurnoRequest
+import com.example.gestionturnosapp.data.OfflineCacheManager
+import com.example.gestionturnosapp.data.Turno
+import com.example.gestionturnosapp.data.TurnoRepository
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class HomeViewModel : ViewModel() {
 
@@ -38,7 +42,7 @@ class HomeViewModel : ViewModel() {
         loadRandomHealthTip()
     }
 
-    fun refreshData(context: android.content.Context? = null) {
+    fun refreshData(context: Context? = null) {
         loadRandomHealthTip()
         viewModelScope.launch {
             _isLoading.value = true
@@ -46,11 +50,11 @@ class HomeViewModel : ViewModel() {
             
             // 1. Carga desde Caché (Respuesta instantánea)
             context?.let {
-                val cachedTurnos = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedTurnos(it)
+                val cachedTurnos = OfflineCacheManager.getCachedTurnos(it)
                 if (cachedTurnos.isNotEmpty()) {
                     updateTurnosUI(cachedTurnos)
                 }
-                val cachedMeds = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedMedicamentos(it)
+                val cachedMeds = OfflineCacheManager.getCachedMedicamentos(it)
                 if (cachedMeds.isNotEmpty()) {
                     _medicamentos.value = cachedMeds
                 }
@@ -60,11 +64,11 @@ class HomeViewModel : ViewModel() {
                 // 2. Carga desde Servidor
                 val turnos = turnoRepository.getTurnos()
                 updateTurnosUI(turnos)
-                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveTurnos(it, turnos) }
+                context?.let { OfflineCacheManager.saveTurnos(it, turnos) }
 
                 val meds = medRepository.getMedicamentos()
                 _medicamentos.value = meds
-                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveMedicamentos(it, meds) }
+                context?.let { OfflineCacheManager.saveMedicamentos(it, meds) }
 
             } catch (e: Exception) {
                 // Si no hay nada en LiveData aún, mostramos error
@@ -87,22 +91,38 @@ class HomeViewModel : ViewModel() {
             .firstOrNull()
     }
 
-    fun refreshTurnosCount(context: android.content.Context) = refreshData(context)
+    fun refreshTurnosCount(context: Context) = refreshData(context)
 
-    fun syncAll(context: android.content.Context) {
+    fun syncAll(context: Context) {
         viewModelScope.launch {
             // Sincronizar Turnos
-            val pendingTurnos = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingTurnos(context)
+            val pendingTurnos = OfflineCacheManager.getPendingTurnos(context)
             if (pendingTurnos.isNotEmpty()) {
-                pendingTurnos.forEach { try { turnoRepository.crearTurno(it) } catch (_: Exception) {} }
-                com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingTurnos(context)
+                val syncedTurnos = mutableListOf<NuevoTurnoRequest>()
+                pendingTurnos.forEach { 
+                    try { 
+                        turnoRepository.crearTurno(it)
+                        syncedTurnos.add(it)
+                    } catch (_: Exception) {} 
+                }
+                if (syncedTurnos.isNotEmpty()) {
+                    OfflineCacheManager.removePendingTurnos(context, syncedTurnos)
+                }
             }
 
             // Sincronizar Meds
-            val pendingMeds = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingMeds(context)
+            val pendingMeds = OfflineCacheManager.getPendingMeds(context)
             if (pendingMeds.isNotEmpty()) {
-                pendingMeds.forEach { try { medRepository.agregarMedicamento(it) } catch (_: Exception) {} }
-                com.example.gestionturnosapp.data.OfflineCacheManager.clearPendingMeds(context)
+                val syncedMeds = mutableListOf<Medicamento>()
+                pendingMeds.forEach { 
+                    try { 
+                        medRepository.agregarMedicamento(it)
+                        syncedMeds.add(it)
+                    } catch (_: Exception) {} 
+                }
+                if (syncedMeds.isNotEmpty()) {
+                    OfflineCacheManager.removePendingMeds(context, syncedMeds)
+                }
             }
 
             refreshData(context)
@@ -123,7 +143,7 @@ class HomeViewModel : ViewModel() {
             R.string.tip_health_10
         )
         // Usamos el día del año para que la recomendación sea realmente "del día"
-        val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+        val dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
         _healthTipResId.value = tips[dayOfYear % tips.size]
     }
 }

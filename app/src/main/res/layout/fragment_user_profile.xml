@@ -195,7 +195,7 @@
                 android:layout_marginBottom="16dp"
                 android:text="@string/btn_edit_data"
                 app:cornerRadius="16dp"
-                app:icon="@drawable/ic_share" />
+                app:icon="@drawable/ic_edit" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnProfileSettings"
@@ -204,7 +204,7 @@
                 android:layout_height="60dp"
                 android:text="@string/menu_settings"
                 app:cornerRadius="16dp"
-                app:icon="@drawable/ic_logout" />
+                app:icon="@drawable/ic_settings" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
