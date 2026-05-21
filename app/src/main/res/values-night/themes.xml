@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Base application theme for Dark Mode - Luxury Midnight Edition -->
+    <!-- Base application theme for Dark Mode - Professional Indigo Edition -->
     <style name="Theme.GestionTurnosApp" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Colores de Marca -->
         <item name="colorPrimary">@color/primary</item>
@@ -15,7 +15,7 @@
 
         <item name="colorTertiary">@color/accent</item>
 
-        <!-- Colores de Fondo Premium -->
+        <!-- Colores de Fondo Dark Premium -->
         <item name="android:windowBackground">@drawable/bg_window_soft</item>
         <item name="colorSurface">@color/surface</item>
         <item name="colorOnSurface">@color/on_surface</item>
@@ -25,7 +25,7 @@
         <item name="colorError">@color/error</item>
         <item name="colorOnError">@color/white</item>
 
-        <!-- Barra de estado Transparente -->
+        <!-- Barra de estado -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
@@ -43,5 +43,25 @@
         <item name="materialCardViewStyle">@style/Widget.App.Card</item>
         <item name="textInputStyle">@style/Widget.App.TextInputLayout</item>
         <item name="materialButtonStyle">@style/Widget.App.Button</item>
+    </style>
+
+    <style name="Widget.App.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">24dp</item>
+        <item name="cardElevation">2dp</item>
+        <item name="strokeColor">@color/outline</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="android:stateListAnimator">@animator/card_click_animator</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">20dp</item>
+        <item name="boxCornerRadiusTopEnd">20dp</item>
+        <item name="boxCornerRadiusBottomStart">20dp</item>
+        <item name="boxCornerRadiusBottomEnd">20dp</item>
+        <item name="boxStrokeColor">@color/primary</item>
+        <item name="hintTextColor">@color/text_secondary</item>
     </style>
 </resources>
