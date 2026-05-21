@@ -42,9 +42,12 @@ class HomeViewModel : ViewModel() {
         loadRandomHealthTip()
     }
 
+    private var refreshJob: kotlinx.coroutines.Job? = null
+
     fun refreshData(context: Context? = null) {
         loadRandomHealthTip()
-        viewModelScope.launch {
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
             
@@ -71,16 +74,18 @@ class HomeViewModel : ViewModel() {
                 context?.let { OfflineCacheManager.saveMedicamentos(it, meds) }
 
             } catch (e: Exception) {
-                // Si no hay nada en LiveData aún, mostramos error
-                if (_nextTurno.value == null && _medicamentos.value.isNullOrEmpty()) {
-                    _turnosCount.value = 0
-                    _nextTurno.value = null
-                    _medicamentos.value = emptyList()
-                    val msg = e.localizedMessage ?: ""
-                    _errorMessage.value = if (msg.contains("resolve host", true) || msg.contains("connect", true)) {
-                        context?.getString(R.string.msg_no_connection) ?: "Sin conexión a internet"
-                    } else {
-                        msg.ifBlank { "Error al conectar con el servidor" }
+                if (refreshJob?.isActive == true) {
+                    // Si no hay nada en LiveData aún, mostramos error
+                    if (_nextTurno.value == null && _medicamentos.value.isNullOrEmpty()) {
+                        _turnosCount.value = 0
+                        _nextTurno.value = null
+                        _medicamentos.value = emptyList()
+                        val msg = e.localizedMessage ?: ""
+                        _errorMessage.value = if (msg.contains("resolve host", true) || msg.contains("connect", true)) {
+                            context?.getString(R.string.msg_no_connection) ?: "Sin conexión a internet"
+                        } else {
+                            msg.ifBlank { "Error al conectar con el servidor" }
+                        }
                     }
                 }
             } finally {

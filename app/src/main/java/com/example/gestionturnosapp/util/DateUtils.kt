@@ -6,33 +6,43 @@ import java.util.*
 object DateUtils {
     private val isoDateFormat get() = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     private fun getDisplayTimeFormat() = SimpleDateFormat("hh:mm a", Locale.getDefault())
-    private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm", "H:mm")
+    private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm", "H:mm", "hh:mm a", "h:mm a")
 
-    fun formatDisplayTime(time: String?): String {
-        if (time.isNullOrBlank()) return ""
+    fun parseTime(time: String?): Date? {
+        if (time.isNullOrBlank()) return null
         
-        var dateObj: Date? = null
+        // Limpieza de formatos comunes en español
+        val cleanTime = time.uppercase()
+            .replace("A. M.", "AM")
+            .replace("P. M.", "PM")
+            .replace("A.M.", "AM")
+            .replace("P.M.", "PM")
+            .trim()
+
         for (fmt in inputFormats) {
             try {
                 val sdf = SimpleDateFormat(fmt, Locale.getDefault())
                 sdf.isLenient = false
-                dateObj = sdf.parse(time)
-                if (dateObj != null) break
+                val date = sdf.parse(cleanTime)
+                if (date != null) return date
             } catch (e: Exception) {}
         }
 
-        if (dateObj == null) {
-            for (fmt in inputFormats) {
-                try {
-                    val sdf = SimpleDateFormat(fmt, Locale.US)
-                    sdf.isLenient = false
-                    dateObj = sdf.parse(time)
-                    if (dateObj != null) break
-                } catch (e: Exception) {}
-            }
+        for (fmt in inputFormats) {
+            try {
+                val sdf = SimpleDateFormat(fmt, Locale.US)
+                sdf.isLenient = false
+                val date = sdf.parse(cleanTime)
+                if (date != null) return date
+            } catch (e: Exception) {}
         }
+        
+        return null
+    }
 
-        return if (dateObj != null) getDisplayTimeFormat().format(dateObj) else time
+    fun formatDisplayTime(time: String?): String {
+        val dateObj = parseTime(time)
+        return if (dateObj != null) getDisplayTimeFormat().format(dateObj) else time ?: ""
     }
 
     fun formatDisplayDate(context: android.content.Context, dateStr: String?): String {
@@ -77,27 +87,8 @@ object DateUtils {
     }
 
     fun formatTo24h(time: String): String {
-        var date: Date? = null
-        for (format in inputFormats) {
-            try {
-                val sdf = SimpleDateFormat(format, Locale.getDefault())
-                sdf.isLenient = false
-                date = sdf.parse(time)
-                if (date != null) break
-            } catch (e: Exception) {}
-        }
+        val date = parseTime(time)
         
-        if (date == null) {
-            for (format in inputFormats) {
-                try {
-                    val sdf = SimpleDateFormat(format, Locale.US)
-                    sdf.isLenient = false
-                    date = sdf.parse(time)
-                    if (date != null) break
-                } catch (e: Exception) {}
-            }
-        }
-
         return if (date != null) {
             SimpleDateFormat("HH:mm", Locale.US).format(date)
         } else {

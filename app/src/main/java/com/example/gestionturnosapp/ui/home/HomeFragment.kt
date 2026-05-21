@@ -160,7 +160,7 @@ class HomeFragment : Fragment() {
         }
 
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
-            error?.let {
+            error?.takeIf { it.isNotBlank() }?.let {
                 if (it.contains("401") || it.contains("token", true)) {
                     handleSessionExpired()
                 } else {
@@ -264,8 +264,9 @@ class HomeFragment : Fragment() {
             val displayDate = DateUtils.formatDisplayDate(requireContext(), nextTurno.fecha)
 
             summary.append(getString(R.string.title_next_appointment)).append(":\n")
-            summary.append("- ${nextTurno.especialidad ?: getString(R.string.label_default_specialty)}: ")
-            summary.append(getString(R.string.detail_date_time_format, displayDate, displayTime)).append("\n")
+            summary.append("- ").append(getString(R.string.label_share_date, displayDate)).append("\n")
+            summary.append("- ").append(getString(R.string.label_share_time, displayTime)).append("\n")
+            summary.append("- ").append(getString(R.string.label_share_reason, nextTurno.especialidad ?: getString(R.string.label_default_specialty))).append("\n")
             summary.append("- Dr. ${nextTurno.doctor ?: getString(R.string.label_default_doctor)}\n\n")
         }
         

@@ -113,12 +113,12 @@ class MedicamentosViewModel : ViewModel() {
         _operationResource.value = Resource.Idle
     }
 
-    fun eliminarMedicamento(id: String) {
+    fun eliminarMedicamento(context: android.content.Context, id: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 repository.eliminarMedicamento(id)
-                loadMedicamentos()
+                loadMedicamentos(context)
             } catch (e: Exception) {
                 _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error al eliminar")
             } finally {

@@ -18,6 +18,8 @@ class EspecialidadesFragment : Fragment() {
 
     private val viewModel: EspecialidadesViewModel by viewModels()
 
+    private lateinit var adapter: EspecialidadesAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,7 +37,14 @@ class EspecialidadesFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        adapter = EspecialidadesAdapter { especialidad ->
+            val bundle = Bundle().apply {
+                putString("especialidadNombre", getString(especialidad.nombreRes))
+            }
+            findNavController().navigate(R.id.action_especialidadesFragment_to_solicitarTurnoFragment, bundle)
+        }
         binding.rvEspecialidades.layoutManager = GridLayoutManager(context, 2)
+        binding.rvEspecialidades.adapter = adapter
     }
 
     private fun setupSearchView() {
@@ -50,13 +59,7 @@ class EspecialidadesFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.filteredEspecialidades.observe(viewLifecycleOwner) { lista ->
-            val adapter = EspecialidadesAdapter(lista) { especialidad ->
-                val bundle = Bundle().apply {
-                    putString("especialidadNombre", getString(especialidad.nombreRes))
-                }
-                findNavController().navigate(R.id.action_especialidadesFragment_to_solicitarTurnoFragment, bundle)
-            }
-            binding.rvEspecialidades.adapter = adapter
+            adapter.submitList(lista)
         }
     }
 

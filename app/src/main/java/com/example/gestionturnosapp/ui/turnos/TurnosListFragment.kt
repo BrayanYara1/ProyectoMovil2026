@@ -111,18 +111,24 @@ class TurnosListFragment : Fragment() {
             .setMessage(getString(R.string.msg_delete_confirm_with_name, turno.pacienteNombre))
             .setPositiveButton(getString(R.string.btn_delete)) { _, _ ->
                 view?.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-                viewModel.eliminarTurno(turno.id)
-                com.google.android.material.snackbar.Snackbar.make(
-                    binding.root,
-                    getString(R.string.msg_cancel_success),
-                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
-                ).show()
+                viewModel.eliminarTurno(requireContext(), turno.id)
             }
             .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
     }
 
     private fun setupObservers() {
+        viewModel.turnoEliminadoExitosamente.observe(viewLifecycleOwner) { exito ->
+            if (exito) {
+                com.google.android.material.snackbar.Snackbar.make(
+                    binding.root,
+                    getString(R.string.msg_cancel_success),
+                    com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                ).show()
+                viewModel.resetNavegacion()
+            }
+        }
+
         viewModel.filteredTurnos.observe(viewLifecycleOwner) { turnos ->
             adapter.submitList(turnos) {
                 // Forzar la animación de cascada cada vez que se actualiza la lista

@@ -57,7 +57,7 @@ class MedicamentosFragment : Fragment() {
                 .setTitle(getString(R.string.title_delete_medication))
                 .setMessage(getString(R.string.msg_confirm_delete_medication, med.nombre))
                 .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
-                    viewModel.eliminarMedicamento(med.id)
+                    viewModel.eliminarMedicamento(requireContext(), med.id)
                 }
                 .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
                 .show()

@@ -128,7 +128,7 @@ class TurnoDetailFragment : Fragment() {
                     .setTitle(R.string.title_delete_appointment)
                     .setMessage(R.string.msg_delete_confirm)
                     .setPositiveButton(R.string.btn_delete) { _, _ ->
-                        viewModel.eliminarTurno(id)
+                        viewModel.eliminarTurno(requireContext(), id)
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()
@@ -181,28 +181,7 @@ class TurnoDetailFragment : Fragment() {
         val calendar = Calendar.getInstance()
         try {
             val dateParts = fecha.split("-")
-            
-            // Usar SimpleDateFormat para parsear la hora AM/PM correctamente (Resiliente)
-            val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
-            var timeDate: java.util.Date? = null
-            
-            for (fmt in inputFormats) {
-                try {
-                    val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
-                    timeDate = sdf.parse(hora)
-                    if (timeDate != null) break
-                } catch (e: Exception) {}
-            }
-            
-            if (timeDate == null) {
-                for (fmt in inputFormats) {
-                    try {
-                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
-                        timeDate = sdf.parse(hora)
-                        if (timeDate != null) break
-                    } catch (e: Exception) {}
-                }
-            }
+            val timeDate = DateUtils.parseTime(hora)
 
             if (dateParts.size == 3 && timeDate != null) {
                 val timeCalendar = Calendar.getInstance()
@@ -289,25 +268,7 @@ class TurnoDetailFragment : Fragment() {
         val cal = Calendar.getInstance()
         try {
             val d = fecha.split("-")
-            val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm")
-            var timeDate: java.util.Date? = null
-            for (fmt in inputFormats) {
-                try {
-                    val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.getDefault())
-                    timeDate = sdf.parse(hora)
-                    if (timeDate != null) break
-                } catch (e: Exception) {}
-            }
-            
-            if (timeDate == null) {
-                for (fmt in inputFormats) {
-                    try {
-                        val sdf = java.text.SimpleDateFormat(fmt, java.util.Locale.US)
-                        timeDate = sdf.parse(hora)
-                        if (timeDate != null) break
-                    } catch (e: Exception) {}
-                }
-            }
+            val timeDate = DateUtils.parseTime(hora)
 
             if (d.size == 3 && timeDate != null) {
                 val timeCal = Calendar.getInstance()

@@ -76,7 +76,7 @@ class EstudiosFragment : Fragment() {
                 .setTitle(getString(R.string.title_delete_study))
                 .setMessage(getString(R.string.msg_confirm_delete_study, estudio.titulo))
                 .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
-                    viewModel.eliminarEstudio(estudio.id)
+                    viewModel.eliminarEstudio(requireContext(), estudio.id)
                 }
                 .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
                 .show()

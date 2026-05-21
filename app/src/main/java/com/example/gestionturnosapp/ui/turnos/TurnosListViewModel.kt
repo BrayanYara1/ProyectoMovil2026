@@ -200,13 +200,13 @@ class TurnosListViewModel : ViewModel() {
         }
     }
 
-    fun eliminarTurno(id: String) {
+    fun eliminarTurno(context: android.content.Context, id: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 repository.eliminarTurno(id)
                 _turnoEliminadoExitosamente.value = true
-                fetchTurnos()
+                fetchTurnos(context)
             } catch (e: Exception) {
                 _errorMessage.value = e.localizedMessage ?: "Error"
             } finally {
