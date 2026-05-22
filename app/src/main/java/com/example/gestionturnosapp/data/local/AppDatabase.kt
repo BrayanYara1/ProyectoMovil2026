@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import net.sqlcipher.database.SupportFactory
 import com.example.gestionturnosapp.data.EstudioMedico
 import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.Turno
@@ -20,11 +21,17 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
+                // Passphrase para el cifrado (Idealmente obtenida de Keystore)
+                val passphrase = net.sqlcipher.database.SQLiteDatabase.getBytes("gestion_turnos_secure_key".toCharArray())
+                val factory = SupportFactory(passphrase)
+
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "gestion_turnos_db"
-                ).build()
+                )
+                .openHelperFactory(factory)
+                .build()
                 INSTANCE = instance
                 instance
             }

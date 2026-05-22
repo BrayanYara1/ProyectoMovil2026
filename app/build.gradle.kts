@@ -89,6 +89,13 @@ dependencies {
     // Biometric
     implementation(libs.androidx.biometric)
 
+    // Lottie
+    implementation(libs.lottie)
+
+    // SQLCipher for Room Encryption
+    implementation(libs.sqlcipher)
+    implementation(libs.androidx.sqlite.ktx)
+
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging.ktx)

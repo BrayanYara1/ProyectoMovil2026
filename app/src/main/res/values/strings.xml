@@ -196,6 +196,7 @@
     <string name="label_doctor_reply">Respuesta del Doctor</string>
     <string name="msg_chat_welcome">Bienvenido al chat de asistencia médica. ¿En qué podemos ayudarte?</string>
     <string name="status_pending_offline">Pendiente (Offline)</string>
+    <string name="msg_no_internet_banner">Sin conexión a internet</string>
 
     <string name="today">Hoy</string>
     <string name="tomorrow">Mañana</string>

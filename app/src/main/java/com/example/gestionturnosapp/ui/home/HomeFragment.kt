@@ -314,12 +314,14 @@ class HomeFragment : Fragment() {
 
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {
         binding.tvNoMeds.isVisible = meds.isEmpty()
+        binding.lottieMeds.isVisible = meds.isEmpty()
+
         binding.layoutMedication.apply {
             // Remove everything except the empty state message
             val viewsToRemove = mutableListOf<View>()
             for (i in 0 until childCount) {
                 val child = getChildAt(i)
-                if (child.id != R.id.tvNoMeds) viewsToRemove.add(child)
+                if (child.id != R.id.tvNoMeds && child.id != R.id.lottieMeds) viewsToRemove.add(child)
             }
             viewsToRemove.forEach { removeView(it) }
 

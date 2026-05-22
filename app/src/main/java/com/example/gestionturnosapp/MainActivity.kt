@@ -22,13 +22,20 @@ import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.ActivityMainBinding
 import com.example.gestionturnosapp.network.RetrofitClient
 import com.example.gestionturnosapp.notifications.NotificationHelper
+import com.example.gestionturnosapp.util.NetworkMonitor
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var navController: NavController? = null
+
+    @Inject
+    lateinit var networkMonitor: NetworkMonitor
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -90,6 +97,15 @@ class MainActivity : AppCompatActivity() {
         sincronizarFcmToken()
         NotificationHelper.createNotificationChannels(this)
         handleIntent(intent)
+        observeNetworkStatus()
+    }
+
+    private fun observeNetworkStatus() {
+        networkMonitor.isOnline
+            .onEach { isOnline ->
+                binding.tvOfflineBanner.visibility = if (isOnline) View.GONE else View.VISIBLE
+            }
+            .launchIn(lifecycleScope)
     }
 
     override fun onNewIntent(intent: Intent) {
