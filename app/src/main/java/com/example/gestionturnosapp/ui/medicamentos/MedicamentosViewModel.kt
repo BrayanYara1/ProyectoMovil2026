@@ -59,8 +59,10 @@ class MedicamentosViewModel @Inject constructor(
         viewModelScope.launch {
             _operationResource.value = Resource.Loading
             _isLoading.value = true
+            // Generar un ID local único para evitar colisiones en la DB
+            val tempId = "local_${System.currentTimeMillis()}"
             val nuevoMed = Medicamento(
-                id = "", 
+                id = tempId,
                 nombre = nombre,
                 dosis = dosis,
                 frecuencia = frecuencia,
@@ -70,7 +72,14 @@ class MedicamentosViewModel @Inject constructor(
                 val result = repository.agregarMedicamento(nuevoMed)
                 if (result != null) {
                     _operationResource.value = Resource.Success(result)
-                    loadMedicamentos()
+                    
+                    // Actualizar lista local inmediatamente para feedback instantáneo
+                    val currentList = (_medicamentosResource.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+                    currentList.add(0, result)
+                    _medicamentosResource.value = Resource.Success(currentList)
+                    
+                    // Sincronizar cache
+                    OfflineCacheManager.saveMedicamentos(getApplication(), currentList)
                 } else {
                     _operationResource.value = Resource.Error("Error al guardar")
                 }
@@ -118,7 +127,15 @@ class MedicamentosViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 repository.eliminarMedicamento(id)
-                loadMedicamentos()
+                
+                // Actualizar lista local inmediatamente
+                val currentList = (_medicamentosResource.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+                currentList.removeAll { it.id == id }
+                _medicamentosResource.value = Resource.Success(currentList)
+                
+                // Sincronizar cache
+                OfflineCacheManager.saveMedicamentos(getApplication(), currentList)
+
             } catch (e: Exception) {
                 _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error al eliminar")
             } finally {

@@ -83,20 +83,21 @@ class TurnoDetailFragment : Fragment() {
             tvDetailMotivo.text = motivo
             
             // Configurar Estado Visual
-            tvDetailStatus.text = when(estado.lowercase()) {
-                "completado", "completed" -> getString(R.string.status_completed)
-                "cancelado", "cancelled" -> getString(R.string.status_cancelled)
+            val statusClean = estado.lowercase()
+            tvDetailStatus.text = when {
+                statusClean.contains("completado") || statusClean.contains("completed") -> getString(R.string.status_completed)
+                statusClean.contains("cancelado") || statusClean.contains("cancelled") -> getString(R.string.status_cancelled)
                 else -> getString(R.string.status_pending)
             }
             
-            val statusBg = when(estado.lowercase()) {
-                "completado", "completed" -> R.drawable.bg_status_completed
-                "cancelado", "cancelled" -> R.drawable.bg_status_cancelled
+            val statusBg = when {
+                statusClean.contains("completado") || statusClean.contains("completed") -> R.drawable.bg_status_completed
+                statusClean.contains("cancelado") || statusClean.contains("cancelled") -> R.drawable.bg_status_cancelled
                 else -> R.drawable.bg_status_pending
             }
             tvDetailStatus.setBackgroundResource(statusBg)
 
-            btnCancelarTurno.visibility = if (estado.lowercase() == "pendiente" || estado.lowercase() == "pending") {
+            btnCancelarTurno.visibility = if (statusClean.contains("pendiente") || statusClean.contains("pending")) {
                 View.VISIBLE
             } else {
                 View.GONE

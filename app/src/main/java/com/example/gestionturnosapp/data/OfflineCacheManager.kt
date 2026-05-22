@@ -53,6 +53,17 @@ object OfflineCacheManager {
         getDb(context).estudioDao().getAllEstudios()
     }
 
+    // --- MENSAJES (ROOM) ---
+    suspend fun saveMensajes(context: Context, mensajes: List<Mensaje>) = withContext(Dispatchers.IO) {
+        val dao = getDb(context).mensajeDao()
+        dao.deleteAllMensajes()
+        dao.insertMensajes(mensajes)
+    }
+
+    suspend fun getCachedMensajes(context: Context): List<Mensaje> = withContext(Dispatchers.IO) {
+        getDb(context).mensajeDao().getAllMensajes()
+    }
+
     // --- PENDIENTES (SHARED PREFERENCES - Colas de sincronización) ---
     fun addPendingTurno(context: Context, request: NuevoTurnoRequest) {
         val pending = getPendingTurnos(context).toMutableList()
@@ -146,6 +157,7 @@ object OfflineCacheManager {
         db.turnoDao().deleteAllTurnos()
         db.medicamentoDao().deleteAllMedicamentos()
         db.estudioDao().deleteAllEstudios()
+        db.mensajeDao().deleteAllMensajes()
     }
 
     fun isNetworkError(e: Exception): Boolean {

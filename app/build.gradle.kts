@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
-    id("kotlin-kapt")
+    kotlin("kapt")
     alias(libs.plugins.hilt.android)
 }
 
@@ -41,6 +41,15 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = false
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
@@ -83,16 +92,10 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.compiler)
 
-    // Shimmer
+    // UI/UX Libraries
     implementation(libs.facebook.shimmer)
-
-    // Biometric
-    implementation(libs.androidx.biometric)
-
-    // Lottie
     implementation(libs.lottie)
-
-    // SQLCipher for Room Encryption
+    implementation(libs.androidx.biometric)
     implementation(libs.sqlcipher)
     implementation(libs.androidx.sqlite.ktx)
 

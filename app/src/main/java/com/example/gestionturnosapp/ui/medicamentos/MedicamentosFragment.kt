@@ -20,6 +20,7 @@ import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentMedicamentosBinding
 import com.example.gestionturnosapp.notifications.ReminderReceiver
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 
@@ -54,18 +55,33 @@ class MedicamentosFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = MedicamentosAdapter { med ->
-            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(R.string.title_delete_medication))
-                .setMessage(getString(R.string.msg_confirm_delete_medication, med.nombre))
-                .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
-                    viewModel.eliminarMedicamento(med.id)
-                }
-                .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
-                .show()
-        }
+        adapter = MedicamentosAdapter(
+            onItemClick = { med ->
+                showMedicationDetailDialog(med)
+            },
+            onDeleteClick = { med ->
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.title_delete_medication))
+                    .setMessage(getString(R.string.msg_confirm_delete_medication, med.nombre))
+                    .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
+                        viewModel.eliminarMedicamento(med.id)
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
+                    .show()
+            }
+        )
         binding.rvMedicamentos.layoutManager = LinearLayoutManager(context)
         binding.rvMedicamentos.adapter = adapter
+    }
+
+    private fun showMedicationDetailDialog(med: Medicamento) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(med.nombre)
+            .setMessage("${getString(R.string.hint_med_dose)}: ${med.dosis}\n" +
+                     "${getString(R.string.hint_med_freq)}: ${med.frecuencia}\n" +
+                     "${getString(R.string.hint_med_next)}: ${med.proximaToma}")
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 
     private fun setupListeners() {

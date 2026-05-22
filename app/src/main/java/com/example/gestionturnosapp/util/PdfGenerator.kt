@@ -128,7 +128,7 @@ object PdfGenerator {
         return try {
             pdfDocument.writeTo(FileOutputStream(file))
             pdfDocument.close()
-            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+            FileProvider.getUriForFile(context, "com.example.gestionturnosapp.fileprovider", file)
         } catch (e: Exception) {
             e.printStackTrace()
             null

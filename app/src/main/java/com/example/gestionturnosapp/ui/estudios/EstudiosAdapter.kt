@@ -11,12 +11,13 @@ import com.example.gestionturnosapp.data.EstudioMedico
 import com.example.gestionturnosapp.databinding.ItemEstudioBinding
 
 class EstudiosAdapter(
+    private val onItemClick: (EstudioMedico) -> Unit,
     private val onDeleteClick: (EstudioMedico) -> Unit
 ) : ListAdapter<EstudioMedico, EstudiosAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemEstudioBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding, onDeleteClick)
+        return ViewHolder(binding, onItemClick, onDeleteClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -25,6 +26,7 @@ class EstudiosAdapter(
 
     class ViewHolder(
         private val binding: ItemEstudioBinding,
+        private val onItemClick: (EstudioMedico) -> Unit,
         private val onDeleteClick: (EstudioMedico) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(estudio: EstudioMedico) {
@@ -39,6 +41,10 @@ class EstudiosAdapter(
                     ivEstudioAdjunto.load(estudio.urlDocumento)
                 } else {
                     ivEstudioAdjunto.visibility = android.view.View.GONE
+                }
+
+                root.setOnClickListener {
+                    onItemClick(estudio)
                 }
 
                 btnDeleteEstudio.setOnClickListener {

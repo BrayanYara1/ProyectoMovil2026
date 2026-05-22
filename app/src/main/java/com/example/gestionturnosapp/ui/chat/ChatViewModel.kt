@@ -1,8 +1,9 @@
 package com.example.gestionturnosapp.ui.chat
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.data.*
 import com.example.gestionturnosapp.util.SmartAssistant
@@ -14,10 +15,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    application: Application,
     private val repository: ChatRepository,
     private val turnoRepository: TurnoRepository,
     private val medRepository: MedicamentoRepository,
-) : ViewModel() {
+) : AndroidViewModel(application) {
 
     private val _mensajes = MutableLiveData<Resource<List<Mensaje>>>()
     val mensajes: LiveData<Resource<List<Mensaje>>> = _mensajes
@@ -47,11 +49,21 @@ class ChatViewModel @Inject constructor(
         
         viewModelScope.launch {
             _mensajes.value = Resource.Loading
+            
+            // Offline First
+            val cached = OfflineCacheManager.getCachedMensajes(getApplication())
+            if (cached.isNotEmpty()) {
+                _mensajes.value = Resource.Success(cached)
+            }
+
             try {
                 val list = repository.getMensajes()
                 _mensajes.value = Resource.Success(list)
+                OfflineCacheManager.saveMensajes(getApplication(), list)
             } catch (e: Exception) {
-                _mensajes.value = Resource.Error(e.localizedMessage ?: "Error de red")
+                if (cached.isEmpty()) {
+                    _mensajes.value = Resource.Error(e.localizedMessage ?: "Error de red")
+                }
             }
         }
     }

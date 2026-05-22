@@ -9,12 +9,13 @@ import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.databinding.ItemMedicationHomeBinding
 
 class MedicamentosAdapter(
+    private val onItemClick: (Medicamento) -> Unit,
     private val onDeleteClick: (Medicamento) -> Unit
 ) : ListAdapter<Medicamento, MedicamentosAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemMedicationHomeBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding, onDeleteClick)
+        return ViewHolder(binding, onItemClick, onDeleteClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -23,6 +24,7 @@ class MedicamentosAdapter(
 
     class ViewHolder(
         private val binding: ItemMedicationHomeBinding,
+        private val onItemClick: (Medicamento) -> Unit,
         private val onDeleteClick: (Medicamento) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(med: Medicamento) {
@@ -30,11 +32,13 @@ class MedicamentosAdapter(
             binding.tvMedName.text = context.getString(com.example.gestionturnosapp.R.string.label_medication_format, med.nombre, med.dosis)
             binding.tvMedSchedule.text = med.frecuencia + context.getString(com.example.gestionturnosapp.R.string.label_next_dose, med.proximaToma)
             
-            // Mostrar botón de borrar solo si es el adaptador de la lista completa (no en Home)
-            // Para simplificar, lo hacemos visible siempre si estamos en este adaptador
             binding.btnDeleteMed.visibility = android.view.View.VISIBLE
             binding.ivMedInfo.visibility = android.view.View.GONE
             
+            binding.root.setOnClickListener {
+                onItemClick(med)
+            }
+
             binding.btnDeleteMed.setOnClickListener {
                 onDeleteClick(med)
             }

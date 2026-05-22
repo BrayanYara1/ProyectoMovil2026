@@ -9,6 +9,7 @@
     <application
         android:name=".GestionTurnosApp"
         android:allowBackup="true"
+        android:extractNativeLibs="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
@@ -43,7 +44,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
+            android:authorities="com.example.gestionturnosapp.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

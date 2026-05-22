@@ -14,6 +14,7 @@ import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.data.TurnoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
@@ -31,7 +32,10 @@ class HomeViewModel @Inject constructor(
     private val _nextTurno = MutableLiveData<Turno?>()
     val nextTurno: LiveData<Turno?> = _nextTurno
 
-    private val _medicamentos = MutableLiveData<List<Medicamento>>()
+    private val _allTurnos = MutableLiveData<List<Turno>>(emptyList())
+    val allTurnos: LiveData<List<Turno>> = _allTurnos
+
+    private val _medicamentos = MutableLiveData<List<Medicamento>>(emptyList())
     val medicamentos: LiveData<List<Medicamento>> = _medicamentos
 
     private val _isLoading = MutableLiveData<Boolean>()
@@ -58,8 +62,12 @@ class HomeViewModel @Inject constructor(
                 updateTurnosUI(cachedTurnos)
             }
             val cachedMeds = OfflineCacheManager.getCachedMedicamentos(getApplication())
-            if (cachedMeds.isNotEmpty()) {
-                _medicamentos.value = cachedMeds
+            val pendingMeds = OfflineCacheManager.getPendingMeds(getApplication())
+            
+            val combined = (cachedMeds + pendingMeds).distinctBy { it.nombre.lowercase() }
+            
+            if (combined.isNotEmpty()) {
+                _medicamentos.value = combined
             }
         }
     }
@@ -71,28 +79,62 @@ class HomeViewModel @Inject constructor(
             _errorMessage.value = null
 
             try {
-                // 1. Carga desde Servidor
-                val turnos = turnoRepository.getTurnos()
-                updateTurnosUI(turnos)
-                OfflineCacheManager.saveTurnos(getApplication(), turnos)
+                // Ejecutar en paralelo para mayor eficiencia y resiliencia
+                val turnosDeferred = async { 
+                    try {
+                        val turnos = turnoRepository.getTurnos()
+                        OfflineCacheManager.saveTurnos(getApplication(), turnos)
+                        turnos
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeViewModel", "Error fetching turnos", e)
+                        null
+                    }
+                }
 
-                val meds = medRepository.getMedicamentos()
-                _medicamentos.value = meds
-                OfflineCacheManager.saveMedicamentos(getApplication(), meds)
+                val medsDeferred = async {
+                    try {
+                        val meds = medRepository.getMedicamentos()
+                        OfflineCacheManager.saveMedicamentos(getApplication(), meds)
+                        meds
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeViewModel", "Error fetching meds", e)
+                        null
+                    }
+                }
 
+                val serverTurnos = turnosDeferred.await()
+                val medsFromApi = medsDeferred.await()
+                val pendingMeds = OfflineCacheManager.getPendingMeds(getApplication())
+
+                // Combinar servidor + pendientes
+                val combinedMeds = mutableListOf<Medicamento>()
+                if (medsFromApi != null) combinedMeds.addAll(medsFromApi)
+                
+                pendingMeds.forEach { pending ->
+                    if (combinedMeds.none { it.nombre.lowercase() == pending.nombre.lowercase() }) {
+                        combinedMeds.add(pending)
+                    }
+                }
+
+                if (combinedMeds.isNotEmpty()) {
+                    _medicamentos.value = combinedMeds
+                } else {
+                    val cachedMeds = OfflineCacheManager.getCachedMedicamentos(getApplication())
+                    if (cachedMeds.isNotEmpty()) {
+                        _medicamentos.value = cachedMeds
+                    }
+                }
+
+                if (serverTurnos != null) {
+                    updateTurnosUI(serverTurnos)
+                } else if (_nextTurno.value == null) {
+                    val cachedTurnos = OfflineCacheManager.getCachedTurnos(getApplication())
+                    if (cachedTurnos.isNotEmpty()) updateTurnosUI(cachedTurnos)
+                }
             } catch (e: Exception) {
                 if (refreshJob?.isActive == true) {
-                    val msg = e.localizedMessage ?: ""
-                    _errorMessage.value = if (msg.contains(other = "resolve host", ignoreCase = true) || msg.contains(other = "connect", ignoreCase = true)) {
-                        getApplication<Application>().getString(R.string.msg_no_connection)
-                    } else {
-                        msg.ifBlank { getApplication<Application>().getString(R.string.msg_error_unknown) }
-                    }
-                    
-                    // Si falló el servidor, nos aseguramos de que al menos la caché sea visible
-                    if ((_nextTurno.value == null) && _medicamentos.value.isNullOrEmpty()) {
-                        loadFromCache()
-                    }
+                    _errorMessage.value = e.localizedMessage
+                    loadFromCache()
                 }
             } finally {
                 _isLoading.value = false
@@ -101,6 +143,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun updateTurnosUI(turnos: List<Turno>) {
+        _allTurnos.value = turnos
         _turnosCount.value = turnos.size
         _nextTurno.value = turnos.asSequence().filter { it.estado.lowercase() in listOf("pendiente", "pending") }
             .minByOrNull { "${it.fecha} ${it.hora}" }
@@ -126,12 +169,15 @@ class HomeViewModel @Inject constructor(
             // Sincronizar Meds
             val pendingMeds = OfflineCacheManager.getPendingMeds(getApplication())
             if (pendingMeds.isNotEmpty()) {
+                android.util.Log.d("HomeViewModel", "Syncing ${pendingMeds.size} pending meds")
                 val syncedMeds = mutableListOf<Medicamento>()
                 pendingMeds.forEach { 
                     try { 
                         medRepository.agregarMedicamento(it)
                         syncedMeds.add(it)
-                    } catch (_: Exception) {} 
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeViewModel", "Error syncing med: ${it.nombre}", e)
+                    }
                 }
                 if (syncedMeds.isNotEmpty()) {
                     OfflineCacheManager.removePendingMeds(getApplication(), syncedMeds)

@@ -73,18 +73,47 @@ class EstudiosFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = EstudiosAdapter { estudio ->
-            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-                .setTitle(getString(R.string.title_delete_study))
-                .setMessage(getString(R.string.msg_confirm_delete_study, estudio.titulo))
-                .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
-                    viewModel.eliminarEstudio(estudio.id)
-                }
-                .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
-                .show()
-        }
+        adapter = EstudiosAdapter(
+            onItemClick = { estudio ->
+                showEstudioDetailDialog(estudio)
+            },
+            onDeleteClick = { estudio ->
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(getString(R.string.title_delete_study))
+                    .setMessage(getString(R.string.msg_confirm_delete_study, estudio.titulo))
+                    .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
+                        viewModel.eliminarEstudio(estudio.id)
+                    }
+                    .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
+                    .show()
+            }
+        )
         binding.rvEstudios.layoutManager = LinearLayoutManager(context)
         binding.rvEstudios.adapter = adapter
+    }
+
+    private fun showEstudioDetailDialog(estudio: com.example.gestionturnosapp.data.EstudioMedico) {
+        val detailLayout = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_estudio_detail, null)
+        val ivDetail = detailLayout.findViewById<ImageView>(R.id.ivEstudioDetail)
+        val tvTitulo = detailLayout.findViewById<android.widget.TextView>(R.id.tvDetailTitulo)
+        val tvInfo = detailLayout.findViewById<android.widget.TextView>(R.id.tvDetailInfo)
+        val tvResultado = detailLayout.findViewById<android.widget.TextView>(R.id.tvDetailResultado)
+
+        tvTitulo.text = estudio.titulo
+        tvInfo.text = "${estudio.tipo.uppercase()} • ${estudio.fecha}"
+        tvResultado.text = estudio.resultadoBreve
+
+        if (!estudio.urlDocumento.isNullOrEmpty()) {
+            ivDetail.isVisible = true
+            ivDetail.load(estudio.urlDocumento)
+        } else {
+            ivDetail.isVisible = false
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setView(detailLayout)
+            .setPositiveButton(getString(android.R.string.ok), null)
+            .show()
     }
 
     private fun setupListeners() {

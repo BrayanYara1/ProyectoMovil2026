@@ -242,7 +242,7 @@ class HomeFragment : Fragment() {
     private fun shareHealthSummary() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_health_summary)
-            .setMessage("¿Cómo deseas compartir tu resumen de salud?")
+            .setMessage(R.string.label_share_health_question)
             .setPositiveButton("PDF (RECOMENDADO)") { _, _ ->
                 generateAndSharePdf()
             }
@@ -254,7 +254,7 @@ class HomeFragment : Fragment() {
 
     private fun generateAndSharePdf() {
         val user = UserManager.getUser(requireContext())
-        val turnos = viewModel.nextTurno.value?.let { listOf(it) } ?: emptyList()
+        val turnos = viewModel.allTurnos.value ?: emptyList()
         val meds = viewModel.medicamentos.value ?: emptyList()
         
         val pdfUri = com.example.gestionturnosapp.util.PdfGenerator.generateHealthReport(
@@ -313,11 +313,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {
-        binding.tvNoMeds.isVisible = meds.isEmpty()
-        binding.lottieMeds.isVisible = meds.isEmpty()
+        val hasMeds = meds.isNotEmpty()
+        binding.tvNoMeds.isVisible = !hasMeds
+        binding.lottieMeds.isVisible = !hasMeds
 
         binding.layoutMedication.apply {
-            // Remove everything except the empty state message
+            // Eliminar solo los items inflados previamente (manteniendo los placeholders de error/vacio)
             val viewsToRemove = mutableListOf<View>()
             for (i in 0 until childCount) {
                 val child = getChildAt(i)
@@ -325,13 +326,25 @@ class HomeFragment : Fragment() {
             }
             viewsToRemove.forEach { removeView(it) }
 
-            // Add top 3 medications
-            meds.take(3).forEach { med ->
-                val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, this, false)
-                medView.findViewById<TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
-                medView.findViewById<TextView>(R.id.tvMedSchedule).text = med.frecuencia
-                medView.findViewById<View>(R.id.btnDeleteMed).isVisible = false
-                addView(medView)
+            if (hasMeds) {
+                // Mostrar solo los 3 primeros medicamentos
+                meds.take(3).forEach { med ->
+                    val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, this, false)
+                    medView.findViewById<TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
+                    
+                    val scheduleText = if (med.proximaToma.isNotBlank()) {
+                        "${med.frecuencia} • ${getString(R.string.hint_med_next)}: ${med.proximaToma}"
+                    } else {
+                        med.frecuencia
+                    }
+                    medView.findViewById<TextView>(R.id.tvMedSchedule).text = scheduleText
+                    
+                    // En Home no queremos botón de borrar, ocultamos
+                    medView.findViewById<View>(R.id.btnDeleteMed).isVisible = false
+                    medView.findViewById<View>(R.id.ivMedInfo).isVisible = true
+                    
+                    addView(medView)
+                }
             }
         }
     }
