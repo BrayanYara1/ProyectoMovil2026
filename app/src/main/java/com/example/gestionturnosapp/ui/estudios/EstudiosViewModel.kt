@@ -10,11 +10,16 @@ import com.example.gestionturnosapp.data.EstudioMedico
 import com.example.gestionturnosapp.data.EstudioRepository
 import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EstudiosViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class EstudiosViewModel @Inject constructor(
+    application: Application,
+    private val repository: EstudioRepository
+) : AndroidViewModel(application) {
 
-    private val repository = EstudioRepository()
     private val context = application.applicationContext
 
     private val _allEstudios = MutableLiveData<List<EstudioMedico>>(emptyList())

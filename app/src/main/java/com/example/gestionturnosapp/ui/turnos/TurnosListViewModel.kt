@@ -13,12 +13,17 @@ import com.example.gestionturnosapp.data.NuevoTurnoRequest
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.util.DateUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TurnosListViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class TurnosListViewModel @Inject constructor(
+    application: Application,
+    private val repository: TurnoRepository
+) : AndroidViewModel(application) {
 
-    private val repository = TurnoRepository()
     private val context = application.applicationContext
 
     private val _turnos = MutableLiveData<List<Turno>>()
@@ -48,6 +53,30 @@ class TurnosListViewModel(application: Application) : AndroidViewModel(applicati
     val isSlotAvailable: LiveData<Boolean?> = _isSlotAvailable
 
     private var availabilityJob: Job? = null
+
+    // CAMPOS FORMULARIO REACTIVO
+    val formPacienteNombre = MutableLiveData("")
+    val formFecha = MutableLiveData("")
+    val formHora = MutableLiveData("")
+    val formMotivo = MutableLiveData("")
+
+    val isFormValid = MediatorLiveData<Boolean>().apply {
+        val observer = { _: String? ->
+            val nombre = formPacienteNombre.value ?: ""
+            val fecha = formFecha.value ?: ""
+            val hora = formHora.value ?: ""
+            val motivo = formMotivo.value ?: ""
+            
+            value = nombre.isNotBlank() && 
+                    fecha.isNotBlank() && 
+                    hora.isNotBlank() && 
+                    motivo.isNotBlank()
+        }
+        addSource(formPacienteNombre, observer)
+        addSource(formFecha, observer)
+        addSource(formHora, observer)
+        addSource(formMotivo, observer)
+    }
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
@@ -109,7 +138,12 @@ class TurnosListViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
-    fun crearNuevoTurno(nombre: String, fecha: String, hora: String, motivo: String, especialidad: String? = null, doctor: String? = null) {
+    fun crearNuevoTurno(especialidad: String? = null, doctor: String? = null) {
+        val nombre = formPacienteNombre.value ?: ""
+        val fecha = formFecha.value ?: ""
+        val hora = formHora.value ?: ""
+        val motivo = formMotivo.value ?: ""
+
         viewModelScope.launch {
             _createTurnoResource.value = Resource.Loading
             _isLoading.value = true
@@ -177,6 +211,11 @@ class TurnosListViewModel(application: Application) : AndroidViewModel(applicati
         _createTurnoResource.value = Resource.Idle
         _turnoEliminadoExitosamente.value = false
         _isSlotAvailable.value = null
+        // Limpiar formulario
+        formPacienteNombre.value = ""
+        formFecha.value = ""
+        formHora.value = ""
+        formMotivo.value = ""
     }
 
     fun verificarDisponibilidad(fecha: String, hora: String) {

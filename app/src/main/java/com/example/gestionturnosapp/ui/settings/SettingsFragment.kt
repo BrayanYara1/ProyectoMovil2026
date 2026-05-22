@@ -18,6 +18,14 @@ import com.example.gestionturnosapp.databinding.FragmentSettingsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import com.example.gestionturnosapp.data.OfflineCacheManager
+import com.example.gestionturnosapp.util.BiometricHelper
+import androidx.core.view.isVisible
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class SettingsFragment : Fragment() {
 
     private var _binding: FragmentSettingsBinding? = null
@@ -41,6 +49,16 @@ class SettingsFragment : Fragment() {
         // Inicializar Switches
         binding.switchNotifications.isChecked = PreferenceManager.areNotificationsEnabled(requireContext())
         binding.switchDarkMode.isChecked = PreferenceManager.isDarkMode(requireContext())
+
+        // BIOMETRÍA
+        val isBiometricAvailable = BiometricHelper.isBiometricAvailable(requireContext())
+        binding.layoutBiometric.isVisible = isBiometricAvailable
+        if (isBiometricAvailable) {
+            binding.switchBiometric.isChecked = PreferenceManager.isBiometricEnabled(requireContext())
+            binding.switchBiometric.setOnCheckedChangeListener { _, isChecked ->
+                PreferenceManager.setBiometricEnabled(requireContext(), isChecked)
+            }
+        }
 
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             PreferenceManager.setNotificationsEnabled(requireContext(), isChecked)
@@ -79,8 +97,11 @@ class SettingsFragment : Fragment() {
                 .setTitle(getString(R.string.btn_logout))
                 .setMessage(getString(R.string.msg_logout_confirm))
                 .setPositiveButton(getString(R.string.btn_yes)) { _, _ ->
-                    UserManager.logout(requireContext())
-                    findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        OfflineCacheManager.clearCache(requireContext())
+                        UserManager.logout(requireContext())
+                        findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)
+                    }
                 }
                 .setNegativeButton(getString(R.string.btn_cancel), null)
                 .show()

@@ -4,14 +4,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gestionturnosapp.data.Mensaje
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.*
+import com.example.gestionturnosapp.util.SmartAssistant
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Date
+import javax.inject.Inject
 
-class ChatViewModel : ViewModel() {
-
-    private val repository = com.example.gestionturnosapp.data.ChatRepository()
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    private val repository: ChatRepository,
+    private val turnoRepository: TurnoRepository,
+    private val medRepository: MedicamentoRepository
+) : ViewModel() {
 
     private val _mensajes = MutableLiveData<Resource<List<Mensaje>>>()
     val mensajes: LiveData<Resource<List<Mensaje>>> = _mensajes
@@ -22,7 +28,23 @@ class ChatViewModel : ViewModel() {
     private val _isDoctorTyping = MutableLiveData<Boolean>(false)
     val isDoctorTyping: LiveData<Boolean> = _isDoctorTyping
 
+    // Modo Asistente IA (Por defecto activado para Help)
+    private val _isAiAssistantMode = MutableLiveData<Boolean>(true)
+    val isAiAssistantMode: LiveData<Boolean> = _isAiAssistantMode
+
+    fun setAiMode(enabled: Boolean) {
+        _isAiAssistantMode.value = enabled
+        fetchMensajes()
+    }
+
     fun fetchMensajes() {
+        if (_isAiAssistantMode.value == true) {
+            if (_mensajes.value !is Resource.Success) {
+                _mensajes.value = Resource.Success(emptyList())
+            }
+            return
+        }
+        
         viewModelScope.launch {
             _mensajes.value = Resource.Loading
             try {
@@ -37,18 +59,20 @@ class ChatViewModel : ViewModel() {
     fun enviarMensaje(texto: String) {
         if (texto.isBlank()) return
         
+        if (_isAiAssistantMode.value == true) {
+            enviarMensajeIA(texto)
+            return
+        }
+
         viewModelScope.launch {
             _mensajeEnviado.value = Resource.Loading
             try {
                 val mensaje = repository.enviarMensaje(texto)
                 if (mensaje != null) {
                     _mensajeEnviado.value = Resource.Success(mensaje)
-                    
-                    // Simular que el doctor está escribiendo
                     _isDoctorTyping.value = true
                     delay(2500)
                     _isDoctorTyping.value = false
-
                     fetchMensajes()
                 } else {
                     _mensajeEnviado.value = Resource.Error("Error al enviar")
@@ -56,6 +80,31 @@ class ChatViewModel : ViewModel() {
             } catch (e: Exception) {
                 _mensajeEnviado.value = Resource.Error(e.localizedMessage ?: "Error de red")
             }
+        }
+    }
+
+    private fun enviarMensajeIA(texto: String) {
+        viewModelScope.launch {
+            // 1. Agregar mensaje del usuario localmente
+            val userMsg = Mensaje(id = "local_${System.currentTimeMillis()}", texto = texto, remitente = "PACIENTE", fecha = Date())
+            val currentList = (_mensajes.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+            currentList.add(userMsg)
+            _mensajes.value = Resource.Success(currentList)
+            
+            _isDoctorTyping.value = true
+            delay(1500)
+            
+            // 2. Obtener contexto para la IA
+            val turnos = try { turnoRepository.getTurnos() } catch(_: Exception) { emptyList() }
+            val meds = try { medRepository.getMedicamentos() } catch(_: Exception) { emptyList() }
+            
+            // 3. Generar respuesta "IA"
+            val response = SmartAssistant.generateResponse(texto, turnos, meds)
+            
+            val aiMsg = Mensaje(id = "ai_${System.currentTimeMillis()}", texto = response, remitente = "DOCTOR", fecha = Date())
+            currentList.add(aiMsg)
+            _isDoctorTyping.value = false
+            _mensajes.value = Resource.Success(currentList)
         }
     }
 }

@@ -24,6 +24,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.util.Calendar
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import com.example.gestionturnosapp.data.OfflineCacheManager
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
@@ -126,8 +132,15 @@ class HomeFragment : Fragment() {
 
     private fun setupObservers() {
         viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
-            binding.progressBar.isVisible = isLoading
-            if (!isLoading) {
+            binding.progressBar.isVisible = false // Desactivamos el progress bar viejo
+            val isRefreshing = binding.swipeRefresh.isRefreshing
+            
+            if (isLoading && !isRefreshing) {
+                binding.shimmerHome.isVisible = true
+                binding.shimmerHome.startShimmer()
+            } else {
+                binding.shimmerHome.stopShimmer()
+                binding.shimmerHome.isVisible = false
                 binding.swipeRefresh.isRefreshing = false
             }
         }
@@ -217,13 +230,50 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
-        UserManager.logout(requireContext())
-        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
-            .setPopUpTo(R.id.nav_graph, true)
-            .build())
+        viewLifecycleOwner.lifecycleScope.launch {
+            OfflineCacheManager.clearCache(requireContext())
+            UserManager.logout(requireContext())
+            findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+                .setPopUpTo(R.id.nav_graph, true)
+                .build())
+        }
     }
 
     private fun shareHealthSummary() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.title_health_summary)
+            .setMessage("¿Cómo deseas compartir tu resumen de salud?")
+            .setPositiveButton("PDF (RECOMENDADO)") { _, _ ->
+                generateAndSharePdf()
+            }
+            .setNegativeButton("SOLO TEXTO") { _, _ ->
+                shareTextSummary()
+            }
+            .show()
+    }
+
+    private fun generateAndSharePdf() {
+        val user = UserManager.getUser(requireContext())
+        val turnos = viewModel.nextTurno.value?.let { listOf(it) } ?: emptyList()
+        val meds = viewModel.medicamentos.value ?: emptyList()
+        
+        val pdfUri = com.example.gestionturnosapp.util.PdfGenerator.generateHealthReport(
+            requireContext(), user, turnos, meds
+        )
+        
+        if (pdfUri != null) {
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "application/pdf"
+                putExtra(Intent.EXTRA_STREAM, pdfUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            startActivity(Intent.createChooser(intent, getString(R.string.label_share_via)))
+        } else {
+            Snackbar.make(binding.root, "Error al generar el PDF", Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun shareTextSummary() {
         val nextTurno = viewModel.nextTurno.value
         val meds = viewModel.medicamentos.value ?: emptyList()
         val user = UserManager.getUser(requireContext())

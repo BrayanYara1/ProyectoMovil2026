@@ -10,9 +10,14 @@ import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.data.Usuario
 import com.example.gestionturnosapp.network.RetrofitClient
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ProfileViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class ProfileViewModel @Inject constructor(
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _user = MutableLiveData<Usuario?>()
     val user: LiveData<Usuario?> = _user

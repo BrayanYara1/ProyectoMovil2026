@@ -9,11 +9,15 @@ import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.MedicamentoRepository
 import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MedicamentosViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = MedicamentoRepository()
+@HiltViewModel
+class MedicamentosViewModel @Inject constructor(
+    application: Application,
+    private val repository: MedicamentoRepository
+) : AndroidViewModel(application) {
 
     private val _medicamentosResource = MutableLiveData<Resource<List<Medicamento>>>()
     val medicamentosResource: LiveData<Resource<List<Medicamento>>> = _medicamentosResource

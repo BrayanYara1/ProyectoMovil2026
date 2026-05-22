@@ -14,6 +14,12 @@ import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.databinding.FragmentTurnosListBinding
 
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import com.example.gestionturnosapp.data.OfflineCacheManager
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class TurnosListFragment : Fragment() {
 
     private var _binding: FragmentTurnosListBinding? = null
@@ -139,6 +145,15 @@ class TurnosListFragment : Fragment() {
         }
 
         viewModel.turnosResource.observe(viewLifecycleOwner) { resource ->
+            binding.shimmerViewContainer.isVisible = resource is Resource.Loading && !binding.swipeRefresh.isRefreshing
+            if (resource is Resource.Loading && !binding.swipeRefresh.isRefreshing) {
+                binding.shimmerViewContainer.startShimmer()
+                binding.rvTurnos.isVisible = false
+            } else {
+                binding.shimmerViewContainer.stopShimmer()
+                binding.rvTurnos.isVisible = true
+            }
+
             when (resource) {
                 is Resource.Loading -> {
                     if (!binding.swipeRefresh.isRefreshing) {
@@ -184,11 +199,14 @@ class TurnosListFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
-        com.example.gestionturnosapp.data.UserManager.logout(requireContext())
-        Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
-        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
-            .setPopUpTo(R.id.nav_graph, true)
-            .build())
+        viewLifecycleOwner.lifecycleScope.launch {
+            OfflineCacheManager.clearCache(requireContext())
+            com.example.gestionturnosapp.data.UserManager.logout(requireContext())
+            Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
+            findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+                .setPopUpTo(R.id.nav_graph, true)
+                .build())
+        }
     }
 
     private fun setupFab() {

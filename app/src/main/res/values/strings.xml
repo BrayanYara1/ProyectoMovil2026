@@ -103,6 +103,10 @@
     <string name="label_notifications">Notificaciones de Turnos</string>
     <string name="label_dark_mode">Modo Oscuro</string>
     <string name="label_language">Idioma: Español</string>
+    <string name="label_biometric">Autenticación Biométrica</string>
+    <string name="title_biometric_auth">Desbloquea la App</string>
+    <string name="subtitle_biometric_auth">Usa tu huella o rostro para continuar</string>
+    <string name="error_biometric_auth">Fallo en la autenticación biométrica</string>
     <string name="label_about">Acerca de Salud Activa</string>
     <string name="btn_logout">CERRAR SESIÓN</string>
     <string name="msg_logout_confirm">¿Estás seguro de que quieres salir?</string>

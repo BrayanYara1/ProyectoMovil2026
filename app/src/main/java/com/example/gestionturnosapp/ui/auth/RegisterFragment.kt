@@ -15,7 +15,9 @@ import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.RegisterRequest
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentRegisterBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
@@ -38,6 +40,11 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.isRegisterValid.observe(viewLifecycleOwner) { isValid ->
+            binding.btnRegister.isEnabled = isValid
+            binding.btnRegister.alpha = if (isValid) 1.0f else 0.5f
+        }
+
         viewModel.authState.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
@@ -67,11 +74,19 @@ class RegisterFragment : Fragment() {
     }
 
     private fun setupRegisterActions() {
-        // Limpiar errores mientras el usuario escribe
-        binding.etNombre.doAfterTextChanged { binding.tilNombre.error = null }
-        binding.etEmail.doAfterTextChanged { binding.tilEmail.error = null }
-        binding.etTelefono.doAfterTextChanged { binding.tilTelefono.error = null }
-        binding.etPassword.doAfterTextChanged { binding.tilPassword.error = null }
+        // Enlace bidireccional manual
+        binding.etNombre.doAfterTextChanged { 
+            viewModel.regName.value = it.toString()
+            binding.tilNombre.error = null 
+        }
+        binding.etEmail.doAfterTextChanged { 
+            viewModel.regEmail.value = it.toString()
+            binding.tilEmail.error = null 
+        }
+        binding.etPassword.doAfterTextChanged { 
+            viewModel.regPassword.value = it.toString()
+            binding.tilPassword.error = null 
+        }
 
         binding.etTelefono.doAfterTextChanged { s ->
             val text = s.toString()
@@ -81,48 +96,12 @@ class RegisterFragment : Fragment() {
                 binding.etTelefono.setText(formatted)
                 binding.etTelefono.setSelection(binding.etTelefono.length())
             }
+            viewModel.regPhone.value = binding.etTelefono.text.toString()
+            binding.tilTelefono.error = null
         }
 
         binding.btnRegister.setOnClickListener {
-            val name = binding.etNombre.text.toString().trim()
-            val email = binding.etEmail.text.toString().trim()
-            val phone = binding.etTelefono.text.toString().trim()
-            val pass = binding.etPassword.text.toString().trim()
-
-            var isValid = true
-
-            if (name.isEmpty()) {
-                binding.tilNombre.error = getString(R.string.msg_complete_fields)
-                isValid = false
-            }
-
-            if (email.isEmpty()) {
-                binding.tilEmail.error = getString(R.string.msg_complete_fields)
-                isValid = false
-            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                binding.tilEmail.error = getString(R.string.msg_invalid_email)
-                isValid = false
-            }
-
-            if (phone.isEmpty()) {
-                binding.tilTelefono.error = getString(R.string.msg_complete_fields)
-                isValid = false
-            } else if (phone.length < 10) {
-                binding.tilTelefono.error = getString(R.string.msg_invalid_phone)
-                isValid = false
-            }
-
-            if (pass.isEmpty()) {
-                binding.tilPassword.error = getString(R.string.msg_complete_fields)
-                isValid = false
-            } else if (pass.length < 6) {
-                binding.tilPassword.error = getString(R.string.msg_password_length)
-                isValid = false
-            }
-
-            if (isValid) {
-                viewModel.register(RegisterRequest(name, email, phone, pass))
-            }
+            viewModel.register()
         }
 
         binding.tvGoToLogin.setOnClickListener {

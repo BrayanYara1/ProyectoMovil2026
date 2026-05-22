@@ -19,8 +19,10 @@ import com.example.gestionturnosapp.databinding.FragmentTurnoDetailBinding
 import com.example.gestionturnosapp.notifications.ReminderReceiver
 import com.example.gestionturnosapp.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 
+@AndroidEntryPoint
 class TurnoDetailFragment : Fragment() {
 
     private var _binding: FragmentTurnoDetailBinding? = null

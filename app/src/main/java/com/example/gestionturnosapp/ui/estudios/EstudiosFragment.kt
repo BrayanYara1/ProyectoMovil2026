@@ -22,9 +22,11 @@ import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentEstudiosBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 import java.util.Locale
 
+@AndroidEntryPoint
 class EstudiosFragment : Fragment() {
 
     private var _binding: FragmentEstudiosBinding? = null

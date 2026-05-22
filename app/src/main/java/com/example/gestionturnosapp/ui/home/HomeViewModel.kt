@@ -12,14 +12,18 @@ import com.example.gestionturnosapp.data.NuevoTurnoRequest
 import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.data.TurnoRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import javax.inject.Inject
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val turnoRepository = TurnoRepository()
-    private val medRepository = MedicamentoRepository()
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    application: Application,
+    private val turnoRepository: TurnoRepository,
+    private val medRepository: MedicamentoRepository
+) : AndroidViewModel(application) {
 
     private val _turnosCount = MutableLiveData<Int>()
     val turnosCount: LiveData<Int> = _turnosCount
@@ -48,13 +52,15 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadFromCache() {
-        val cachedTurnos = OfflineCacheManager.getCachedTurnos(getApplication())
-        if (cachedTurnos.isNotEmpty()) {
-            updateTurnosUI(cachedTurnos)
-        }
-        val cachedMeds = OfflineCacheManager.getCachedMedicamentos(getApplication())
-        if (cachedMeds.isNotEmpty()) {
-            _medicamentos.value = cachedMeds
+        viewModelScope.launch {
+            val cachedTurnos = OfflineCacheManager.getCachedTurnos(getApplication())
+            if (cachedTurnos.isNotEmpty()) {
+                updateTurnosUI(cachedTurnos)
+            }
+            val cachedMeds = OfflineCacheManager.getCachedMedicamentos(getApplication())
+            if (cachedMeds.isNotEmpty()) {
+                _medicamentos.value = cachedMeds
+            }
         }
     }
 

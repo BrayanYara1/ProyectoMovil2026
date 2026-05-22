@@ -22,8 +22,10 @@ import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.ActivityMainBinding
 import com.example.gestionturnosapp.network.RetrofitClient
 import com.example.gestionturnosapp.notifications.NotificationHelper
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var navController: NavController? = null

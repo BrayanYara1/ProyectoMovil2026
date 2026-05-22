@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.google.firebase.crashlytics)
+    id("kotlin-kapt")
+    alias(libs.plugins.hilt.android)
 }
 
 android {
@@ -71,6 +73,21 @@ dependencies {
     
     // Coil for Image Loading
     implementation(libs.coil)
+
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    kapt(libs.androidx.room.compiler)
+
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // Shimmer
+    implementation(libs.facebook.shimmer)
+
+    // Biometric
+    implementation(libs.androidx.biometric)
 
     // Firebase
     implementation(platform(libs.firebase.bom))

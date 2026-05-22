@@ -7,11 +7,15 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.gestionturnosapp.data.Especialidad
 import com.example.gestionturnosapp.data.EspecialidadRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
+import javax.inject.Inject
 
-class EspecialidadesViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = EspecialidadRepository()
+@HiltViewModel
+class EspecialidadesViewModel @Inject constructor(
+    application: Application,
+    private val repository: EspecialidadRepository
+) : AndroidViewModel(application) {
     private val _allEspecialidades = MutableLiveData<List<Especialidad>>()
     private val _searchQuery = MutableLiveData<String>("")
     private val _localeTrigger = MutableLiveData<Long>(System.currentTimeMillis())

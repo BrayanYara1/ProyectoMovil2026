@@ -14,7 +14,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentLoginBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
@@ -37,35 +39,18 @@ class LoginFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        // Limpiar errores mientras el usuario escribe
-        binding.etEmail.doAfterTextChanged { binding.tilEmail.error = null }
-        binding.etPassword.doAfterTextChanged { binding.tilPassword.error = null }
+        // Enlace bidireccional manual (sin DataBinding para mayor control)
+        binding.etEmail.doAfterTextChanged { 
+            viewModel.loginEmail.value = it.toString()
+            binding.tilEmail.error = null 
+        }
+        binding.etPassword.doAfterTextChanged { 
+            viewModel.loginPassword.value = it.toString()
+            binding.tilPassword.error = null 
+        }
 
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString().trim()
-            val password = binding.etPassword.text.toString().trim()
-
-            var isValid = true
-            
-            if (email.isEmpty()) {
-                binding.tilEmail.error = getString(R.string.msg_complete_fields)
-                isValid = false
-            } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                binding.tilEmail.error = getString(R.string.msg_invalid_email)
-                isValid = false
-            }
-
-            if (password.isEmpty()) {
-                binding.tilPassword.error = getString(R.string.msg_complete_fields)
-                isValid = false
-            } else if (password.length < 6) {
-                binding.tilPassword.error = getString(R.string.msg_password_length)
-                isValid = false
-            }
-
-            if (isValid) {
-                viewModel.login(email, password)
-            }
+            viewModel.login()
         }
 
         binding.tvGoToRegister.setOnClickListener {
@@ -74,6 +59,12 @@ class LoginFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.isLoginValid.observe(viewLifecycleOwner) { isValid ->
+            binding.btnLogin.isEnabled = isValid
+            // Opción: Cambiar opacidad del botón si no es válido
+            binding.btnLogin.alpha = if (isValid) 1.0f else 0.5f
+        }
+
         viewModel.authState.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {

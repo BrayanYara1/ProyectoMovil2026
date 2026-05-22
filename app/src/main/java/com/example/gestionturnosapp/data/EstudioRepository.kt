@@ -1,9 +1,14 @@
 package com.example.gestionturnosapp.data
 
+import com.example.gestionturnosapp.network.ApiService
 import com.example.gestionturnosapp.network.RetrofitClient
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class EstudioRepository {
-    private val apiService = RetrofitClient.instance
+@Singleton
+class EstudioRepository @Inject constructor(
+    private val apiService: ApiService
+) {
 
     suspend fun getEstudios(): List<EstudioMedico> {
         val response = apiService.getEstudios()

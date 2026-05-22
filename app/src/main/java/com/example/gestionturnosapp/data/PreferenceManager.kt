@@ -9,6 +9,7 @@ object PreferenceManager {
     private const val KEY_DARK_MODE = "dark_mode"
     private const val KEY_NOTIFICATIONS = "notifications_enabled"
     private const val KEY_LOCALE = "app_locale"
+    private const val KEY_BIOMETRIC = "biometric_enabled"
 
     private fun getPrefs(context: Context): SharedPreferences {
         return context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
@@ -51,5 +52,13 @@ object PreferenceManager {
 
     fun setNotificationsEnabled(context: Context, enabled: Boolean) {
         getPrefs(context).edit().putBoolean(KEY_NOTIFICATIONS, enabled).apply()
+    }
+
+    fun isBiometricEnabled(context: Context): Boolean {
+        return getPrefs(context).getBoolean(KEY_BIOMETRIC, false)
+    }
+
+    fun setBiometricEnabled(context: Context, enabled: Boolean) {
+        getPrefs(context).edit().putBoolean(KEY_BIOMETRIC, enabled).apply()
     }
 }

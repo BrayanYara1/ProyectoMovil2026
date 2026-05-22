@@ -1,8 +1,11 @@
 package com.example.gestionturnosapp.data
 
 import com.example.gestionturnosapp.R
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class EspecialidadRepository {
+@Singleton
+class EspecialidadRepository @Inject constructor() {
     fun getEspecialidades(): List<Especialidad> {
         return listOf(
             Especialidad(1, R.string.name_cardiology, R.string.desc_cardiology, R.drawable.ic_specialty_cardiology),

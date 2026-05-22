@@ -21,11 +21,13 @@ import com.example.gestionturnosapp.databinding.FragmentSolicitarTurnoBinding
 import com.example.gestionturnosapp.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 
+@AndroidEntryPoint
 class SolicitarTurnoFragment : Fragment() {
 
     private var _binding: FragmentSolicitarTurnoBinding? = null
@@ -45,12 +47,15 @@ class SolicitarTurnoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         UserManager.usuarioActual?.let {
+            viewModel.formPacienteNombre.value = it.nombre
             binding.etPacienteNombre.setText(it.nombre)
         }
 
         val especialidadArg = arguments?.getString("especialidadNombre")
         especialidadArg?.let { esp ->
-            binding.etMotivo.setText(getString(R.string.reason_consultation_for, esp))
+            val motivo = getString(R.string.reason_consultation_for, esp)
+            viewModel.formMotivo.value = motivo
+            binding.etMotivo.setText(motivo)
         }
 
         setupObservers()
@@ -64,33 +69,25 @@ class SolicitarTurnoFragment : Fragment() {
         binding.btnConfirmarTurno.setOnClickListener {
             view.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             
-            if (validarCampos()) {
-                val nombre = binding.etPacienteNombre.text.toString()
-                val fecha = binding.etFecha.text.toString()
-                val hora = binding.etHora.text.toString()
-                val motivo = binding.etMotivo.text.toString()
+            val fecha = viewModel.formFecha.value ?: ""
+            val hora = viewModel.formHora.value ?: ""
 
-                if (DateUtils.isPastDateTime(fecha, hora)) {
-                    Snackbar.make(binding.root, R.string.msg_past_date, Snackbar.LENGTH_LONG).show()
-                    return@setOnClickListener
-                }
-                
-                MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.msg_confirm_booking_title)
-                    .setMessage(getString(R.string.msg_confirm_booking_body, fecha, hora))
-                    .setPositiveButton(R.string.btn_confirm) { _, _ ->
-                        // Prevenir múltiples clics
-                        binding.btnConfirmarTurno.isEnabled = false
-
-                        viewModel.crearNuevoTurno(
-                            nombre, fecha, hora, motivo, 
-                            especialidad = especialidadArg,
-                            doctor = getString(R.string.label_assigned_doctor)
-                        )
-                    }
-                    .setNegativeButton(R.string.btn_cancel, null)
-                    .show()
+            if (DateUtils.isPastDateTime(fecha, hora)) {
+                Snackbar.make(binding.root, R.string.msg_past_date, Snackbar.LENGTH_LONG).show()
+                return@setOnClickListener
             }
+            
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.msg_confirm_booking_title)
+                .setMessage(getString(R.string.msg_confirm_booking_body, fecha, hora))
+                .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                    viewModel.crearNuevoTurno(
+                        especialidad = especialidadArg,
+                        doctor = getString(R.string.label_assigned_doctor)
+                    )
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .show()
         }
     }
 
@@ -128,27 +125,6 @@ class SolicitarTurnoFragment : Fragment() {
             .show()
     }
 
-    private fun validarCampos(): Boolean {
-        var esValido = true
-        if (binding.etPacienteNombre.text.isNullOrBlank()) {
-            binding.tilPacienteNombre.error = getString(R.string.msg_complete_fields)
-            esValido = false
-        } else { binding.tilPacienteNombre.error = null }
-        if (binding.etFecha.text.isNullOrBlank()) {
-            binding.tilFecha.error = getString(R.string.msg_complete_fields)
-            esValido = false
-        } else { binding.tilFecha.error = null }
-        if (binding.etHora.text.isNullOrBlank()) {
-            binding.tilHora.error = getString(R.string.msg_complete_fields)
-            esValido = false
-        } else { binding.tilHora.error = null }
-        if (binding.etMotivo.text.isNullOrBlank()) {
-            binding.tilMotivo.error = getString(R.string.msg_complete_fields)
-            esValido = false
-        } else { binding.tilMotivo.error = null }
-        return esValido
-    }
-
     private fun setupPickers() {
         binding.etFecha.setOnClickListener {
             val c = Calendar.getInstance()
@@ -178,15 +154,32 @@ class SolicitarTurnoFragment : Fragment() {
     }
 
     private fun setupValidationListeners() {
-        val watcher = object : TextWatcher {
+        binding.etPacienteNombre.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                validarDebounced()
+            override fun afterTextChanged(s: Editable?) { viewModel.formPacienteNombre.value = s.toString() }
+        })
+        binding.etFecha.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) { 
+                viewModel.formFecha.value = s.toString()
+                validarDebounced() 
             }
-        }
-        binding.etFecha.addTextChangedListener(watcher)
-        binding.etHora.addTextChangedListener(watcher)
+        })
+        binding.etHora.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) { 
+                viewModel.formHora.value = s.toString()
+                validarDebounced() 
+            }
+        })
+        binding.etMotivo.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) { viewModel.formMotivo.value = s.toString() }
+        })
     }
 
     private var availabilityCheckJob: kotlinx.coroutines.Job? = null
@@ -194,8 +187,8 @@ class SolicitarTurnoFragment : Fragment() {
         availabilityCheckJob?.cancel()
         availabilityCheckJob = viewLifecycleOwner.lifecycleScope.launch {
             kotlinx.coroutines.delay(500)
-            val fecha = binding.etFecha.text.toString().trim()
-            val hora = binding.etHora.text.toString().trim()
+            val fecha = viewModel.formFecha.value ?: ""
+            val hora = viewModel.formHora.value ?: ""
             if (fecha.isNotEmpty() && hora.isNotEmpty()) {
                 viewModel.verificarDisponibilidad(fecha, hora)
             }
@@ -203,6 +196,11 @@ class SolicitarTurnoFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.isFormValid.observe(viewLifecycleOwner) { isValid ->
+            binding.btnConfirmarTurno.isEnabled = isValid
+            binding.btnConfirmarTurno.alpha = if (isValid) 1.0f else 0.5f
+        }
+
         viewModel.isSlotAvailable.observe(viewLifecycleOwner) { disponible ->
             actualizarEstadoBotonDisponibilidad(disponible)
         }

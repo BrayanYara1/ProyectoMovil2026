@@ -20,8 +20,10 @@ import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentMedicamentosBinding
 import com.example.gestionturnosapp.notifications.ReminderReceiver
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
 
+@AndroidEntryPoint
 class MedicamentosFragment : Fragment() {
 
     private var _binding: FragmentMedicamentosBinding? = null

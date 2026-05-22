@@ -19,7 +19,9 @@ import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.data.Usuario
 import com.example.gestionturnosapp.databinding.FragmentUserProfileBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class UserProfileFragment : Fragment() {
 
     private var _binding: FragmentUserProfileBinding? = null

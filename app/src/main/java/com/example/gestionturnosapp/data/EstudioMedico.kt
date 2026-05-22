@@ -1,8 +1,12 @@
 package com.example.gestionturnosapp.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
+@Entity(tableName = "estudios")
 data class EstudioMedico(
+    @PrimaryKey
     @SerializedName("_id", alternate = ["id"])
     val id: String,
     val titulo: String,

@@ -10,7 +10,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.databinding.FragmentEspecialidadesBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class EspecialidadesFragment : Fragment() {
 
     private var _binding: FragmentEspecialidadesBinding? = null

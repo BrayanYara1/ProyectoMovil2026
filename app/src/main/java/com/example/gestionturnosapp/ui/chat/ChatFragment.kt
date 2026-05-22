@@ -10,7 +10,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.data.Resource
 import com.example.gestionturnosapp.databinding.FragmentChatBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ChatFragment : Fragment() {
 
     private var _binding: FragmentChatBinding? = null
@@ -55,6 +57,11 @@ class ChatFragment : Fragment() {
     }
 
     private fun setupObservers() {
+        viewModel.isAiAssistantMode.observe(viewLifecycleOwner) { isAi ->
+            binding.toolbar.title = if (isAi) "Asistente Inteligente" else "Chat Médico"
+            binding.tvTypingIndicator.text = if (isAi) "El asistente está analizando..." else "El doctor está escribiendo..."
+        }
+
         viewModel.mensajes.observe(viewLifecycleOwner) { resource ->
             binding.progressBar.isVisible = resource is Resource.Loading && adapter.currentList.isEmpty()
             

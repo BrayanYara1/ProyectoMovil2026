@@ -14,9 +14,14 @@ import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentWelcomeBinding
+import com.example.gestionturnosapp.data.PreferenceManager
+import com.example.gestionturnosapp.util.BiometricHelper
+import android.widget.Toast
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class WelcomeFragment : Fragment() {
 
     private var _binding: FragmentWelcomeBinding? = null
@@ -50,15 +55,32 @@ class WelcomeFragment : Fragment() {
         val user = UserManager.getUser(requireContext())
         
         if (user != null) {
-            // Usuario logueado: Navegación automática después de un breve retraso
+            // Usuario logueado
             binding.layoutAuthButtons.isVisible = false
             binding.btnGetStarted.isVisible = true
             binding.tvWelcomeSubtitle.text = getString(R.string.welcome_back, user.nombre)
             
-            viewLifecycleOwner.lifecycleScope.launch {
-                kotlinx.coroutines.delay(1500) // 1.5 segundos para que vea la bienvenida
-                if (isAdded) {
-                    findNavController().navigate(R.id.action_welcomeFragment_to_homeFragment)
+            val isBiometricEnabled = PreferenceManager.isBiometricEnabled(requireContext())
+            val isBiometricAvailable = BiometricHelper.isBiometricAvailable(requireContext())
+
+            if (isBiometricEnabled && isBiometricAvailable) {
+                BiometricHelper.showBiometricPrompt(
+                    activity = requireActivity(),
+                    title = getString(R.string.title_biometric_auth),
+                    subtitle = getString(R.string.subtitle_biometric_auth),
+                    onSuccess = {
+                        findNavController().navigate(R.id.action_welcomeFragment_to_homeFragment)
+                    },
+                    onError = { error ->
+                        Toast.makeText(requireContext(), "${getString(R.string.error_biometric_auth)}: $error", Toast.LENGTH_SHORT).show()
+                    }
+                )
+            } else {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(1500)
+                    if (isAdded) {
+                        findNavController().navigate(R.id.action_welcomeFragment_to_homeFragment)
+                    }
                 }
             }
             

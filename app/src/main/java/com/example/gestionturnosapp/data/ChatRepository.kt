@@ -1,10 +1,15 @@
 package com.example.gestionturnosapp.data
 
+import com.example.gestionturnosapp.network.ApiService
 import com.example.gestionturnosapp.network.RetrofitClient
 import retrofit2.Response
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ChatRepository {
-    private val apiService = RetrofitClient.instance
+@Singleton
+class ChatRepository @Inject constructor(
+    private val apiService: ApiService
+) {
 
     private fun parseError(response: Response<*>): String {
         return try {

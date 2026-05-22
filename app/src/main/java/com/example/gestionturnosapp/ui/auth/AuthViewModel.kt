@@ -1,26 +1,73 @@
 package com.example.gestionturnosapp.ui.auth
 
 import android.app.Application
+import android.util.Patterns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.*
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class AuthViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val repository = AuthRepository()
+@HiltViewModel
+class AuthViewModel @Inject constructor(
+    application: Application,
+    private val repository: AuthRepository
+) : AndroidViewModel(application) {
     
     private val _authState = MutableLiveData<Resource<Usuario>>(Resource.Idle)
     val authState: LiveData<Resource<Usuario>> = _authState
 
-    fun login(email: String, contrasena: String) {
+    // CAMPOS REACTIVOS LOGIN
+    val loginEmail = MutableLiveData("")
+    val loginPassword = MutableLiveData("")
+
+    val isLoginValid = MediatorLiveData<Boolean>().apply {
+        val observer = { _: String? ->
+            val email = loginEmail.value ?: ""
+            val pass = loginPassword.value ?: ""
+            value = Patterns.EMAIL_ADDRESS.matcher(email).matches() && pass.length >= 6
+        }
+        addSource(loginEmail, observer)
+        addSource(loginPassword, observer)
+    }
+
+    // CAMPOS REACTIVOS REGISTRO
+    val regName = MutableLiveData("")
+    val regEmail = MutableLiveData("")
+    val regPhone = MutableLiveData("")
+    val regPassword = MutableLiveData("")
+
+    val isRegisterValid = MediatorLiveData<Boolean>().apply {
+        val observer = { _: String? ->
+            val name = regName.value ?: ""
+            val email = regEmail.value ?: ""
+            val phone = regPhone.value ?: ""
+            val pass = regPassword.value ?: ""
+            
+            value = name.isNotBlank() && 
+                    Patterns.EMAIL_ADDRESS.matcher(email).matches() && 
+                    phone.length >= 10 && 
+                    pass.length >= 6
+        }
+        addSource(regName, observer)
+        addSource(regEmail, observer)
+        addSource(regPhone, observer)
+        addSource(regPassword, observer)
+    }
+
+    fun login() {
+        val email = loginEmail.value ?: return
+        val pass = loginPassword.value ?: return
+        
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
-                val response = repository.login(LoginRequest(email, contrasena))
+                val response = repository.login(LoginRequest(email, pass))
                 if (response.isSuccessful) {
                     val authResponse = response.body()
                     val usuario = authResponse?.usuario
@@ -45,7 +92,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun register(request: RegisterRequest) {
+    fun register() {
+        val name = regName.value ?: return
+        val email = regEmail.value ?: return
+        val phone = regPhone.value ?: return
+        val pass = regPassword.value ?: return
+        
+        val request = RegisterRequest(name, email, phone, pass)
+
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
