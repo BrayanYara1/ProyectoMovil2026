@@ -42,26 +42,18 @@ class MainActivity : AppCompatActivity() {
     ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Pantalla de Inicio (Splash Screen) - Debe llamarse antes de super.onCreate
         installSplashScreen()
-
-        // Habilitar Edge-to-Edge para un diseño inmersivo
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        // Aplicar Tema antes de crear la actividad
-        PreferenceManager.applyTheme(PreferenceManager.isDarkMode(this))
-        
         super.onCreate(savedInstanceState)
         
-        // Cargar sesión
-        UserManager.loadUser(this)
+        try {
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+        } catch (t: Throwable) {
+            android.util.Log.e("MainActivity", "Inflate Error", t)
+            // Fallback manual if ViewBinding fails
+            setContentView(R.layout.activity_main)
+        }
 
-        // Inicializar ViewBinding
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        setSupportActionBar(binding.toolbar)
-        
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
         
@@ -76,7 +68,6 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigation.setupWithNavController(controller)
 
             controller.addOnDestinationChangedListener { _, destination, _ ->
-                // Actualizar visibilidad de componentes
                 when (destination.id) {
                     R.id.homeFragment, R.id.turnosListFragment, R.id.userProfileFragment, R.id.especialidadesFragment -> {
                         binding.bottomNavigation.visibility = View.VISIBLE
@@ -91,27 +82,12 @@ class MainActivity : AppCompatActivity() {
                         binding.toolbar.visibility = View.VISIBLE
                     }
                 }
-
-                // Ajustar iconos de barra de estado según el fondo del fragmento
-                val isDarkHeader = destination.id in setOf(
-                    R.id.homeFragment, 
-                    R.id.welcomeFragment, 
-                    R.id.loginFragment, 
-                    R.id.registerFragment,
-                    R.id.turnosListFragment
-                )
-                
-                // Si es un header oscuro (azul), queremos iconos claros (windowLightStatusBar = false)
-                // Si es un fondo claro, queremos iconos oscuros (windowLightStatusBar = true)
-                WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDarkHeader
             }
         }
         
-        pedirPermisoNotificaciones()
-        sincronizarFcmToken()
-        NotificationHelper.createNotificationChannels(this)
-        handleIntent(intent)
-        observeNetworkStatus()
+        // Desactivar funciones secundarias para probar estabilidad
+        // sincronizarFcmToken()
+        // observeNetworkStatus()
     }
 
     private fun observeNetworkStatus() {

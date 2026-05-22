@@ -117,11 +117,15 @@ class MedicamentosFragment : Fragment() {
             android.app.TimePickerDialog(
                 requireContext(),
                 { _, hour, minute ->
-                    binding.etMedNext.setText(String.format(java.util.Locale.getDefault(), "%02d:%02d", hour, minute))
+                    val calendar = Calendar.getInstance()
+                    calendar.set(Calendar.HOUR_OF_DAY, hour)
+                    calendar.set(Calendar.MINUTE, minute)
+                    val sdf = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
+                    binding.etMedNext.setText(sdf.format(calendar.time))
                 },
                 c[Calendar.HOUR_OF_DAY],
                 c[Calendar.MINUTE],
-                true
+                false
             ).show()
         }
     }
@@ -175,12 +179,13 @@ class MedicamentosFragment : Fragment() {
     private fun scheduleMedicationAlarm(med: Medicamento) {
         try {
             val alarmManager = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            val parts = med.proximaToma.split(":")
-            if (parts.size != 2) return
+            val timeDate = com.example.gestionturnosapp.util.DateUtils.parseTime(med.proximaToma) ?: return
 
+            val timeCalendar = Calendar.getInstance().apply { time = timeDate }
+            
             val calendar = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, parts[0].toInt())
-                set(Calendar.MINUTE, parts[1].toInt())
+                set(Calendar.HOUR_OF_DAY, timeCalendar.get(Calendar.HOUR_OF_DAY))
+                set(Calendar.MINUTE, timeCalendar.get(Calendar.MINUTE))
                 set(Calendar.SECOND, 0)
                 
                 if (timeInMillis <= System.currentTimeMillis()) {

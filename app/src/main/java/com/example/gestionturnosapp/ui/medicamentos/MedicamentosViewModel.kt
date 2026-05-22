@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.data.Medicamento
+import com.example.gestionturnosapp.data.NuevoMedicamentoRequest
 import com.example.gestionturnosapp.data.MedicamentoRepository
 import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Resource
@@ -74,8 +75,9 @@ class MedicamentosViewModel @Inject constructor(
             )
 
             try {
-                // 2. Intentar guardar en el servidor
-                val result = repository.agregarMedicamento(nuevoMed)
+                // 2. Intentar guardar en el servidor usando un Request DTO (sin ID)
+                val request = NuevoMedicamentoRequest(nombre, dosis, frecuencia, proximaToma)
+                val result = repository.agregarMedicamento(request)
                 if (result != null) {
                     _operationResource.value = Resource.Success(result)
                     
@@ -99,7 +101,7 @@ class MedicamentosViewModel @Inject constructor(
                     
                     _operationResource.value = Resource.Success(nuevoMed)
                 } else {
-                    _operationResource.value = Resource.Error(e.localizedMessage ?: "Error")
+                    _operationResource.value = Resource.Error(e.localizedMessage ?: "Error de conexión o validación")
                 }
             } finally {
                 _isLoading.value = false
@@ -115,7 +117,8 @@ class MedicamentosViewModel @Inject constructor(
             val synced = mutableListOf<Medicamento>()
             pending.forEach { med ->
                 try {
-                    repository.agregarMedicamento(med)
+                    val request = NuevoMedicamentoRequest(med.nombre, med.dosis, med.frecuencia, med.proximaToma, med.notas)
+                    repository.agregarMedicamento(request)
                     synced.add(med)
                 } catch (_: Exception) {
                     return@forEach

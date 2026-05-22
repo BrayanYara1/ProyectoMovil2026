@@ -7,7 +7,10 @@ import dagger.hilt.android.HiltAndroidApp
 class GestionTurnosApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        // Inicializar SQLCipher para que la DB cifrada funcione correctamente
-        net.sqlcipher.database.SQLiteDatabase.loadLibs(this)
+        try {
+            net.sqlcipher.database.SQLiteDatabase.loadLibs(this)
+        } catch (t: Throwable) {
+            android.util.Log.e("App", "LoadLibs Error", t)
+        }
     }
 }

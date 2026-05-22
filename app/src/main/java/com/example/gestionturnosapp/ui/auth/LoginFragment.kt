@@ -74,6 +74,7 @@ class LoginFragment : Fragment() {
                 is Resource.Success -> {
                     binding.progressBar.isVisible = false
                     binding.btnLogin.isEnabled = true
+                    viewModel.resetAuthState() // Limpiar estado para evitar re-navegación
                     findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
                 }
                 is Resource.Error -> {

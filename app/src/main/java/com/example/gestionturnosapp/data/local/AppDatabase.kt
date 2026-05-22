@@ -25,21 +25,34 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                // Passphrase para el cifrado (Idealmente obtenida de Keystore)
-                val passphrase = net.sqlcipher.database.SQLiteDatabase.getBytes("gestion_turnos_secure_key".toCharArray())
-                val factory = SupportFactory(passphrase)
+                try {
+                    buildDatabase(context)
+                } catch (t: Throwable) {
+                    android.util.Log.e("AppDatabase", "Error building database, attempting to recover", t)
+                    try {
+                        context.deleteDatabase("gestion_turnos_db")
+                        buildDatabase(context)
+                    } catch (t2: Throwable) {
+                        // Último recurso: crear sin cifrado si SQLCipher falla catastróficamente
+                        Room.databaseBuilder(
+                            context.applicationContext,
+                            AppDatabase::class.java,
+                            "gestion_turnos_db_unencrypted"
+                        ).fallbackToDestructiveMigration().build()
+                    }
+                }
+            }.also { INSTANCE = it }
+        }
 
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "gestion_turnos_db",
-                )
-                .openHelperFactory(factory)
-                .fallbackToDestructiveMigration()
-                .build()
-                INSTANCE = instance
-                instance
-            }
+        private fun buildDatabase(context: Context): AppDatabase {
+            // TEMPORAL: Desactivar cifrado SQLCipher para diagnosticar el crash
+            return Room.databaseBuilder(
+                context.applicationContext,
+                AppDatabase::class.java,
+                "gestion_turnos_db_diag",
+            )
+            .fallbackToDestructiveMigration()
+            .build()
         }
     }
 }

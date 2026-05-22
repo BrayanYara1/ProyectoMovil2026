@@ -19,31 +19,18 @@ object UserManager {
     var token: String? = null
 
     private fun getEncryptedPrefs(context: Context): SharedPreferences {
-        val masterKey = MasterKey.Builder(context.applicationContext)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        // TEMPORAL: Usar SharedPreferences normales para diagnosticar el crash
+        return context.getSharedPreferences(PREF_NAME + "_diagnostics", Context.MODE_PRIVATE)
+    }
 
-        return try {
-            EncryptedSharedPreferences.create(
-                context.applicationContext,
-                PREF_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        } catch (_: Exception) {
-            // Si hay un error de cifrado (común al cambiar versiones o Keystore), 
-            // borramos las preferencias corruptas para que la app no crashee.
-            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit { clear() }
-            // Intentamos crear de nuevo
-            EncryptedSharedPreferences.create(
-                context.applicationContext,
-                PREF_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        }
+    private fun createEncryptedPrefs(context: Context, masterKey: MasterKey): SharedPreferences {
+        return EncryptedSharedPreferences.create(
+            context.applicationContext,
+            PREF_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
     fun saveUser(context: Context, usuario: Usuario, authToken: String? = null) {

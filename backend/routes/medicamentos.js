@@ -22,6 +22,19 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 });
 
+router.put('/:id', authenticateToken, async (req, res) => {
+    try {
+        const med = await Medicamento.findOneAndUpdate(
+            { _id: req.params.id, usuarioId: req.userId },
+            req.body,
+            { new: true }
+        );
+        res.json(med);
+    } catch (error) {
+        res.status(500).json({ mensaje: "Error" });
+    }
+});
+
 router.delete('/:id', authenticateToken, async (req, res) => {
     try {
         await Medicamento.findOneAndDelete({ _id: req.params.id, usuarioId: req.userId });

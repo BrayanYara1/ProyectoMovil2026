@@ -45,7 +45,7 @@ interface ApiService {
     suspend fun getMedicamentos(): Response<List<Medicamento>>
 
     @POST("api/medicamentos")
-    suspend fun agregarMedicamento(@Body med: Medicamento): Response<Medicamento>
+    suspend fun agregarMedicamento(@Body request: NuevoMedicamentoRequest): Response<Medicamento>
 
     @PUT("api/medicamentos/{id}")
     suspend fun updateMedicamento(@Path("id") id: String, @Body med: Medicamento): Response<Medicamento>

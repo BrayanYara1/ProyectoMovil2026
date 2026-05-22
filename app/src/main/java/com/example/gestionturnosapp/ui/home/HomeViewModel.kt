@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Medicamento
+import com.example.gestionturnosapp.data.NuevoMedicamentoRequest
 import com.example.gestionturnosapp.data.MedicamentoRepository
 import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Turno
@@ -121,9 +122,13 @@ class HomeViewModel @Inject constructor(
         _nextTurno.value = turnos.asSequence()
             .filter { it.estado.lowercase() in listOf("pendiente", "pending") }
             .minByOrNull { turno ->
-                // Normalizar hora para ordenamiento lexicográfico correcto (HH:mm)
-                val horaNormalizada = com.example.gestionturnosapp.util.DateUtils.formatTo24h(turno.hora)
-                "${turno.fecha} $horaNormalizada"
+                try {
+                    // Normalizar hora para ordenamiento lexicográfico correcto (HH:mm)
+                    val horaNormalizada = com.example.gestionturnosapp.util.DateUtils.formatTo24h(turno.hora)
+                    "${turno.fecha} $horaNormalizada"
+                } catch (e: Exception) {
+                    "${turno.fecha} ${turno.hora}"
+                }
             }
     }
 
@@ -134,7 +139,8 @@ class HomeViewModel @Inject constructor(
                 val syncedMeds = mutableListOf<Medicamento>()
                 for (med in pendingMeds) {
                     try {
-                        val res = medRepository.agregarMedicamento(med)
+                        val request = NuevoMedicamentoRequest(med.nombre, med.dosis, med.frecuencia, med.proximaToma, med.notas)
+                        val res = medRepository.agregarMedicamento(request)
                         if (res != null) syncedMeds.add(med)
                     } catch (e: Exception) {
                         break // Si falla uno, paramos este ciclo
@@ -155,11 +161,10 @@ class HomeViewModel @Inject constructor(
                 // Lógica simple: Extraer horas de la frecuencia (ej: "Cada 8 horas" -> 8)
                 val hoursToAdd = med.frecuencia.filter { it.isDigit() }.toIntOrNull() ?: 8
                 
-                val sdf = java.text.SimpleDateFormat("HH:mm", java.util.Locale.US)
                 val calendar = java.util.Calendar.getInstance()
                 
-                // Si la proxima toma ya pasó, empezamos desde ahora
-                val proximaDate = try { sdf.parse(med.proximaToma) } catch (_: Exception) { null }
+                // Intentar parsear la hora actual del medicamento
+                val proximaDate = com.example.gestionturnosapp.util.DateUtils.parseTime(med.proximaToma)
                 if (proximaDate != null) {
                     val pCal = java.util.Calendar.getInstance().apply { time = proximaDate }
                     // Solo actualizamos la hora/minuto en el calendario de "hoy"
@@ -168,6 +173,9 @@ class HomeViewModel @Inject constructor(
                 }
                 
                 calendar.add(java.util.Calendar.HOUR_OF_DAY, hoursToAdd)
+                
+                // Guardar en formato AM/PM para consistencia visual
+                val sdf = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
                 val nuevaProximaToma = sdf.format(calendar.time)
                 
                 val medActualizado = med.copy(proximaToma = nuevaProximaToma)

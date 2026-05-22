@@ -102,7 +102,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateUI() {
-        val user = UserManager.getUser(requireContext())
+        val context = context ?: return
+        val user = UserManager.getUser(context)
         val rawName = user?.nombre ?: getString(R.string.label_anonymous)
         
         // Limpieza del nombre: Eliminar versión (vX.X.X), saltos de línea y espacios extra
@@ -123,7 +124,8 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateAvatar() {
-        val savedImageUri = ImageStorageManager.getProfileImageUri(requireContext())
+        val context = context ?: return
+        val savedImageUri = ImageStorageManager.getProfileImageUri(context)
         binding.ivUserAvatar.load(savedImageUri) {
             crossfade(true)
             placeholder(R.drawable.ic_nav_profile)

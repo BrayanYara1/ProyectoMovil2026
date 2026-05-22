@@ -19,8 +19,8 @@ class MedicamentoRepository @Inject constructor(
         }
     }
 
-    suspend fun agregarMedicamento(med: Medicamento): Medicamento? {
-        val response = apiService.agregarMedicamento(med)
+    suspend fun agregarMedicamento(request: NuevoMedicamentoRequest): Medicamento? {
+        val response = apiService.agregarMedicamento(request)
         if (response.isSuccessful) {
             return response.body()
         } else {
