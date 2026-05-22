@@ -1,15 +1,17 @@
 package com.example.gestionturnosapp.ui.medicamentos
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.MedicamentoRepository
+import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Resource
 import kotlinx.coroutines.launch
 
-class MedicamentosViewModel : ViewModel() {
+class MedicamentosViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = MedicamentoRepository()
 
@@ -22,21 +24,15 @@ class MedicamentosViewModel : ViewModel() {
     private val _operationResource = MutableLiveData<Resource<Medicamento>>(Resource.Idle)
     val operationResource: LiveData<Resource<Medicamento>> = _operationResource
 
-    init {
-        // Se carga desde el Fragment con contexto para usar caché
-    }
-
-    fun loadMedicamentos(context: android.content.Context? = null) {
+    fun loadMedicamentos() {
         viewModelScope.launch {
             _medicamentosResource.value = Resource.Loading
             _isLoading.value = true
             
             // Offline Cache First
-            context?.let {
-                val cached = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedMedicamentos(it)
-                if (cached.isNotEmpty()) {
-                    _medicamentosResource.value = Resource.Success(cached)
-                }
+            val cached = OfflineCacheManager.getCachedMedicamentos(getApplication())
+            if (cached.isNotEmpty()) {
+                _medicamentosResource.value = Resource.Success(cached)
             }
 
             try {
@@ -44,7 +40,7 @@ class MedicamentosViewModel : ViewModel() {
                 _medicamentosResource.value = Resource.Success(list)
                 
                 // Save to Cache
-                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveMedicamentos(it, list) }
+                OfflineCacheManager.saveMedicamentos(getApplication(), list)
             } catch (e: Exception) {
                 if (_medicamentosResource.value !is Resource.Success) {
                     _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
@@ -55,7 +51,7 @@ class MedicamentosViewModel : ViewModel() {
         }
     }
 
-    fun agregarMedicamento(context: android.content.Context, nombre: String, dosis: String, frecuencia: String, proximaToma: String) {
+    fun agregarMedicamento(nombre: String, dosis: String, frecuencia: String, proximaToma: String) {
         viewModelScope.launch {
             _operationResource.value = Resource.Loading
             _isLoading.value = true
@@ -70,15 +66,15 @@ class MedicamentosViewModel : ViewModel() {
                 val result = repository.agregarMedicamento(nuevoMed)
                 if (result != null) {
                     _operationResource.value = Resource.Success(result)
-                    loadMedicamentos(context)
+                    loadMedicamentos()
                 } else {
                     _operationResource.value = Resource.Error("Error al guardar")
                 }
             } catch (e: Exception) {
-                if (com.example.gestionturnosapp.data.OfflineCacheManager.isNetworkError(e)) {
-                    com.example.gestionturnosapp.data.OfflineCacheManager.addPendingMed(context, nuevoMed)
+                if (OfflineCacheManager.isNetworkError(e)) {
+                    OfflineCacheManager.addPendingMed(getApplication(), nuevoMed)
                     _operationResource.value = Resource.Success(nuevoMed.copy(id = "pending"))
-                    loadMedicamentos(context)
+                    loadMedicamentos()
                 } else {
                     _operationResource.value = Resource.Error(e.localizedMessage ?: "Error de red")
                 }
@@ -88,8 +84,8 @@ class MedicamentosViewModel : ViewModel() {
         }
     }
 
-    fun syncPendingMeds(context: android.content.Context) {
-        val pending = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingMeds(context)
+    fun syncPendingMeds() {
+        val pending = OfflineCacheManager.getPendingMeds(getApplication())
         if (pending.isEmpty()) return
 
         viewModelScope.launch {
@@ -103,8 +99,8 @@ class MedicamentosViewModel : ViewModel() {
                 }
             }
             if (synced.isNotEmpty()) {
-                com.example.gestionturnosapp.data.OfflineCacheManager.removePendingMeds(context, synced)
-                loadMedicamentos(context)
+                OfflineCacheManager.removePendingMeds(getApplication(), synced)
+                loadMedicamentos()
             }
         }
     }
@@ -113,12 +109,12 @@ class MedicamentosViewModel : ViewModel() {
         _operationResource.value = Resource.Idle
     }
 
-    fun eliminarMedicamento(context: android.content.Context, id: String) {
+    fun eliminarMedicamento(id: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 repository.eliminarMedicamento(id)
-                loadMedicamentos(context)
+                loadMedicamentos()
             } catch (e: Exception) {
                 _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error al eliminar")
             } finally {

@@ -66,8 +66,8 @@ class EstudiosFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.syncPendingEstudios(requireContext())
-        viewModel.loadEstudios(requireContext())
+        viewModel.syncPendingEstudios()
+        viewModel.loadEstudios()
     }
 
     private fun setupRecyclerView() {
@@ -76,7 +76,7 @@ class EstudiosFragment : Fragment() {
                 .setTitle(getString(R.string.title_delete_study))
                 .setMessage(getString(R.string.msg_confirm_delete_study, estudio.titulo))
                 .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
-                    viewModel.eliminarEstudio(requireContext(), estudio.id)
+                    viewModel.eliminarEstudio(estudio.id)
                 }
                 .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
                 .show()
@@ -99,14 +99,16 @@ class EstudiosFragment : Fragment() {
         })
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.loadEstudios(requireContext())
+            viewModel.loadEstudios()
         }
 
         binding.fabAddEstudio.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             showAddEstudioDialog()
         }
 
         binding.chipDateStart.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             showDatePicker { date ->
                 filterStart = date
                 binding.chipDateStart.text = getString(R.string.filter_from_date, date)
@@ -115,6 +117,7 @@ class EstudiosFragment : Fragment() {
         }
 
         binding.chipDateEnd.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             showDatePicker { date ->
                 filterEnd = date
                 binding.chipDateEnd.text = getString(R.string.filter_to_date, date)
@@ -123,6 +126,7 @@ class EstudiosFragment : Fragment() {
         }
 
         binding.btnClearFilters.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             filterStart = null
             filterEnd = null
             binding.chipDateStart.text = getString(R.string.filter_from_date, getString(R.string.all_dates))
@@ -249,7 +253,7 @@ class EstudiosFragment : Fragment() {
                         finalPhotoPath = com.example.gestionturnosapp.data.ImageStorageManager.saveStudyImage(requireContext(), uri)
                     }
                     
-                    viewModel.agregarEstudio(requireContext(), titulo, fecha, tipo, resultado, finalPhotoPath)
+                    viewModel.agregarEstudio(titulo, fecha, tipo, resultado, finalPhotoPath)
                 }
             }
             .setNegativeButton(getString(R.string.btn_cancel_dialog), null)

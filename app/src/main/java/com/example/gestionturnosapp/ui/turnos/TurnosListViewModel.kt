@@ -1,10 +1,11 @@
 package com.example.gestionturnosapp.ui.turnos
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.data.TurnoRepository
@@ -15,9 +16,10 @@ import com.example.gestionturnosapp.util.DateUtils
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class TurnosListViewModel : ViewModel() {
+class TurnosListViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = TurnoRepository()
+    private val context = application.applicationContext
 
     private val _turnos = MutableLiveData<List<Turno>>()
     
@@ -75,18 +77,16 @@ class TurnosListViewModel : ViewModel() {
         }
     }
 
-    fun fetchTurnos(context: android.content.Context? = null) {
+    fun fetchTurnos() {
         viewModelScope.launch {
             _turnosResource.value = Resource.Loading
             _isLoading.value = true
             
             // 1. Cargar de caché primero para respuesta instantánea (Offline Pro)
-            context?.let {
-                val cached = OfflineCacheManager.getCachedTurnos(it)
-                if (cached.isNotEmpty()) {
-                    _turnos.value = cached
-                    _turnosResource.value = Resource.Success(cached)
-                }
+            val cached = OfflineCacheManager.getCachedTurnos(context)
+            if (cached.isNotEmpty()) {
+                _turnos.value = cached
+                _turnosResource.value = Resource.Success(cached)
             }
 
             try {
@@ -95,7 +95,7 @@ class TurnosListViewModel : ViewModel() {
                 _turnosResource.value = Resource.Success(turnosList)
                 
                 // 2. Guardar en caché para uso offline
-                context?.let { OfflineCacheManager.saveTurnos(it, turnosList) }
+                OfflineCacheManager.saveTurnos(context, turnosList)
                 
             } catch (e: Exception) {
                 android.util.Log.e("TurnosListViewModel", "Error fetchTurnos", e)
@@ -109,7 +109,7 @@ class TurnosListViewModel : ViewModel() {
         }
     }
 
-    fun crearNuevoTurno(context: android.content.Context, nombre: String, fecha: String, hora: String, motivo: String, especialidad: String? = null, doctor: String? = null) {
+    fun crearNuevoTurno(nombre: String, fecha: String, hora: String, motivo: String, especialidad: String? = null, doctor: String? = null) {
         viewModelScope.launch {
             _createTurnoResource.value = Resource.Loading
             _isLoading.value = true
@@ -129,7 +129,7 @@ class TurnosListViewModel : ViewModel() {
                 val nuevoTurno = repository.crearTurno(request)
                 if (nuevoTurno != null) {
                     _createTurnoResource.value = Resource.Success(nuevoTurno)
-                    fetchTurnos(context)
+                    fetchTurnos()
                 } else {
                     _createTurnoResource.value = Resource.Error("Error")
                 }
@@ -138,7 +138,7 @@ class TurnosListViewModel : ViewModel() {
                     // MODO OFFLINE: Guardar para sincronizar después
                     OfflineCacheManager.addPendingTurno(context, request)
                     _createTurnoResource.value = Resource.Success(Turno("pending", nombre, fechaNormalizada, horaNormalizada, motivo, context.getString(R.string.status_pending_offline), especialidad, doctor))
-                    fetchTurnos(context)
+                    fetchTurnos()
                 } else {
                     _createTurnoResource.value = Resource.Error(e.localizedMessage ?: "Error")
                 }
@@ -148,7 +148,7 @@ class TurnosListViewModel : ViewModel() {
         }
     }
 
-    fun syncPendingTurnos(context: android.content.Context) {
+    fun syncPendingTurnos() {
         val pending = OfflineCacheManager.getPendingTurnos(context)
         if (pending.isEmpty()) return
 
@@ -165,7 +165,7 @@ class TurnosListViewModel : ViewModel() {
             }
             if (synced.isNotEmpty()) {
                 OfflineCacheManager.removePendingTurnos(context, synced)
-                fetchTurnos(context)
+                fetchTurnos()
             }
         }
     }
@@ -200,13 +200,13 @@ class TurnosListViewModel : ViewModel() {
         }
     }
 
-    fun eliminarTurno(context: android.content.Context, id: String) {
+    fun eliminarTurno(id: String) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
                 repository.eliminarTurno(id)
                 _turnoEliminadoExitosamente.value = true
-                fetchTurnos(context)
+                fetchTurnos()
             } catch (e: Exception) {
                 _errorMessage.value = e.localizedMessage ?: "Error"
             } finally {

@@ -6,7 +6,7 @@ import java.util.*
 object DateUtils {
     private val isoDateFormat get() = SimpleDateFormat("yyyy-MM-dd", Locale.US)
     private fun getDisplayTimeFormat() = SimpleDateFormat("hh:mm a", Locale.getDefault())
-    private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm", "H:mm", "hh:mm a", "h:mm a")
+    private val inputFormats = listOf("hh:mm a", "h:mm a", "HH:mm", "H:mm")
 
     fun parseTime(time: String?): Date? {
         if (time.isNullOrBlank()) return null
@@ -74,10 +74,15 @@ object DateUtils {
             val timeStr = formatTo24h(hora)
             val timeParts = timeStr.split(":")
             
+            if (timeParts.size < 2) return true
+
+            val hourInt = timeParts[0].toIntOrNull() ?: return true
+            val minuteInt = timeParts[1].toIntOrNull() ?: return true
+
             val calendar = Calendar.getInstance()
             calendar.time = dateObj
-            calendar.set(Calendar.HOUR_OF_DAY, timeParts[0].toInt())
-            calendar.set(Calendar.MINUTE, timeParts[1].toInt())
+            calendar.set(Calendar.HOUR_OF_DAY, hourInt)
+            calendar.set(Calendar.MINUTE, minuteInt)
             calendar.set(Calendar.SECOND, 0)
             
             calendar.time.before(Date())

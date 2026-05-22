@@ -1,9 +1,9 @@
 package com.example.gestionturnosapp.ui.home
 
-import android.content.Context
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Medicamento
@@ -12,10 +12,11 @@ import com.example.gestionturnosapp.data.NuevoTurnoRequest
 import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Turno
 import com.example.gestionturnosapp.data.TurnoRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     private val turnoRepository = TurnoRepository()
     private val medRepository = MedicamentoRepository()
@@ -38,54 +39,53 @@ class HomeViewModel : ViewModel() {
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    private var refreshJob: Job? = null
+
     init {
         loadRandomHealthTip()
+        // Carga inicial desde caché para rapidez
+        loadFromCache()
     }
 
-    private var refreshJob: kotlinx.coroutines.Job? = null
+    private fun loadFromCache() {
+        val cachedTurnos = OfflineCacheManager.getCachedTurnos(getApplication())
+        if (cachedTurnos.isNotEmpty()) {
+            updateTurnosUI(cachedTurnos)
+        }
+        val cachedMeds = OfflineCacheManager.getCachedMedicamentos(getApplication())
+        if (cachedMeds.isNotEmpty()) {
+            _medicamentos.value = cachedMeds
+        }
+    }
 
-    fun refreshData(context: Context? = null) {
-        loadRandomHealthTip()
+    fun refreshData() {
         refreshJob?.cancel()
         refreshJob = viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
-            
-            // 1. Carga desde Caché (Respuesta instantánea)
-            context?.let {
-                val cachedTurnos = OfflineCacheManager.getCachedTurnos(it)
-                if (cachedTurnos.isNotEmpty()) {
-                    updateTurnosUI(cachedTurnos)
-                }
-                val cachedMeds = OfflineCacheManager.getCachedMedicamentos(it)
-                if (cachedMeds.isNotEmpty()) {
-                    _medicamentos.value = cachedMeds
-                }
-            }
 
             try {
-                // 2. Carga desde Servidor
+                // 1. Carga desde Servidor
                 val turnos = turnoRepository.getTurnos()
                 updateTurnosUI(turnos)
-                context?.let { OfflineCacheManager.saveTurnos(it, turnos) }
+                OfflineCacheManager.saveTurnos(getApplication(), turnos)
 
                 val meds = medRepository.getMedicamentos()
                 _medicamentos.value = meds
-                context?.let { OfflineCacheManager.saveMedicamentos(it, meds) }
+                OfflineCacheManager.saveMedicamentos(getApplication(), meds)
 
             } catch (e: Exception) {
                 if (refreshJob?.isActive == true) {
-                    // Si no hay nada en LiveData aún, mostramos error
+                    val msg = e.localizedMessage ?: ""
+                    _errorMessage.value = if (msg.contains("resolve host", true) || msg.contains("connect", true)) {
+                        getApplication<Application>().getString(R.string.msg_no_connection)
+                    } else {
+                        msg.ifBlank { getApplication<Application>().getString(R.string.msg_error_unknown) }
+                    }
+                    
+                    // Si falló el servidor, nos aseguramos de que al menos la caché sea visible
                     if (_nextTurno.value == null && _medicamentos.value.isNullOrEmpty()) {
-                        _turnosCount.value = 0
-                        _nextTurno.value = null
-                        _medicamentos.value = emptyList()
-                        val msg = e.localizedMessage ?: ""
-                        _errorMessage.value = if (msg.contains("resolve host", true) || msg.contains("connect", true)) {
-                            context?.getString(R.string.msg_no_connection) ?: "Sin conexión a internet"
-                        } else {
-                            msg.ifBlank { "Error al conectar con el servidor" }
-                        }
+                        loadFromCache()
                     }
                 }
             } finally {
@@ -101,12 +101,10 @@ class HomeViewModel : ViewModel() {
             .firstOrNull()
     }
 
-    fun refreshTurnosCount(context: Context) = refreshData(context)
-
-    fun syncAll(context: Context) {
+    fun syncAll() {
         viewModelScope.launch {
             // Sincronizar Turnos
-            val pendingTurnos = OfflineCacheManager.getPendingTurnos(context)
+            val pendingTurnos = OfflineCacheManager.getPendingTurnos(getApplication())
             if (pendingTurnos.isNotEmpty()) {
                 val syncedTurnos = mutableListOf<NuevoTurnoRequest>()
                 pendingTurnos.forEach { 
@@ -116,12 +114,12 @@ class HomeViewModel : ViewModel() {
                     } catch (_: Exception) {} 
                 }
                 if (syncedTurnos.isNotEmpty()) {
-                    OfflineCacheManager.removePendingTurnos(context, syncedTurnos)
+                    OfflineCacheManager.removePendingTurnos(getApplication(), syncedTurnos)
                 }
             }
 
             // Sincronizar Meds
-            val pendingMeds = OfflineCacheManager.getPendingMeds(context)
+            val pendingMeds = OfflineCacheManager.getPendingMeds(getApplication())
             if (pendingMeds.isNotEmpty()) {
                 val syncedMeds = mutableListOf<Medicamento>()
                 pendingMeds.forEach { 
@@ -131,11 +129,11 @@ class HomeViewModel : ViewModel() {
                     } catch (_: Exception) {} 
                 }
                 if (syncedMeds.isNotEmpty()) {
-                    OfflineCacheManager.removePendingMeds(context, syncedMeds)
+                    OfflineCacheManager.removePendingMeds(getApplication(), syncedMeds)
                 }
             }
 
-            refreshData(context)
+            refreshData()
         }
     }
 

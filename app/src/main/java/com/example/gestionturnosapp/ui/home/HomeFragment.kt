@@ -49,48 +49,22 @@ class HomeFragment : Fragment() {
         updateUI()
 
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.refreshData(requireContext())
+            viewModel.refreshData()
         }
 
-        binding.cardHomeProfile.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_userProfileFragment)
+        val navigateTo = { actionId: Int ->
+            view?.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            findNavController().navigate(actionId)
         }
 
-        binding.cardSearch.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_especialidadesFragment)
-        }
-
-        binding.cardSolicitarTurno.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_solicitarTurnoFragment)
-        }
-
-        binding.cardMisTurnos.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_turnosListFragment)
-        }
-
-        binding.cardEspecialidades.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_especialidadesFragment)
-        }
-
-        binding.cardMedication.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_medicamentosFragment)
-        }
-
-        binding.cardEstudios.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_estudiosFragment)
-        }
-
-        binding.cardChat.setOnClickListener {
-            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
-            findNavController().navigate(R.id.action_homeFragment_to_chatFragment)
-        }
+        binding.cardHomeProfile.setOnClickListener { navigateTo(R.id.action_homeFragment_to_userProfileFragment) }
+        binding.cardSearch.setOnClickListener { navigateTo(R.id.action_homeFragment_to_especialidadesFragment) }
+        binding.cardSolicitarTurno.setOnClickListener { navigateTo(R.id.action_homeFragment_to_solicitarTurnoFragment) }
+        binding.cardMisTurnos.setOnClickListener { navigateTo(R.id.action_homeFragment_to_turnosListFragment) }
+        binding.cardEspecialidades.setOnClickListener { navigateTo(R.id.action_homeFragment_to_especialidadesFragment) }
+        binding.cardMedication.setOnClickListener { navigateTo(R.id.action_homeFragment_to_medicamentosFragment) }
+        binding.cardEstudios.setOnClickListener { navigateTo(R.id.action_homeFragment_to_estudiosFragment) }
+        binding.cardChat.setOnClickListener { navigateTo(R.id.action_homeFragment_to_chatFragment) }
 
         binding.cardUrgencias.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
@@ -121,14 +95,13 @@ class HomeFragment : Fragment() {
 
     private fun updateUI() {
         val user = UserManager.getUser(requireContext())
-        var name = user?.nombre ?: getString(R.string.label_anonymous)
+        val rawName = user?.nombre ?: getString(R.string.label_anonymous)
         
-        // LIMPIEZA AGRESIVA: Eliminar versión (vX.X.X), saltos de línea y emojis previos del nombre
-        name = name.replace(Regex("\\s*\\(v?\\d+(\\.\\d+)*\\)\\s*"), "")
-                   .split("\n")[0]
-                   .trim()
+        // Limpieza del nombre: Eliminar versión (vX.X.X), saltos de línea y espacios extra
+        val cleanName = rawName.replace(Regex("\\s*\\(v?\\d+(\\.\\d+)*\\)\\s*"), "")
+                              .split("\n")[0]
+                              .trim()
         
-        // Saludo Dinámico según la hora del día
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val greetingRes = when (hour) {
             in 6..11 -> R.string.greeting_morning
@@ -137,7 +110,7 @@ class HomeFragment : Fragment() {
             else -> R.string.welcome
         }
         
-        binding.tvGreeting.text = getString(greetingRes, name)
+        binding.tvGreeting.text = getString(greetingRes, cleanName)
         updateAvatar()
     }
 
@@ -290,26 +263,30 @@ class HomeFragment : Fragment() {
     }
 
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {
-        binding.layoutMedication.removeAllViews()
-        if (meds.isEmpty()) {
-            binding.layoutMedication.addView(binding.tvNoMeds)
-            return
-        }
+        binding.tvNoMeds.isVisible = meds.isEmpty()
+        binding.layoutMedication.apply {
+            // Remove everything except the empty state message
+            val viewsToRemove = mutableListOf<View>()
+            for (i in 0 until childCount) {
+                val child = getChildAt(i)
+                if (child.id != R.id.tvNoMeds) viewsToRemove.add(child)
+            }
+            viewsToRemove.forEach { removeView(it) }
 
-        // Mostrar solo los 2-3 primeros para no saturar el home
-        meds.take(3).forEach { med ->
-            val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, binding.layoutMedication, false)
-            medView.findViewById<TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
-            medView.findViewById<TextView>(R.id.tvMedSchedule).text = med.frecuencia
-            
-            medView.findViewById<View>(R.id.btnDeleteMed).visibility = View.GONE
-            binding.layoutMedication.addView(medView)
+            // Add top 3 medications
+            meds.take(3).forEach { med ->
+                val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, this, false)
+                medView.findViewById<TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
+                medView.findViewById<TextView>(R.id.tvMedSchedule).text = med.frecuencia
+                medView.findViewById<View>(R.id.btnDeleteMed).isVisible = false
+                addView(medView)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.syncAll(requireContext())
+        viewModel.syncAll()
         updateUI()
     }
 

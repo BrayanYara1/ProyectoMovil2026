@@ -1,20 +1,21 @@
 package com.example.gestionturnosapp.ui.estudios
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MediatorLiveData
 import com.example.gestionturnosapp.data.EstudioMedico
 import com.example.gestionturnosapp.data.EstudioRepository
+import com.example.gestionturnosapp.data.OfflineCacheManager
 import com.example.gestionturnosapp.data.Resource
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
-class EstudiosViewModel : ViewModel() {
+class EstudiosViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository = EstudioRepository()
+    private val context = application.applicationContext
 
     private val _allEstudios = MutableLiveData<List<EstudioMedico>>(emptyList())
     private val _startDate = MutableLiveData<String?>(null)
@@ -45,10 +46,6 @@ class EstudiosViewModel : ViewModel() {
     }
     val estudios: LiveData<Resource<List<EstudioMedico>>> = _estudiosResource
 
-    init {
-        // Carga iniciada desde Fragment para soporte Offline
-    }
-
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
     }
@@ -65,17 +62,15 @@ class EstudiosViewModel : ViewModel() {
         _createResource.value = Resource.Idle
     }
 
-    fun loadEstudios(context: android.content.Context? = null) {
+    fun loadEstudios() {
         viewModelScope.launch {
             _estudiosResource.value = Resource.Loading
             
             // Offline Cache First
-            context?.let {
-                val cached = com.example.gestionturnosapp.data.OfflineCacheManager.getCachedEstudios(it)
-                if (cached.isNotEmpty()) {
-                    _allEstudios.value = cached
-                    _estudiosResource.value = Resource.Success(cached)
-                }
+            val cached = OfflineCacheManager.getCachedEstudios(getApplication())
+            if (cached.isNotEmpty()) {
+                _allEstudios.value = cached
+                _estudiosResource.value = Resource.Success(cached)
             }
 
             try {
@@ -83,7 +78,7 @@ class EstudiosViewModel : ViewModel() {
                 _allEstudios.value = list
                 
                 // Save to Cache
-                context?.let { com.example.gestionturnosapp.data.OfflineCacheManager.saveEstudios(it, list) }
+                OfflineCacheManager.saveEstudios(getApplication(), list)
             } catch (e: Exception) {
                 if (_allEstudios.value.isNullOrEmpty()) {
                     _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al cargar")
@@ -92,7 +87,7 @@ class EstudiosViewModel : ViewModel() {
         }
     }
 
-    fun agregarEstudio(context: android.content.Context, titulo: String, fecha: String, tipo: String, resultado: String, photoUrl: String? = null) {
+    fun agregarEstudio(titulo: String, fecha: String, tipo: String, resultado: String, photoUrl: String? = null) {
         viewModelScope.launch {
             _createResource.value = Resource.Loading
             val nuevo = EstudioMedico("", titulo, fecha, tipo, resultado, urlDocumento = photoUrl)
@@ -101,16 +96,16 @@ class EstudiosViewModel : ViewModel() {
                 
                 if (response.isSuccessful && response.body() != null) {
                     _createResource.value = Resource.Success(response.body()!!)
-                    loadEstudios(context)
+                    loadEstudios()
                 } else {
                     val errorMsg = response.errorBody()?.string() ?: "Error desconocido del servidor"
                     _createResource.value = Resource.Error("Error ${response.code()}: $errorMsg")
                 }
             } catch (e: Exception) {
-                if (com.example.gestionturnosapp.data.OfflineCacheManager.isNetworkError(e)) {
-                    com.example.gestionturnosapp.data.OfflineCacheManager.addPendingEstudio(context, nuevo)
+                if (OfflineCacheManager.isNetworkError(e)) {
+                    OfflineCacheManager.addPendingEstudio(getApplication(), nuevo)
                     _createResource.value = Resource.Success(nuevo.copy(id = "pending"))
-                    loadEstudios(context)
+                    loadEstudios()
                 } else {
                     _createResource.value = Resource.Error("Error de conexión: ${e.localizedMessage}")
                 }
@@ -118,8 +113,8 @@ class EstudiosViewModel : ViewModel() {
         }
     }
 
-    fun syncPendingEstudios(context: android.content.Context) {
-        val pending = com.example.gestionturnosapp.data.OfflineCacheManager.getPendingEstudios(context)
+    fun syncPendingEstudios() {
+        val pending = OfflineCacheManager.getPendingEstudios(getApplication())
         if (pending.isEmpty()) return
 
         viewModelScope.launch {
@@ -133,18 +128,18 @@ class EstudiosViewModel : ViewModel() {
                 }
             }
             if (synced.isNotEmpty()) {
-                com.example.gestionturnosapp.data.OfflineCacheManager.removePendingEstudios(context, synced)
-                loadEstudios(context)
+                OfflineCacheManager.removePendingEstudios(getApplication(), synced)
+                loadEstudios()
             }
         }
     }
 
-    fun eliminarEstudio(context: android.content.Context, id: String) {
+    fun eliminarEstudio(id: String) {
         viewModelScope.launch {
             _estudiosResource.value = Resource.Loading
             try {
                 repository.eliminarEstudio(id)
-                loadEstudios(context)
+                loadEstudios()
             } catch (e: Exception) {
                 _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al eliminar")
             }

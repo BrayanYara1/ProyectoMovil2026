@@ -83,7 +83,6 @@ class SolicitarTurnoFragment : Fragment() {
                         binding.btnConfirmarTurno.isEnabled = false
 
                         viewModel.crearNuevoTurno(
-                            requireContext(),
                             nombre, fecha, hora, motivo, 
                             especialidad = especialidadArg,
                             doctor = getString(R.string.label_assigned_doctor)

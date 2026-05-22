@@ -64,7 +64,7 @@ class LoginFragment : Fragment() {
             }
 
             if (isValid) {
-                viewModel.login(email, password, requireContext())
+                viewModel.login(email, password)
             }
         }
 

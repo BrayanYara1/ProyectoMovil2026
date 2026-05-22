@@ -10,21 +10,22 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.lifecycleScope
-import com.example.gestionturnosapp.network.RetrofitClient
-import kotlinx.coroutines.launch
+import androidx.fragment.app.viewModels
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.databinding.FragmentUserProfileBinding
-import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.data.ImageStorageManager
+import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.data.Usuario
+import com.example.gestionturnosapp.databinding.FragmentUserProfileBinding
 
 class UserProfileFragment : Fragment() {
 
     private var _binding: FragmentUserProfileBinding? = null
     private val binding get() = _binding!!
+
+    private val viewModel: ProfileViewModel by viewModels()
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
@@ -53,7 +54,7 @@ class UserProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        cargarDatos()
+        setupObservers()
 
         binding.ivProfileAvatar.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
@@ -71,17 +72,46 @@ class UserProfileFragment : Fragment() {
         }
     }
 
-    private fun cargarDatos() {
-        val usuario = UserManager.loadUser(requireContext())
-        if (usuario != null) {
-            binding.tvProfileName.text = usuario.nombre
-            binding.tvProfileEmail.text = usuario.email
-            binding.tvProfilePhone.text = usuario.telefono ?: getString(R.string.label_not_specified)
-        } else {
-            binding.tvProfileName.text = getString(R.string.loading_user)
+    private fun setupObservers() {
+        viewModel.user.observe(viewLifecycleOwner) { usuario ->
+            if (usuario != null) {
+                binding.tvProfileName.text = usuario.nombre
+                binding.tvProfileEmail.text = usuario.email
+                binding.tvProfilePhone.text = usuario.telefono ?: getString(R.string.label_not_specified)
+            } else {
+                binding.tvProfileName.text = getString(R.string.loading_user)
+            }
+            updateAvatar()
         }
 
-        updateAvatar()
+        viewModel.updateStatus.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    binding.btnEditProfile.isEnabled = false
+                }
+                is Resource.Success -> {
+                    binding.btnEditProfile.isEnabled = true
+                    Toast.makeText(context, R.string.msg_profile_update_success, Toast.LENGTH_SHORT).show()
+                    viewModel.resetUpdateStatus()
+                }
+                is Resource.Error -> {
+                    binding.btnEditProfile.isEnabled = true
+                    when (resource.message) {
+                        "SESSION_EXPIRED" -> handleSessionExpired()
+                        "OFFLINE_SAVED" -> {
+                            Toast.makeText(context, R.string.msg_profile_sync_local, Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {
+                            Toast.makeText(context, resource.message, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    viewModel.resetUpdateStatus()
+                }
+                else -> {
+                    binding.btnEditProfile.isEnabled = true
+                }
+            }
+        }
     }
 
     private fun updateAvatar() {
@@ -103,7 +133,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun mostrarDialogoEdicion() {
-        val usuario = UserManager.loadUser(requireContext())
+        val usuario = viewModel.user.value
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle(R.string.btn_edit_data)
 
@@ -140,48 +170,13 @@ class UserProfileFragment : Fragment() {
                     email = usuario?.email ?: "",
                     telefono = nuevoTelefono
                 )
-                actualizarPerfilEnServidor(nuevoUsuario)
+                viewModel.updateProfile(nuevoUsuario)
             }
             dialog.dismiss()
         }
         builder.setNegativeButton(R.string.btn_cancel) { dialog, _ -> dialog.cancel() }
 
         builder.show()
-    }
-
-    private fun actualizarPerfilEnServidor(usuario: Usuario) {
-        lifecycleScope.launch {
-            try {
-                val response = RetrofitClient.instance.updateProfile(usuario)
-                if (response.isSuccessful) {
-                    val usuarioActualizado = response.body() ?: usuario
-                    UserManager.saveUser(requireContext(), usuarioActualizado)
-                    cargarDatos()
-                    Toast.makeText(context, R.string.msg_profile_update_success, Toast.LENGTH_SHORT).show()
-                } else {
-                    val errorBody = response.errorBody()?.string() ?: ""
-                    android.util.Log.e("SyncError", "Code: ${response.code()} Body: $errorBody")
-                    
-                    val displayError = if (errorBody.contains("ruta") || errorBody.contains("not exist")) {
-                        getString(R.string.msg_server_route_error)
-                    } else if (response.code() == 401) {
-                        handleSessionExpired()
-                        return@launch
-                    } else {
-                        "${getString(R.string.msg_generic_sync_error)} (${response.code()})"
-                    }
-                    
-                    Toast.makeText(context, displayError, Toast.LENGTH_SHORT).show()
-                    // Si falla el servidor, al menos guardamos local para la sesión actual
-                    UserManager.saveUser(requireContext(), usuario)
-                    cargarDatos()
-                }
-            } catch (e: Exception) {
-                Toast.makeText(context, R.string.msg_profile_sync_local, Toast.LENGTH_SHORT).show()
-                UserManager.saveUser(requireContext(), usuario)
-                cargarDatos()
-            }
-        }
     }
 
     private fun handleSessionExpired() {

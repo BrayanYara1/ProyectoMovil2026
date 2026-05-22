@@ -74,8 +74,9 @@ class TurnoDetailFragment : Fragment() {
 
             // Formatear hora para mostrar AM/PM siempre (Resiliente)
             val displayTime = DateUtils.formatDisplayTime(hora)
+            val displayDate = DateUtils.formatDisplayDate(requireContext(), fecha)
 
-            tvDetailFechaHora.text = getString(R.string.detail_date_time_format, fecha, displayTime)
+            tvDetailFechaHora.text = getString(R.string.detail_date_time_format, displayDate, displayTime)
             tvDetailMotivo.text = motivo
             
             // Configurar Estado Visual
@@ -128,7 +129,7 @@ class TurnoDetailFragment : Fragment() {
                     .setTitle(R.string.title_delete_appointment)
                     .setMessage(R.string.msg_delete_confirm)
                     .setPositiveButton(R.string.btn_delete) { _, _ ->
-                        viewModel.eliminarTurno(requireContext(), id)
+                        viewModel.eliminarTurno(id)
                     }
                     .setNegativeButton(R.string.btn_cancel, null)
                     .show()

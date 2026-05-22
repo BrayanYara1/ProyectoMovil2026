@@ -41,8 +41,8 @@ class TurnosListFragment : Fragment() {
         setupObservers()
         setupFab()
         
-        viewModel.syncPendingTurnos(requireContext())
-        viewModel.fetchTurnos(requireContext())
+        viewModel.syncPendingTurnos()
+        viewModel.fetchTurnos()
     }
 
     private fun setupFilters() {
@@ -100,7 +100,7 @@ class TurnosListFragment : Fragment() {
 
     private fun setupSwipeRefresh() {
         binding.swipeRefresh.setOnRefreshListener {
-            viewModel.fetchTurnos(requireContext())
+            viewModel.fetchTurnos()
         }
         binding.swipeRefresh.setColorSchemeResources(R.color.primary)
     }
@@ -111,7 +111,7 @@ class TurnosListFragment : Fragment() {
             .setMessage(getString(R.string.msg_delete_confirm_with_name, turno.pacienteNombre))
             .setPositiveButton(getString(R.string.btn_delete)) { _, _ ->
                 view?.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-                viewModel.eliminarTurno(requireContext(), turno.id)
+                viewModel.eliminarTurno(turno.id)
             }
             .setNegativeButton(getString(R.string.btn_cancel), null)
             .show()
@@ -199,7 +199,7 @@ class TurnosListFragment : Fragment() {
         
         binding.btnRetry.setOnClickListener {
             view?.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-            viewModel.fetchTurnos(requireContext())
+            viewModel.fetchTurnos()
         }
     }
 

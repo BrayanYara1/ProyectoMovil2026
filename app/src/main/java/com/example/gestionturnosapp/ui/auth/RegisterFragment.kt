@@ -121,7 +121,7 @@ class RegisterFragment : Fragment() {
             }
 
             if (isValid) {
-                viewModel.register(RegisterRequest(name, email, phone, pass), requireContext())
+                viewModel.register(RegisterRequest(name, email, phone, pass))
             }
         }
 

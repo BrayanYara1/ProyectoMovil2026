@@ -47,8 +47,8 @@ class MedicamentosFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.syncPendingMeds(requireContext())
-        viewModel.loadMedicamentos(requireContext())
+        viewModel.syncPendingMeds()
+        viewModel.loadMedicamentos()
     }
 
     private fun setupRecyclerView() {
@@ -57,7 +57,7 @@ class MedicamentosFragment : Fragment() {
                 .setTitle(getString(R.string.title_delete_medication))
                 .setMessage(getString(R.string.msg_confirm_delete_medication, med.nombre))
                 .setPositiveButton(getString(R.string.btn_delete_confirm)) { _, _ ->
-                    viewModel.eliminarMedicamento(requireContext(), med.id)
+                    viewModel.eliminarMedicamento(med.id)
                 }
                 .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
                 .show()
@@ -72,6 +72,7 @@ class MedicamentosFragment : Fragment() {
         }
 
         binding.btnSaveMed.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             val nombre = binding.etMedName.text.toString()
             val dosis = binding.etMedDose.text.toString()
             val frecuencia = binding.etMedFreq.text.toString()
@@ -90,7 +91,7 @@ class MedicamentosFragment : Fragment() {
             }
 
             binding.btnSaveMed.isEnabled = false // Prevenir duplicados
-            viewModel.agregarMedicamento(requireContext(), nombre, dosis, frecuencia, proxima)
+            viewModel.agregarMedicamento(nombre, dosis, frecuencia, proxima)
         }
 
         binding.etMedNext.setOnClickListener {
