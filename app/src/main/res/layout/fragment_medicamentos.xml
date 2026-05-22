@@ -72,7 +72,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:hint="Dosis (ej: 500mg)">
+                        android:hint="@string/hint_med_dose">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etMedDose"
@@ -86,7 +86,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:hint="Frecuencia (ej: Cada 8 horas)">
+                        android:hint="@string/hint_med_freq">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etMedFreq"
@@ -100,7 +100,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:hint="Próxima toma">
+                        android:hint="@string/hint_med_next">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etMedNext"

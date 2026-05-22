@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Salud Activa</string>
+    <string name="app_name">Salud Activa Pro</string>
 
     <string name="login_welcome_subtitle">Your health, in a single touch</string>
     <string name="login_card_title">LOG IN</string>
-
-    <!-- Login & Register -->
+    <!-- Authentication -->
     <string name="welcome">Welcome, %1$s</string>
     <string name="welcome_back">Hello again, %1$s!</string>
     <string name="login_subtitle">Log in to manage your appointments</string>
@@ -24,20 +23,43 @@
     <string name="msg_connection_error">Connection error: %1$s</string>
     <string name="msg_login_success">Welcome back!</string>
     <string name="msg_login_error">Incorrect email or password</string>
-    <string name="msg_invalid_email">Please enter a real and valid email address</string>
+    <string name="msg_invalid_email">Enter a real and valid email address</string>
 
     <!-- Home -->
-    <string name="home_greeting">Hello, %1$s!</string>
-    <string name="home_subtitle">What do you need today?</string>
-    <string name="menu_request_appointment">Book Appointment</string>
-    <string name="menu_my_appointments">My Appointments</string>
+    <!-- Home Dashboard (Short and precise) -->
+    <string name="dash_request_appointment">New Appoint.</string>
+    <string name="dash_emergencies">Emergencies</string>
+    <string name="dash_share">Share</string>
+    <string name="dash_search_hint">Search doctors, specialties…</string>
+
+    <string name="home_greeting">Hello again, %1$s!</string>
+    <string name="title_featured_services">Featured Services</string>
+    <string name="label_share_health_question">Do you want to share your health?</string>
+    <string name="subtitle_share_health">Send a summary of your appointments and medications.</string>
+    <string name="title_medical_recommendation">Medical Recommendation</string>
+    <string name="title_today_medication">Today\'s Medication</string>
+    <string name="label_specialists">Specialists</string>
+    <string name="label_studies_short">Studies</string>
+    <string name="label_help_short">Help</string>
+    <string name="label_emergencies_short">Emergencies</string>
+    <string name="label_care_short">My Care</string>
+    <string name="home_subtitle">How are you feeling today?</string>
+    <string name="hint_search_home">Search doctors or specialties…</string>
+    <string name="title_quick_actions">Quick Actions</string>
+    <string name="label_share_health">Share Health</string>
+    <string name="title_my_services">My Services</string>
+    <string name="menu_request_appointment">Book an appointment</string>
+    <string name="menu_my_appointments">My Care</string>
     <string name="menu_home">Home</string>
     <string name="menu_profile">My Profile</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_my_studies">My Results</string>
+    <string name="menu_emergencies">I Need Help</string>
+    <string name="menu_help">Assistance</string>
 
-    <!-- Appointments / Book Appointment -->
-    <string name="title_request_appointment">Book Appointment</string>
-    <string name="subtitle_solicitar_turno">Complete the details to schedule your appointment</string>
+    <!-- Turnos -->
+    <string name="title_request_appointment">Request Appointment</string>
+    <string name="subtitle_solicitar_turno">Complete the details to schedule your medical appointment</string>
     <string name="hint_patient_name">Patient Name</string>
     <string name="label_appointment_info">APPOINTMENT INFORMATION</string>
     <string name="hint_date_format">Date (YYYY-MM-DD)</string>
@@ -46,7 +68,7 @@
     <string name="btn_confirm_appointment">CONFIRM APPOINTMENT</string>
     <string name="title_my_appointments">My Appointments</string>
     <string name="subtitle_appointments">Manage your active medical appointments</string>
-    <string name="no_appointments">You have no scheduled appointments</string>
+    <string name="no_appointments">No pending appointments!</string>
     <string name="msg_empty_appointments">Your upcoming appointments will appear here so you don\'t forget any.</string>
     <string name="hint_search_appointments">Search by patient or reason…</string>
     <string name="btn_schedule_appointment">Schedule Appointment</string>
@@ -66,18 +88,18 @@
     <string name="label_email_uppercase">EMAIL ADDRESS</string>
     <string name="label_phone_uppercase">PHONE NUMBER</string>
     <string name="btn_edit_data">EDIT DATA</string>
-    <string name="photo_updated">Photo updated</string>
+    <string name="photo_updated">Profile photo updated</string>
     <string name="label_profile_type">Salud Activa Patient</string>
-    <string name="msg_profile_update_success">Profile updated correctly</string>
+    <string name="msg_profile_update_success">Profile updated successfully</string>
     <string name="msg_profile_sync_local">No connection: Profile saved locally</string>
     <string name="msg_session_expired">Your session has expired. Please log in again.</string>
     <string name="msg_server_route_error">Server error: Route not found</string>
     <string name="msg_generic_sync_error">Error syncing data</string>
 
-    <!-- Settings -->
+    <!-- Ajustes -->
     <string name="title_settings">Settings</string>
     <string name="title_app_preferences">App Preferences</string>
-    <string name="title_info_account">Info &amp; Account</string>
+    <string name="title_info_account">Info and Account</string>
     <string name="label_notifications">Appointment Notifications</string>
     <string name="label_dark_mode">Dark Mode</string>
     <string name="label_language">Language: English</string>
@@ -87,74 +109,7 @@
     <string name="btn_yes">Yes, exit</string>
     <string name="btn_cancel">Cancel</string>
     <string name="version_info">Salud Activa v1.0.2</string>
-    <string name="menu_emergencies">Emergencies</string>
-    <string name="menu_help">Help</string>
     <string name="loading_user">Loading user…</string>
-    <string name="msg_slot_occupied">This slot is already occupied. Choose another.</string>
-    <string name="msg_slot_available">Time slot available</string>
-    <string name="msg_checking_availability">Checking availability…</string>
-    <string name="btn_processing">PROCESSING…</string>
-    <string name="btn_get_started">GET STARTED</string>
-    <string name="msg_past_date">You cannot schedule an appointment on a past date or time</string>
-    <string name="menu_specialties">Specialties</string>
-    <string name="subtitle_specialties">Select an area to schedule with a specialist</string>
-    <string name="desc_cardiology">Heart and vessels</string>
-    <string name="desc_pediatrics">Child care</string>
-    <string name="desc_traumatology">Bones and joints</string>
-    <string name="desc_dermatology">Skin and hair</string>
-    <string name="desc_neurology">Nervous system</string>
-    <string name="name_cardiology">Cardiology</string>
-    <string name="name_pediatrics">Pediatrics</string>
-    <string name="name_traumatology">Traumatology</string>
-    <string name="name_dermatology">Dermatology</string>
-    <string name="name_neurology">Neurology</string>
-
-    <string name="detail_date_time_format">%1$s at %2$s</string>
-    <string name="reason_consultation_for">Consultation for: %1$s</string>
-    <string name="label_patient_info">PATIENT INFORMATION</string>
-    <string name="hint_date">Date</string>
-    <string name="hint_time">Time</string>
-    <string name="msg_disclaimer_availability">* We will verify availability upon confirmation</string>
-    <string name="msg_discard_title">Discard changes</string>
-    <string name="msg_discard_message">Are you sure you want to leave? Entered data will be lost.</string>
-    <string name="btn_keep_editing">Keep editing</string>
-    <string name="btn_discard">Discard</string>
-    <string name="msg_confirm_booking_title">Confirm Appointment</string>
-    <string name="msg_confirm_booking_body">Do you want to schedule this appointment for %1$s at %2$s?</string>
-    <string name="btn_confirm">Schedule</string>
-    <string name="tip_health_1">Drink at least 2 liters of water a day to stay hydrated.</string>
-    <string name="tip_health_2">Do at least 30 minutes of daily physical activity.</string>
-    <string name="tip_health_3">Sleeping 8 hours a day improves your immune system.</string>
-    <string name="tip_health_4">Don\'t forget to wash your hands frequently.</string>
-    <string name="tip_health_5">A balanced diet is the foundation of good health.</string>
-    <string name="tip_health_6">Reduce salt intake to take care of your blood pressure.</string>
-    <string name="tip_health_7">Avoid screen use at least 30 minutes before sleeping.</string>
-    <string name="tip_health_8">Take active breaks if you work sitting for a long time.</string>
-    <string name="tip_health_9">Keep your medical check-ups up to date to prevent diseases.</string>
-    <string name="tip_health_10">Practice meditation or deep breathing to reduce stress.</string>
-
-    <!-- Appointment Statuses -->
-    <string name="status_pending">Pending</string>
-    <string name="status_completed">Completed</string>
-    <string name="status_cancelled">Cancelled</string>
-    <!-- Filters -->
-    <string name="filter_all">All</string>
-    <string name="error_connection">Connection error</string>
-    <string name="btn_retry">Retry</string>
-
-    <!-- Accessibility -->
-    <string name="acc_profile_image">User profile image</string>
-    <string name="acc_request_appointment">Button to request a new medical appointment</string>
-    <string name="acc_my_appointments">Button to see my scheduled appointments</string>
-    <string name="acc_specialties">Button to search for doctors by specialty</string>
-    <string name="acc_emergencies">Direct emergency call button</string>
-    <string name="acc_settings">Button to configure my profile and settings</string>
-    <string name="acc_share_details">Share appointment details</string>
-    <string name="acc_open_map">View clinic location on the map</string>
-    <string name="acc_add_calendar">Add this appointment to my personal calendar</string>
-    <string name="acc_set_reminder">Set a reminder for this appointment</string>
-
-    <string name="menu_my_studies">My Studies</string>
     <string name="btn_upload_study">UPLOAD STUDY</string>
     <string name="msg_no_studies">You have no registered studies</string>
     <string name="filter_from">From: All</string>
@@ -162,7 +117,7 @@
     <string name="title_health_summary">Salud Activa Summary</string>
     <string name="subtitle_health_summary">Share my appointments and medicines</string>
 
-    <!-- Dynamic Greetings -->
+    <!-- Saludos dinámicos -->
     <string name="greeting_morning">Good morning, %1$s! ☀️</string>
     <string name="greeting_afternoon">Good afternoon, %1$s! ⛅</string>
     <string name="greeting_evening">Good evening, %1$s! 🌙</string>
@@ -184,8 +139,8 @@
     <string name="msg_no_mail_app">No email app installed</string>
     <string name="msg_notifications_on">Notifications activated</string>
     <string name="msg_notifications_off">Notifications deactivated</string>
-    <string name="msg_complete_name_dosis">Complete name and dosage</string>
-    <string name="msg_slot_too_soon">The appointment is too soon for a reminder</string>
+    <string name="msg_complete_name_dosis">Complete name and dose</string>
+    <string name="msg_slot_too_soon">The appointment is too soon for the reminder</string>
     <string name="label_share_via">Share via</string>
     <string name="msg_install_maps">Install Google Maps</string>
     <string name="label_emergency_call">Emergency Call</string>
@@ -205,11 +160,11 @@
     <string name="msg_error_unknown">Unknown error</string>
     <string name="msg_user_not_found">User not found</string>
     <string name="msg_server_error">Server error: %1$s</string>
-    <string name="msg_no_connection">Could not connect to server. Check your internet.</string>
+    <string name="msg_no_connection">Could not connect to the server. Check your internet.</string>
     <string name="msg_timeout">The server took too long to respond.</string>
     <string name="msg_error_prefix">Oops! %1$s</string>
     <string name="msg_email_already_registered">This email is already registered</string>
-    <string name="msg_password_weak">Password is too weak</string>
+    <string name="msg_password_weak">Password too weak</string>
     <string name="msg_password_length">Minimum 6 characters</string>
     <string name="msg_register_empty">Registration error: Empty response</string>
     <string name="acc_study_image">Study image</string>
@@ -244,19 +199,7 @@
     <string name="label_default_doctor">Dr. Pending</string>
     <string name="label_not_specified">Not specified</string>
 
-    <string name="title_recommendation">Recommendation of the day</string>
-    <string name="title_next_appointment">NEXT APPOINTMENT</string>
-    <string name="no_upcoming_appointments">No pending appointments</string>
-    <string name="schedule_appointment_prompt">Secure your next medical consultation today.</string>
-    <string name="label_medication_format">%1$s %2$s</string>
-    <string name="label_next_dose"> - Next: %1$s</string>
-    <string name="title_medication">My Medication</string>
-    <string name="title_add_medication">Add Medication</string>
-    <string name="btn_save_medication">SAVE MEDICATION</string>
-    <string name="title_your_medications">Your Medications</string>
-    <string name="msg_no_medication">You have no active medication configured.</string>
-    <string name="label_next_appointment_format">%1$s - %2$s</string>
-
+    <!-- New localization strings -->
     <string name="btn_call">Call</string>
     <string name="msg_emergency_confirm">Do you want to call the emergency line 123 (Colombia)?</string>
     <string name="msg_about_app">Salud Activa is a comprehensive platform for managing your medical well-being, designed to improve the patient experience.</string>
@@ -272,4 +215,80 @@
     <string name="label_share_reason">🩺 %1$s</string>
     <string name="label_calendar_event_title">Appointment: %1$s</string>
     <string name="label_calendar_event_desc">Reason: %1$s</string>
+
+    <!-- Missing strings from default locale -->
+    <string name="label_patient_info">PATIENT INFORMATION</string>
+    <string name="menu_specialties">Specialties</string>
+    <string name="subtitle_specialties">Select an area to schedule with a specialist</string>
+    <string name="title_next_appointment">NEXT APPOINTMENT</string>
+    <string name="title_medication">My Medication</string>
+    <string name="title_recommendation">Recommendation of the day</string>
+    <string name="title_add_medication">Add Medication</string>
+    <string name="hint_med_dose">Dosage (e.g., 500mg)</string>
+    <string name="hint_med_freq">Frequency (e.g., Every 8 hours)</string>
+    <string name="hint_med_next">Next dose</string>
+    <string name="btn_save_medication">SAVE MEDICATION</string>
+    <string name="title_your_medications">Your Medications</string>
+    <string name="msg_no_medication">You have no active medication configured.</string>
+    <string name="hint_date">Date</string>
+    <string name="hint_time">Time</string>
+    <string name="msg_disclaimer_availability">* We will verify availability upon confirmation</string>
+    <string name="status_pending">Pending</string>
+    <string name="acc_add_calendar">Add to my calendar</string>
+    <string name="acc_share_details">Share appointment details</string>
+    <string name="acc_open_map">View location on map</string>
+    <string name="acc_set_reminder">Set reminder</string>
+    <string name="filter_all">All</string>
+
+    <string name="status_completed">Completed</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="error_connection">Connection error</string>
+    <string name="btn_retry">Retry</string>
+    <string name="acc_profile_image">Profile image</string>
+    <string name="btn_get_started">START</string>
+    <string name="acc_emergencies">Emergency call button</string>
+    <string name="acc_my_appointments">My appointments button</string>
+    <string name="acc_request_appointment">Request appointment button</string>
+    <string name="acc_settings">Settings button</string>
+    <string name="acc_specialties">Specialties button</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="btn_discard">Discard</string>
+    <string name="btn_keep_editing">Keep editing</string>
+    <string name="btn_processing">PROCESSING…</string>
+    <string name="msg_checking_availability">Checking availability…</string>
+    <string name="msg_confirm_booking_body">Do you want to schedule this appointment for %1$s at %2$s?</string>
+    <string name="msg_confirm_booking_title">Confirm Appointment</string>
+    <string name="msg_discard_message">Are you sure you want to leave? Entered data will be lost.</string>
+    <string name="msg_discard_title">Discard changes</string>
+    <string name="msg_past_date">You cannot schedule an appointment on a past date or time</string>
+    <string name="msg_slot_available">Time slot available</string>
+    <string name="msg_slot_occupied">This slot is already occupied. Choose another.</string>
+    <string name="no_upcoming_appointments">No pending appointments</string>
+    <string name="schedule_appointment_prompt">Secure your next medical consultation today.</string>
+    <string name="tip_health_1">Drink at least 2 liters of water a day to stay hydrated.</string>
+    <string name="tip_health_2">Do at least 30 minutes of physical activity daily.</string>
+    <string name="tip_health_3">Sleeping 8 hours daily improves your immune system.</string>
+    <string name="tip_health_4">Don\'t forget to wash your hands frequently.</string>
+    <string name="tip_health_5">A balanced diet is the foundation of good health.</string>
+    <string name="tip_health_6">Reduce salt intake to take care of your blood pressure.</string>
+    <string name="tip_health_7">Avoid screen use at least 30 minutes before sleeping.</string>
+    <string name="tip_health_8">Take active breaks if you work sitting for a long time.</string>
+    <string name="tip_health_9">Keep your medical check-ups up to date to prevent diseases.</string>
+    <string name="tip_health_10">Practice meditation or deep breathing to reduce stress.</string>
+    <string name="detail_date_time_format">%1$s at %2$s</string>
+    <string name="reason_consultation_for">Reason for consultation: %1$s</string>
+    <string name="label_medication_format">%1$s %2$s</string>
+    <string name="label_next_dose"> - Next: %1$s</string>
+    <string name="label_next_appointment_format">%1$s with %2$s</string>
+
+    <string name="name_cardiology">Cardiology</string>
+    <string name="desc_cardiology">Heart and blood vessels</string>
+    <string name="name_pediatrics">Pediatrics</string>
+    <string name="desc_pediatrics">Child care</string>
+    <string name="name_traumatology">Traumatology</string>
+    <string name="desc_traumatology">Bones and joints</string>
+    <string name="name_dermatology">Dermatology</string>
+    <string name="desc_dermatology">Skin and hair</string>
+    <string name="name_neurology">Neurology</string>
+    <string name="desc_neurology">Nervous system</string>
 </resources>

@@ -15,7 +15,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:title="Mis Estudios y Resultados"
+            app:title="@string/title_studies_results"
             app:navigationIcon="@android:drawable/ic_menu_revert" />
 
         <!-- Buscador -->
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
-            android:hint="Buscar estudio por nombre o tipo..."
+            android:hint="@string/hint_search_studies"
             app:startIconDrawable="@android:drawable/ic_menu_search"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
             app:boxCornerRadiusTopStart="12dp"

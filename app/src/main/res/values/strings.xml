@@ -224,6 +224,9 @@
     <string name="title_medication">Mi Medicación</string>
     <string name="title_recommendation">Recomendación del día</string>
     <string name="title_add_medication">Agregar Medicamento</string>
+    <string name="hint_med_dose">Dosis (ej: 500mg)</string>
+    <string name="hint_med_freq">Frecuencia (ej: Cada 8 horas)</string>
+    <string name="hint_med_next">Próxima toma</string>
     <string name="btn_save_medication">GUARDAR MEDICAMENTO</string>
     <string name="title_your_medications">Tus Medicamentos</string>
     <string name="msg_no_medication">No tienes medicación activa configurada.</string>

@@ -37,12 +37,50 @@ class TurnosAdapter(
         private val isoDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         private val monthFormat = SimpleDateFormat("MMM", Locale.getDefault())
 
+        private fun translateSpecialty(specialty: String?): String {
+            val context = binding.root.context
+            if (specialty == null) return context.getString(R.string.label_default_specialty)
+            
+            return when (specialty.lowercase()) {
+                "cardiología", "cardiology" -> context.getString(R.string.name_cardiology)
+                "pediatría", "pediatrics" -> context.getString(R.string.name_pediatrics)
+                "traumatología", "traumatology" -> context.getString(R.string.name_traumatology)
+                "dermatología", "dermatology" -> context.getString(R.string.name_dermatology)
+                "neurología", "neurology" -> context.getString(R.string.name_neurology)
+                "general" -> context.getString(R.string.label_default_specialty)
+                else -> specialty
+            }
+        }
+
+        private fun translateDoctor(doctor: String?): String {
+            val context = binding.root.context
+            if (doctor == null || doctor.lowercase().contains("asignado") || doctor.lowercase().contains("assigned")) {
+                return context.getString(R.string.label_assigned_doctor)
+            }
+            return doctor
+        }
+
+        private fun translateMotivo(motivo: String?): String {
+            val context = binding.root.context
+            if (motivo == null) return ""
+            
+            // Detectar y traducir el prefijo "Motivo de consulta: " o "Reason for consultation: "
+            val prefixes = listOf("Motivo de consulta: ", "Reason for consultation: ")
+            for (prefix in prefixes) {
+                if (motivo.startsWith(prefix)) {
+                    val content = motivo.substring(prefix.length)
+                    return context.getString(R.string.reason_consultation_for, translateSpecialty(content))
+                }
+            }
+            return motivo
+        }
+
         fun bind(turno: Turno) {
             binding.apply {
-                tvItemEspecialidad.text = turno.especialidad ?: root.context.getString(R.string.label_default_specialty)
-                tvItemDoctor.text = turno.doctor ?: root.context.getString(R.string.label_default_doctor)
-                tvItemMotivo.text = turno.motivo
-                tvItemNombre.text = turno.pacienteNombre // Mantenemos para compatibilidad si se necesita
+                tvItemEspecialidad.text = translateSpecialty(turno.especialidad)
+                tvItemDoctor.text = translateDoctor(turno.doctor)
+                tvItemMotivo.text = translateMotivo(turno.motivo)
+                tvItemNombre.text = turno.pacienteNombre
 
                 // Formatear Hora
                 tvItemHora.text = DateUtils.formatDisplayTime(turno.hora)
