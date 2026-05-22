@@ -76,6 +76,7 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigation.setupWithNavController(controller)
 
             controller.addOnDestinationChangedListener { _, destination, _ ->
+                // Actualizar visibilidad de componentes
                 when (destination.id) {
                     R.id.homeFragment, R.id.turnosListFragment, R.id.userProfileFragment, R.id.especialidadesFragment -> {
                         binding.bottomNavigation.visibility = View.VISIBLE
@@ -90,6 +91,19 @@ class MainActivity : AppCompatActivity() {
                         binding.toolbar.visibility = View.VISIBLE
                     }
                 }
+
+                // Ajustar iconos de barra de estado según el fondo del fragmento
+                val isDarkHeader = destination.id in setOf(
+                    R.id.homeFragment, 
+                    R.id.welcomeFragment, 
+                    R.id.loginFragment, 
+                    R.id.registerFragment,
+                    R.id.turnosListFragment
+                )
+                
+                // Si es un header oscuro (azul), queremos iconos claros (windowLightStatusBar = false)
+                // Si es un fondo claro, queremos iconos oscuros (windowLightStatusBar = true)
+                WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = !isDarkHeader
             }
         }
         
@@ -114,11 +128,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleIntent(intent: Intent) {
-        val type = intent.getStringExtra("type")
-        if (type == "chat") {
-            navController?.navigate(R.id.chatFragment)
-        } else if (type == "turno") {
-            navController?.navigate(R.id.turnosListFragment)
+        val type = intent.getStringExtra("type") ?: return
+        
+        // Solo navegar si el usuario ya está autenticado
+        if (UserManager.getUser(this) == null) return
+
+        when (type) {
+            "chat" -> navController?.navigate(R.id.chatFragment)
+            "turno" -> navController?.navigate(R.id.turnosListFragment)
         }
     }
 

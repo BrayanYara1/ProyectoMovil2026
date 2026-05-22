@@ -59,21 +59,24 @@ class TurnosListViewModel @Inject constructor(
     val formMotivo = MutableLiveData("")
 
     val isFormValid = MediatorLiveData<Boolean>().apply {
-        val observer = { _: String? ->
+        val observer = { _: Any? ->
             val nombre = formPacienteNombre.value ?: ""
             val fecha = formFecha.value ?: ""
             val hora = formHora.value ?: ""
             val motivo = formMotivo.value ?: ""
+            val disponible = isSlotAvailable.value
             
             value = nombre.isNotBlank() && 
                     fecha.isNotBlank() && 
                     hora.isNotBlank() && 
-                    motivo.isNotBlank()
+                    motivo.isNotBlank() &&
+                    disponible != false // Si es null (no verificado) o true (disponible), es válido
         }
         addSource(formPacienteNombre, observer)
         addSource(formFecha, observer)
         addSource(formHora, observer)
         addSource(formMotivo, observer)
+        addSource(isSlotAvailable, observer)
     }
 
     fun setSearchQuery(query: String) {
@@ -94,9 +97,18 @@ class TurnosListViewModel @Inject constructor(
                              turno.motivo.lowercase().contains(query)
             
             val matchesStatus = when (status) {
-                "PENDIENTE" -> turno.estado.lowercase() in listOf("pendiente", "pending")
-                "COMPLETADO" -> turno.estado.lowercase() in listOf("completado", "completed")
-                "CANCELADO" -> turno.estado.lowercase() in listOf("cancelado", "cancelled")
+                "PENDIENTE" -> {
+                    val st = turno.estado.lowercase()
+                    st.contains("pendiente") || st.contains("pending")
+                }
+                "COMPLETADO" -> {
+                    val st = turno.estado.lowercase()
+                    st.contains("completado") || st.contains("completed")
+                }
+                "CANCELADO" -> {
+                    val st = turno.estado.lowercase()
+                    st.contains("cancelado") || st.contains("cancelled")
+                }
                 else -> true
             }
             

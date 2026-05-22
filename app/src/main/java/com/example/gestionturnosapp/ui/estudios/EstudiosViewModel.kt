@@ -93,24 +93,26 @@ class EstudiosViewModel @Inject constructor(
     fun agregarEstudio(titulo: String, fecha: String, tipo: String, resultado: String, photoUrl: String? = null) {
         viewModelScope.launch {
             _createResource.value = Resource.Loading
-            val nuevo = EstudioMedico("", titulo, fecha, tipo, resultado, urlDocumento = photoUrl)
+            // Generar un ID local único para evitar conflictos en el DiffUtil si hay varios pendientes
+            val localId = "pending_${System.currentTimeMillis()}"
+            val nuevo = EstudioMedico(localId, titulo, fecha, tipo, resultado, urlDocumento = photoUrl)
             try {
-                val response = repository.agregarEstudioConDetalle(nuevo)
+                val response = repository.agregarEstudioConDetalle(nuevo.copy(id = "")) 
                 
                 if (response.isSuccessful && response.body() != null) {
                     _createResource.value = Resource.Success(response.body()!!)
                     loadEstudios()
                 } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Error desconocido del servidor"
-                    _createResource.value = Resource.Error("Error ${response.code()}: $errorMsg")
+                    val errorMsg = response.errorBody()?.string() ?: "Error desconocido"
+                    _createResource.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
                 if (OfflineCacheManager.isNetworkError(e)) {
                     OfflineCacheManager.addPendingEstudio(getApplication(), nuevo)
-                    _createResource.value = Resource.Success(nuevo.copy(id = "pending"))
+                    _createResource.value = Resource.Success(nuevo)
                     loadEstudios()
                 } else {
-                    _createResource.value = Resource.Error("Error de conexión: ${e.localizedMessage}")
+                    _createResource.value = Resource.Error(e.localizedMessage ?: "Error")
                 }
             }
         }

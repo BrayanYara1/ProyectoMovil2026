@@ -271,21 +271,24 @@ class EstudiosFragment : Fragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.btn_upload_study))
             .setView(layout)
-            .setPositiveButton(getString(R.string.btn_save)) { _, _ ->
-                val titulo = etTitulo.text.toString()
-                val tipo = etTipo.text.toString()
-                val resultado = etResultado.text.toString()
-                val fecha = etFecha.text.toString()
+            .setPositiveButton(getString(R.string.btn_save)) { dialog, _ ->
+                val titulo = etTitulo.text.toString().trim()
+                val tipo = etTipo.text.toString().trim()
+                val resultado = etResultado.text.toString().trim()
+                val fecha = etFecha.text.toString().trim()
                 
-                if (titulo.isNotBlank()) {
-                    // PERSISTENCIA DE IMAGEN: Copiar a almacenamiento interno antes de guardar
-                    var finalPhotoPath: String? = null
-                    selectedImageUri?.let { uri ->
-                        finalPhotoPath = com.example.gestionturnosapp.data.ImageStorageManager.saveStudyImage(requireContext(), uri)
-                    }
-                    
-                    viewModel.agregarEstudio(titulo, fecha, tipo, resultado, finalPhotoPath)
+                if (titulo.isEmpty()) {
+                    Toast.makeText(requireContext(), R.string.msg_complete_fields, Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
                 }
+                
+                // PERSISTENCIA DE IMAGEN: Copiar a almacenamiento interno antes de guardar
+                var finalPhotoPath: String? = null
+                selectedImageUri?.let { uri ->
+                    finalPhotoPath = com.example.gestionturnosapp.data.ImageStorageManager.saveStudyImage(requireContext(), uri)
+                }
+                
+                viewModel.agregarEstudio(titulo, fecha, tipo, resultado, finalPhotoPath)
             }
             .setNegativeButton(getString(R.string.btn_cancel_dialog), null)
             .show()

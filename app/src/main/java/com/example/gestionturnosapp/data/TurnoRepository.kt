@@ -28,7 +28,8 @@ class TurnoRepository @Inject constructor(
         return try {
             val response = apiService.checkAvailability(fecha, hora)
             if (response.isSuccessful) {
-                response.body()?.get("disponible") ?: true
+                val body = response.body()
+                body?.get("disponible") ?: body?.get("available") ?: true
             } else {
                 // Si falla la red, permitimos intentar agendar y que el servidor valide el POST
                 true 

@@ -61,7 +61,7 @@ class AuthViewModel @Inject constructor(
     }
 
     fun login() {
-        val email = loginEmail.value ?: return
+        val email = loginEmail.value?.trim() ?: return
         val pass = loginPassword.value ?: return
         
         viewModelScope.launch {

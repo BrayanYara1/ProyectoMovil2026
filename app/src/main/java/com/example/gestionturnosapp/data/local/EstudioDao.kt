@@ -19,4 +19,10 @@ interface EstudioDao {
 
     @Query("DELETE FROM estudios WHERE id = :estudioId")
     suspend fun deleteById(estudioId: String)
+
+    @androidx.room.Transaction
+    suspend fun clearAndInsert(estudios: List<EstudioMedico>) {
+        deleteAllEstudios()
+        insertEstudios(estudios)
+    }
 }

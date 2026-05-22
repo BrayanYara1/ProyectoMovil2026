@@ -137,10 +137,25 @@ class TurnosListFragment : Fragment() {
 
         viewModel.filteredTurnos.observe(viewLifecycleOwner) { turnos ->
             adapter.submitList(turnos) {
-                // Forzar la animación de cascada cada vez que se actualiza la lista
                 binding.rvTurnos.scheduleLayoutAnimation()
             }
-            binding.layoutEmpty.isVisible = turnos.isEmpty() && (viewModel.turnosResource.value as? Resource.Success)?.data?.isEmpty() == true
+            
+            val isInitialListEmpty = (viewModel.turnosResource.value as? Resource.Success)?.data?.isEmpty() == true
+            val noResultsFound = turnos.isEmpty() && !isInitialListEmpty && viewModel.turnosResource.value is Resource.Success
+            
+            binding.layoutEmpty.isVisible = (turnos.isEmpty() && isInitialListEmpty)
+            
+            // Si no hay resultados de búsqueda pero sí hay turnos en total
+            if (noResultsFound) {
+                // Podríamos mostrar un mensaje de "No se encontraron resultados" específico
+                binding.layoutEmpty.isVisible = true
+                binding.tvEmptyTitle.text = getString(R.string.no_appointments) // O uno nuevo
+                binding.tvEmptyMessage.text = getString(R.string.dash_search_hint)
+            } else if (isInitialListEmpty) {
+                binding.tvEmptyTitle.text = getString(R.string.no_appointments)
+                binding.tvEmptyMessage.text = getString(R.string.msg_empty_appointments)
+            }
+
             binding.swipeRefresh.isRefreshing = false
         }
 

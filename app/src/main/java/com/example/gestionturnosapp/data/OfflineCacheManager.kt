@@ -22,9 +22,7 @@ object OfflineCacheManager {
 
     // --- TURNOS (ROOM) ---
     suspend fun saveTurnos(context: Context, turnos: List<Turno>) = withContext(Dispatchers.IO) {
-        val dao = getDb(context).turnoDao()
-        dao.deleteAllTurnos()
-        dao.insertTurnos(turnos)
+        getDb(context).turnoDao().clearAndInsert(turnos)
     }
 
     suspend fun getCachedTurnos(context: Context): List<Turno> = withContext(Dispatchers.IO) {
@@ -33,9 +31,7 @@ object OfflineCacheManager {
 
     // --- MEDICAMENTOS (ROOM) ---
     suspend fun saveMedicamentos(context: Context, meds: List<Medicamento>) = withContext(Dispatchers.IO) {
-        val dao = getDb(context).medicamentoDao()
-        dao.deleteAllMedicamentos()
-        dao.insertMedicamentos(meds)
+        getDb(context).medicamentoDao().clearAndInsert(meds)
     }
 
     suspend fun getCachedMedicamentos(context: Context): List<Medicamento> = withContext(Dispatchers.IO) {
@@ -44,9 +40,7 @@ object OfflineCacheManager {
 
     // --- ESTUDIOS (ROOM) ---
     suspend fun saveEstudios(context: Context, estudios: List<EstudioMedico>) = withContext(Dispatchers.IO) {
-        val dao = getDb(context).estudioDao()
-        dao.deleteAllEstudios()
-        dao.insertEstudios(estudios)
+        getDb(context).estudioDao().clearAndInsert(estudios)
     }
 
     suspend fun getCachedEstudios(context: Context): List<EstudioMedico> = withContext(Dispatchers.IO) {
@@ -161,6 +155,12 @@ object OfflineCacheManager {
     }
 
     fun isNetworkError(e: Exception): Boolean {
+        if (e is java.net.UnknownHostException || 
+            e is java.net.SocketTimeoutException || 
+            e is java.net.ConnectException ||
+            e is java.io.IOException) {
+            return true
+        }
         val msg = e.localizedMessage ?: ""
         return msg.contains(other = "Unable to resolve host", ignoreCase = true) || 
                msg.contains(other = "timeout", ignoreCase = true) || 

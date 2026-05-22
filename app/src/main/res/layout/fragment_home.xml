@@ -172,7 +172,7 @@
                     android:layout_marginHorizontal="24dp"
                     android:layout_marginTop="24dp"
                     app:cardBackgroundColor="@color/surface"
-                    app:cardCornerRadius="16dp"
+                    app:cardCornerRadius="24dp"
                     app:cardElevation="2dp">
 
                     <LinearLayout
@@ -213,23 +213,18 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:shimmer_auto_start="true">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="16dp">
-                        <include layout="@layout/item_turno_skeleton" />
-                        <include layout="@layout/item_turno_skeleton" />
-                    </LinearLayout>
+                    <include layout="@layout/fragment_home_skeleton" />
                 </com.facebook.shimmer.ShimmerFrameLayout>
 
                 <!-- Bento Style Bento Grid -->
                 <GridLayout
+                    android:id="@+id/gridActions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:columnCount="2"
-                    android:paddingHorizontal="16dp">
+                    android:paddingHorizontal="16dp"
+                    android:layoutAnimation="@anim/layout_animation_fall_down">
 
                     <!-- AGENDAR (Primary Action) -->
                     <com.google.android.material.card.MaterialCardView
@@ -577,13 +572,35 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
                         android:padding="20dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/title_today_medication"
-                            android:textColor="@color/text_primary"
-                            android:textStyle="bold"
-                            android:textSize="16sp" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/title_today_medication"
+                                android:textColor="@color/text_primary"
+                                android:textStyle="bold"
+                                android:textSize="16sp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnAddMedHome"
+                                style="@style/Widget.Material3.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="32dp"
+                                android:layout_alignParentEnd="true"
+                                android:layout_centerVertical="true"
+                                android:text="@string/dash_request_appointment"
+                                android:textSize="12sp"
+                                android:padding="0dp"
+                                android:minWidth="0dp"
+                                android:minHeight="0dp"
+                                app:icon="@drawable/ic_add_circle"
+                                app:iconSize="16dp"
+                                tools:text="AGREGAR" />
+                        </RelativeLayout>
                         <LinearLayout
                             android:id="@+id/layoutMedication"
                             android:layout_width="match_parent"

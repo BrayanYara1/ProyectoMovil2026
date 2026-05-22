@@ -296,4 +296,28 @@
     <string name="desc_dermatology">Piel y cabello</string>
     <string name="name_neurology">Neurología</string>
     <string name="desc_neurology">Sistema nervioso</string>
+    <string name="label_share_pdf">PDF (RECOMENDADO)</string>
+    <string name="label_share_text">SOLO TEXTO</string>
+    <string name="msg_pdf_error">Error al generar el PDF</string>
+
+    <string name="pdf_title">Resumen de Salud Personal</string>
+    <string name="pdf_generated_at">Generado el: %1$s</string>
+    <string name="pdf_patient">Paciente:</string>
+    <string name="pdf_appointments_title">Próximas Citas Médicas</string>
+    <string name="pdf_no_appointments">No hay citas programadas.</string>
+    <string name="pdf_meds_title">Medicamentos Actuales</string>
+    <string name="pdf_no_meds">No hay medicamentos registrados.</string>
+    <string name="pdf_footer">Este documento es un resumen informativo generado por la App Salud Activa.</string>
+    <string name="ai_welcome">¡Hola! Soy tu asistente de Salud Activa. ¿En qué puedo ayudarte hoy? Puedo explicarte términos médicos, recordarte tus citas o ayudarte con tus medicamentos.</string>
+    <string name="ai_next_appointment">Tu próxima cita es de %1$s con el %2$s el día %3$s a las %4$s. ¿Te gustaría que te de algunas recomendaciones para ese día?</string>
+    <string name="ai_no_appointments">No tienes citas pendientes por ahora. ¿Quieres que te ayude a agendar una?</string>
+    <string name="ai_meds_list">Actualmente tienes registrados estos medicamentos:\n%1$s\nRecuerda seguir siempre las indicaciones de tu médico.</string>
+    <string name="ai_no_meds">No tienes medicamentos registrados. Si estás tomando algo, puedes agregarlo en la sección de Medicamentos.</string>
+    <string name="ai_generic_recommendation">Interesante pregunta. Como asistente de salud, te recomiendo consultar siempre con un profesional para un diagnóstico preciso. ¿Quieres que te ayude a buscar un especialista?</string>
+    <string name="ai_thanks_reply">¡De nada! Estoy aquí para cuidar de tu salud. ¿Necesitas algo más?</string>
+    <string name="ai_term_ecografia">Una ecografía es un procedimiento que usa ondas de sonido de alta frecuencia para ver órganos y estructuras dentro del cuerpo.</string>
+    <string name="ai_term_ayunas">Estar en ayunas significa no ingerir alimentos ni bebidas (excepto agua) por un periodo, usualmente de 8 a 12 horas, antes de un examen.</string>
+    <string name="ai_term_presion">La presión arterial es la fuerza de su sangre al empujar contra las paredes de sus arterias.</string>
+    <string name="ai_term_diabetes">La diabetes es una enfermedad en la que los niveles de glucosa (azúcar) de la sangre están muy altos.</string>
+    <string name="ai_term_generic">Ese es un término técnico importante. Por seguridad, te sugiero consultarlo directamente con tu médico en tu próxima cita para que te explique cómo aplica a tu caso particular.</string>
 </resources>

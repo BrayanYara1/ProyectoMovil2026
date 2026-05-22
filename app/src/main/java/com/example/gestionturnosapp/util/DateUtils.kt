@@ -11,14 +11,17 @@ object DateUtils {
     fun parseTime(time: String?): Date? {
         if (time.isNullOrBlank()) return null
         
-        // Limpieza de formatos comunes en español
+        // Limpieza de formatos comunes en español y otros
         val cleanTime = time.uppercase()
             .replace("A. M.", "AM")
             .replace("P. M.", "PM")
             .replace("A.M.", "AM")
             .replace("P.M.", "PM")
+            .replace("A M", "AM")
+            .replace("P M", "PM")
             .trim()
 
+        // Primero intentamos con el Locale actual
         for (fmt in inputFormats) {
             try {
                 val sdf = SimpleDateFormat(fmt, Locale.getDefault())
@@ -28,6 +31,7 @@ object DateUtils {
             } catch (_: Exception) {}
         }
 
+        // Luego con US como fallback universal para AM/PM
         for (fmt in inputFormats) {
             try {
                 val sdf = SimpleDateFormat(fmt, Locale.US)
@@ -37,7 +41,22 @@ object DateUtils {
             } catch (_: Exception) {}
         }
         
-        return null
+        // Fallback manual para casos extremos
+        return try {
+            val parts = cleanTime.filter { it.isDigit() || it == ':' || it == ' ' || it == 'A' || it == 'P' || it == 'M' }
+                .split(":")
+            if (parts.size >= 2) {
+                val cal = Calendar.getInstance()
+                var h = parts[0].trim().toIntOrNull() ?: 0
+                val m = parts[1].filter { it.isDigit() }.toIntOrNull() ?: 0
+                if (cleanTime.contains("PM") && h < 12) h += 12
+                if (cleanTime.contains("AM") && h == 12) h = 0
+                cal.set(Calendar.HOUR_OF_DAY, h)
+                cal.set(Calendar.MINUTE, m)
+                cal.set(Calendar.SECOND, 0)
+                cal.time
+            } else null
+        } catch (_: Exception) { null }
     }
 
     fun formatDisplayTime(time: String?): String {

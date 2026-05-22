@@ -16,6 +16,12 @@ interface TurnoDao {
 
     @Query("DELETE FROM turnos")
     suspend fun deleteAllTurnos()
+
+    @androidx.room.Transaction
+    suspend fun clearAndInsert(turnos: List<Turno>) {
+        deleteAllTurnos()
+        insertTurnos(turnos)
+    }
     
     @Query("DELETE FROM turnos WHERE id = :turnoId")
     suspend fun deleteById(turnoId: String)

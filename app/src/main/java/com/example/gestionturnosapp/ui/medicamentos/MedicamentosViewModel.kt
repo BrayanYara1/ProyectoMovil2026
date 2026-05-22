@@ -33,18 +33,13 @@ class MedicamentosViewModel @Inject constructor(
             _medicamentosResource.value = Resource.Loading
             _isLoading.value = true
             
-            // Offline Cache First
-            val cached = OfflineCacheManager.getCachedMedicamentos(getApplication())
-            if (cached.isNotEmpty()) {
-                _medicamentosResource.value = Resource.Success(cached)
-            }
+            // Offline First: Combinar Room + Pendientes
+            refreshLocalList()
 
             try {
                 val list = repository.getMedicamentos()
-                _medicamentosResource.value = Resource.Success(list)
-                
-                // Save to Cache
                 OfflineCacheManager.saveMedicamentos(getApplication(), list)
+                refreshLocalList()
             } catch (e: Exception) {
                 if (_medicamentosResource.value !is Resource.Success) {
                     _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
@@ -55,41 +50,56 @@ class MedicamentosViewModel @Inject constructor(
         }
     }
 
+    private suspend fun refreshLocalList() {
+        val cached = OfflineCacheManager.getCachedMedicamentos(getApplication())
+        val pending = OfflineCacheManager.getPendingMeds(getApplication())
+        // Combinar y eliminar duplicados por nombre
+        val combined = (cached + pending).distinctBy { it.nombre.lowercase().trim() }
+        _medicamentosResource.postValue(Resource.Success(combined))
+    }
+
     fun agregarMedicamento(nombre: String, dosis: String, frecuencia: String, proximaToma: String) {
         viewModelScope.launch {
             _operationResource.value = Resource.Loading
             _isLoading.value = true
-            // Generar un ID local único para evitar colisiones en la DB
+            
+            // 1. Crear el objeto local con ID único
             val tempId = "local_${System.currentTimeMillis()}"
             val nuevoMed = Medicamento(
-                id = tempId,
+                id = tempId, 
                 nombre = nombre,
                 dosis = dosis,
                 frecuencia = frecuencia,
                 proximaToma = proximaToma
             )
+
             try {
+                // 2. Intentar guardar en el servidor
                 val result = repository.agregarMedicamento(nuevoMed)
                 if (result != null) {
                     _operationResource.value = Resource.Success(result)
                     
-                    // Actualizar lista local inmediatamente para feedback instantáneo
-                    val currentList = (_medicamentosResource.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+                    // Actualizar lista local inmediatamente (Servidor ganó)
+                    val currentList = OfflineCacheManager.getCachedMedicamentos(getApplication()).toMutableList()
                     currentList.add(0, result)
                     _medicamentosResource.value = Resource.Success(currentList)
-                    
-                    // Sincronizar cache
                     OfflineCacheManager.saveMedicamentos(getApplication(), currentList)
                 } else {
-                    _operationResource.value = Resource.Error("Error al guardar")
+                    _operationResource.value = Resource.Error("Error de respuesta")
                 }
             } catch (e: Exception) {
+                // 3. Fallo de red: Guardar como pendiente
                 if (OfflineCacheManager.isNetworkError(e)) {
                     OfflineCacheManager.addPendingMed(getApplication(), nuevoMed)
-                    _operationResource.value = Resource.Success(nuevoMed.copy(id = "pending"))
-                    loadMedicamentos()
+                    
+                    // Mostrar en la lista local de inmediato como "Success" local
+                    val currentList = OfflineCacheManager.getCachedMedicamentos(getApplication()).toMutableList()
+                    currentList.add(0, nuevoMed)
+                    _medicamentosResource.value = Resource.Success(currentList)
+                    
+                    _operationResource.value = Resource.Success(nuevoMed)
                 } else {
-                    _operationResource.value = Resource.Error(e.localizedMessage ?: "Error de red")
+                    _operationResource.value = Resource.Error(e.localizedMessage ?: "Error")
                 }
             } finally {
                 _isLoading.value = false

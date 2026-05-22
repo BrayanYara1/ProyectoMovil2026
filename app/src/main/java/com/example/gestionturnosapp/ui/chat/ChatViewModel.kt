@@ -77,13 +77,20 @@ class ChatViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            // Optimistic UI: Agregar mensaje localmente antes de la red
+            val userMsg = Mensaje(id = "local_${System.currentTimeMillis()}", texto = texto, remitente = "PACIENTE", fecha = Date())
+            val currentList = (_mensajes.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+            currentList.add(userMsg)
+            _mensajes.value = Resource.Success(currentList)
+
             _mensajeEnviado.value = Resource.Loading
             try {
                 val mensaje = repository.enviarMensaje(texto)
                 if (mensaje != null) {
                     _mensajeEnviado.value = Resource.Success(mensaje)
                     _isDoctorTyping.value = true
-                    delay(2500)
+                    // Simulamos delay del doctor solo si el servidor no respondió con uno ya
+                    delay(1500)
                     _isDoctorTyping.value = false
                     fetchMensajes()
                 } else {
@@ -91,6 +98,7 @@ class ChatViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _mensajeEnviado.value = Resource.Error(e.localizedMessage ?: "Error de red")
+                // Opcional: Remover el mensaje local si falló el envío (o marcarlo como fallido)
             }
         }
     }
@@ -111,7 +119,7 @@ class ChatViewModel @Inject constructor(
             val meds = try { medRepository.getMedicamentos() } catch(_: Exception) { emptyList() }
             
             // 3. Generar respuesta "IA"
-            val response = SmartAssistant.generateResponse(texto, turnos, meds)
+            val response = SmartAssistant.generateResponse(getApplication(), texto, turnos, meds)
             
             val aiMsg = Mensaje(id = "ai_${System.currentTimeMillis()}", texto = response, remitente = "DOCTOR", fecha = Date())
             currentList.add(aiMsg)

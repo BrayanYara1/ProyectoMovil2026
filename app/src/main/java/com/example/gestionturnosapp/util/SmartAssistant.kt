@@ -1,53 +1,62 @@
 package com.example.gestionturnosapp.util
 
+import android.content.Context
+import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.Medicamento
 import com.example.gestionturnosapp.data.Turno
 
 object SmartAssistant {
 
-    fun generateResponse(query: String, turnos: List<Turno>, meds: List<Medicamento>): String {
+    fun generateResponse(context: Context, query: String, turnos: List<Turno>, meds: List<Medicamento>): String {
         val q = query.lowercase()
 
         return when {
             q.contains("hola") || q.contains("buenos días") || q.contains("buenas tardes") -> 
-                "¡Hola! Soy tu asistente de Salud Activa. ¿En qué puedo ayudarte hoy? Puedo explicarte términos médicos, recordarte tus citas o ayudarte con tus medicamentos."
+                context.getString(R.string.ai_welcome)
 
             q.contains("cita") || q.contains("turno") || q.contains("cuando") -> {
-                val next = turnos.firstOrNull { it.estado.lowercase() in listOf("pendiente", "pending") }
+                val next = turnos.asSequence()
+                    .filter { it.estado.lowercase() in listOf("pendiente", "pending") }
+                    .minByOrNull { "${it.fecha} ${it.hora}" }
+
                 if (next != null) {
-                    "Tu próxima cita es de ${next.especialidad} con el ${next.doctor} el día ${next.fecha} a las ${next.hora}. ¿Te gustaría que te de algunas recomendaciones para ese día?"
+                    context.getString(R.string.ai_next_appointment, 
+                        next.especialidad ?: context.getString(R.string.label_default_specialty), 
+                        next.doctor ?: context.getString(R.string.label_default_doctor), 
+                        next.fecha, 
+                        next.hora)
                 } else {
-                    "No tienes citas pendientes por ahora. ¿Quieres que te ayude a agendar una?"
+                    context.getString(R.string.ai_no_appointments)
                 }
             }
 
             q.contains("medicamento") || q.contains("pastilla") || q.contains("toma") -> {
                 if (meds.isNotEmpty()) {
                     val medList = meds.joinToString("\n") { "- ${it.nombre} (${it.dosis}): ${it.frecuencia}" }
-                    "Actualmente tienes registrados estos medicamentos:\n$medList\nRecuerda seguir siempre las indicaciones de tu médico."
+                    context.getString(R.string.ai_meds_list, medList)
                 } else {
-                    "No tienes medicamentos registrados. Si estás tomando algo, puedes agregarlo en la sección de Medicamentos."
+                    context.getString(R.string.ai_no_meds)
                 }
             }
 
             q.contains("qué es") || q.contains("que es") || q.contains("significa") -> {
-                explainMedicalTerm(q)
+                explainMedicalTerm(context, q)
             }
 
             q.contains("gracias") || q.contains("gracia") -> 
-                "¡De nada! Estoy aquí para cuidar de tu salud. ¿Necesitas algo más?"
+                context.getString(R.string.ai_thanks_reply)
 
-            else -> "Interesante pregunta. Como asistente de salud, te recomiendo consultar siempre con un profesional para un diagnóstico preciso. ¿Quieres que te ayude a buscar un especialista?"
+            else -> context.getString(R.string.ai_generic_recommendation)
         }
     }
 
-    private fun explainMedicalTerm(query: String): String {
+    private fun explainMedicalTerm(context: Context, query: String): String {
         return when {
-            query.contains("ecografía") -> "Una ecografía es un procedimiento que usa ondas de sonido de alta frecuencia para ver órganos y estructuras dentro del cuerpo."
-            query.contains("ayunas") -> "Estar en ayunas significa no ingerir alimentos ni bebidas (excepto agua) por un periodo, usualmente de 8 a 12 horas, antes de un examen."
-            query.contains("presión") || query.contains("tensión") -> "La presión arterial es la fuerza de su sangre al empujar contra las paredes de sus arterias."
-            query.contains("diabetes") -> "La diabetes es una enfermedad en la que los niveles de glucosa (azúcar) de la sangre están muy altos."
-            else -> "Ese es un término técnico importante. Por seguridad, te sugiero consultarlo directamente con tu médico en tu próxima cita para que te explique cómo aplica a tu caso particular."
+            query.contains("ecografía") -> context.getString(R.string.ai_term_ecografia)
+            query.contains("ayunas") -> context.getString(R.string.ai_term_ayunas)
+            query.contains("presión") || query.contains("tensión") -> context.getString(R.string.ai_term_presion)
+            query.contains("diabetes") -> context.getString(R.string.ai_term_diabetes)
+            else -> context.getString(R.string.ai_term_generic)
         }
     }
 }

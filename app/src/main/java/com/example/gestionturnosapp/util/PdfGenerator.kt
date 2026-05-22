@@ -41,30 +41,30 @@ object PdfGenerator {
         y += 30f
         paint.color = Color.BLACK
         paint.textSize = 18f
-        canvas.drawText("Resumen de Salud Personal", margin, y, paint)
+        canvas.drawText(context.getString(R.string.pdf_title), margin, y, paint)
         
         y += 40f
         paint.textSize = 12f
         paint.isFakeBoldText = false
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-        canvas.drawText("Generado el: ${dateFormat.format(Date())}", margin, y, paint)
+        canvas.drawText(context.getString(R.string.pdf_generated_at, dateFormat.format(Date())), margin, y, paint)
 
         // USUARIO
         y += 30f
         paint.isFakeBoldText = true
-        canvas.drawText("Paciente:", margin, y, paint)
+        canvas.drawText(context.getString(R.string.pdf_patient), margin, y, paint)
         paint.isFakeBoldText = false
-        canvas.drawText(usuario?.nombre ?: "Anónimo", margin + 70f, y, paint)
+        canvas.drawText(usuario?.nombre ?: context.getString(R.string.label_anonymous), margin + 70f, y, paint)
         
         y += 20f
-        canvas.drawText("Email: ${usuario?.email ?: "N/A"}", margin, y, paint)
+        canvas.drawText("${context.getString(R.string.hint_email)}: ${usuario?.email ?: "N/A"}", margin, y, paint)
 
         // SECCIÓN TURNOS
         y += 50f
         paint.color = context.getColor(R.color.primary)
         paint.isFakeBoldText = true
         paint.textSize = 16f
-        canvas.drawText("Próximas Citas Médicas", margin, y, paint)
+        canvas.drawText(context.getString(R.string.pdf_appointments_title), margin, y, paint)
         
         y += 10f
         canvas.drawLine(margin, y, margin + contentWidth, y, paint)
@@ -73,7 +73,7 @@ object PdfGenerator {
         paint.color = Color.BLACK
         paint.textSize = 12f
         if (turnos.isEmpty()) {
-            canvas.drawText("No hay citas programadas.", margin, y, paint)
+            canvas.drawText(context.getString(R.string.pdf_no_appointments), margin, y, paint)
             y += 20f
         } else {
             turnos.take(10).forEach { turno ->
@@ -92,7 +92,7 @@ object PdfGenerator {
         paint.color = context.getColor(R.color.primary)
         paint.isFakeBoldText = true
         paint.textSize = 16f
-        canvas.drawText("Medicamentos Actuales", margin, y, paint)
+        canvas.drawText(context.getString(R.string.pdf_meds_title), margin, y, paint)
         
         y += 10f
         canvas.drawLine(margin, y, margin + contentWidth, y, paint)
@@ -101,7 +101,7 @@ object PdfGenerator {
         paint.color = Color.BLACK
         paint.textSize = 12f
         if (meds.isEmpty()) {
-            canvas.drawText("No hay medicamentos registrados.", margin, y, paint)
+            canvas.drawText(context.getString(R.string.pdf_no_meds), margin, y, paint)
             y += 20f
         } else {
             meds.take(15).forEach { med ->
@@ -109,7 +109,7 @@ object PdfGenerator {
                 canvas.drawText("${med.nombre} (${med.dosis})", margin, y, paint)
                 y += 18f
                 paint.isFakeBoldText = false
-                canvas.drawText("Frecuencia: ${med.frecuencia}", margin + 10f, y, paint)
+                canvas.drawText("${context.getString(R.string.hint_med_freq)}: ${med.frecuencia}", margin + 10f, y, paint)
                 y += 25f
             }
         }
@@ -117,7 +117,7 @@ object PdfGenerator {
         // FOOTER
         paint.color = Color.GRAY
         paint.textSize = 10f
-        canvas.drawText("Este documento es un resumen informativo generado por la App Salud Activa.", margin, 820f, paint)
+        canvas.drawText(context.getString(R.string.pdf_footer), margin, 820f, paint)
 
         pdfDocument.finishPage(page)
 

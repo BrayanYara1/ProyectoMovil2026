@@ -19,4 +19,10 @@ interface MedicamentoDao {
 
     @Query("DELETE FROM medicamentos WHERE id = :medId")
     suspend fun deleteById(medId: String)
+
+    @androidx.room.Transaction
+    suspend fun clearAndInsert(meds: List<Medicamento>) {
+        deleteAllMedicamentos()
+        insertMedicamentos(meds)
+    }
 }

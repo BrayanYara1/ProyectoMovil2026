@@ -7,6 +7,7 @@ import android.view.HapticFeedbackConstants
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
@@ -69,6 +70,7 @@ class HomeFragment : Fragment() {
         binding.cardMisTurnos.setOnClickListener { navigateTo(R.id.action_homeFragment_to_turnosListFragment) }
         binding.cardEspecialidades.setOnClickListener { navigateTo(R.id.action_homeFragment_to_especialidadesFragment) }
         binding.cardMedication.setOnClickListener { navigateTo(R.id.action_homeFragment_to_medicamentosFragment) }
+        binding.btnAddMedHome.setOnClickListener { navigateTo(R.id.action_homeFragment_to_medicamentosFragment) }
         binding.cardEstudios.setOnClickListener { navigateTo(R.id.action_homeFragment_to_estudiosFragment) }
         binding.cardChat.setOnClickListener { navigateTo(R.id.action_homeFragment_to_chatFragment) }
 
@@ -243,10 +245,10 @@ class HomeFragment : Fragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_health_summary)
             .setMessage(R.string.label_share_health_question)
-            .setPositiveButton("PDF (RECOMENDADO)") { _, _ ->
+            .setPositiveButton(R.string.label_share_pdf) { _, _ ->
                 generateAndSharePdf()
             }
-            .setNegativeButton("SOLO TEXTO") { _, _ ->
+            .setNegativeButton(R.string.label_share_text) { _, _ ->
                 shareTextSummary()
             }
             .show()
@@ -269,7 +271,7 @@ class HomeFragment : Fragment() {
             }
             startActivity(Intent.createChooser(intent, getString(R.string.label_share_via)))
         } else {
-            Snackbar.make(binding.root, "Error al generar el PDF", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(binding.root, R.string.msg_pdf_error, Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -314,36 +316,52 @@ class HomeFragment : Fragment() {
 
     private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {
         val hasMeds = meds.isNotEmpty()
-        binding.tvNoMeds.isVisible = !hasMeds
-        binding.lottieMeds.isVisible = !hasMeds
+        binding.tvNoMeds.visibility = if (hasMeds) View.GONE else View.VISIBLE
+        binding.lottieMeds.visibility = if (hasMeds) View.GONE else View.VISIBLE
 
         binding.layoutMedication.apply {
-            // Eliminar solo los items inflados previamente (manteniendo los placeholders de error/vacio)
-            val viewsToRemove = mutableListOf<View>()
+            // Limpieza TOTAL de views previas EXCEPTO los elementos fijos (tvNoMeds, lottieMeds)
+            val fixedViewIds = setOf(R.id.tvNoMeds, R.id.lottieMeds)
+            val childrenToRemove = mutableListOf<View>()
             for (i in 0 until childCount) {
                 val child = getChildAt(i)
-                if (child.id != R.id.tvNoMeds && child.id != R.id.lottieMeds) viewsToRemove.add(child)
+                if (child.id !in fixedViewIds) {
+                    childrenToRemove.add(child)
+                }
             }
-            viewsToRemove.forEach { removeView(it) }
+            childrenToRemove.forEach { removeView(it) }
 
             if (hasMeds) {
-                // Mostrar solo los 3 primeros medicamentos
+                // Mostrar máximo 3 medicamentos para no saturar el Inicio
                 meds.take(3).forEach { med ->
-                    val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, this, false)
-                    medView.findViewById<TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
-                    
-                    val scheduleText = if (med.proximaToma.isNotBlank()) {
-                        "${med.frecuencia} • ${getString(R.string.hint_med_next)}: ${med.proximaToma}"
-                    } else {
-                        med.frecuencia
+                    try {
+                        val medView = LayoutInflater.from(context).inflate(R.layout.item_medication_home, this, false)
+                        medView.findViewById<TextView>(R.id.tvMedName).text = getString(R.string.label_medication_format, med.nombre, med.dosis)
+                        
+                        val scheduleText = if (!med.proximaToma.isNullOrBlank()) {
+                            "${med.frecuencia} • ${getString(R.string.hint_med_next)}: ${med.proximaToma}"
+                        } else {
+                            med.frecuencia
+                        }
+                        medView.findViewById<TextView>(R.id.tvMedSchedule).text = scheduleText
+                        
+                        // Configuración visual interactiva para Dashboard
+                        medView.findViewById<View>(R.id.btnDeleteMed).visibility = View.GONE
+                        val btnTomar = medView.findViewById<ImageView>(R.id.ivMedInfo)
+                        btnTomar.setImageResource(android.R.drawable.checkbox_off_background)
+                        btnTomar.alpha = 1.0f
+                        btnTomar.setOnClickListener {
+                            it.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            btnTomar.setImageResource(android.R.drawable.checkbox_on_background)
+                            btnTomar.imageTintList = ColorStateList.valueOf(requireContext().getColor(R.color.success))
+                            viewModel.marcarComoTomado(med)
+                            Snackbar.make(binding.root, "Dosis de ${med.nombre} registrada", Snackbar.LENGTH_SHORT).show()
+                        }
+                        
+                        addView(medView)
+                    } catch (e: Exception) {
+                        android.util.Log.e("HomeFragment", "Error inflating med item", e)
                     }
-                    medView.findViewById<TextView>(R.id.tvMedSchedule).text = scheduleText
-                    
-                    // En Home no queremos botón de borrar, ocultamos
-                    medView.findViewById<View>(R.id.btnDeleteMed).isVisible = false
-                    medView.findViewById<View>(R.id.ivMedInfo).isVisible = true
-                    
-                    addView(medView)
                 }
             }
         }

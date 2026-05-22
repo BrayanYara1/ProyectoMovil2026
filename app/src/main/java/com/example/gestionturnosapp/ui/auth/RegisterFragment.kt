@@ -88,17 +88,25 @@ class RegisterFragment : Fragment() {
             binding.tilPassword.error = null 
         }
 
-        binding.etTelefono.doAfterTextChanged { s ->
-            val text = s.toString()
-            if (text.isNotEmpty() && !text.startsWith("+57 ")) {
-                val clean = text.replace("+57", "").trim()
-                val formatted = "+57 $clean"
-                binding.etTelefono.setText(formatted)
-                binding.etTelefono.setSelection(binding.etTelefono.length())
+        binding.etTelefono.addTextChangedListener(object : android.text.TextWatcher {
+            private var isUpdating = false
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                if (isUpdating) return
+                
+                val text = s.toString()
+                if (text.isNotEmpty() && !text.startsWith("+57 ")) {
+                    isUpdating = true
+                    val clean = text.replace("+57", "").trim()
+                    binding.etTelefono.setText("+57 $clean")
+                    binding.etTelefono.setSelection(binding.etTelefono.length())
+                    isUpdating = false
+                }
+                viewModel.regPhone.value = binding.etTelefono.text.toString()
+                binding.tilTelefono.error = null
             }
-            viewModel.regPhone.value = binding.etTelefono.text.toString()
-            binding.tilTelefono.error = null
-        }
+        })
 
         binding.btnRegister.setOnClickListener {
             viewModel.register()

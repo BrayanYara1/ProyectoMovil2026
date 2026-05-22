@@ -24,3 +24,8 @@ build/
 *.tfstate.*
 .terraform.lock.hcl
 *.tfvars
+
+# Backend (Ignorar para mejorar rendimiento en Android Studio)
+backend/node_modules/
+backend/.env
+node_modules/

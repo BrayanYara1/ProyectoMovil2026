@@ -28,6 +28,15 @@ class MedicamentoRepository @Inject constructor(
         }
     }
 
+    suspend fun updateMedicamento(id: String, med: Medicamento): Medicamento? {
+        val response = apiService.updateMedicamento(id, med)
+        if (response.isSuccessful) {
+            return response.body()
+        } else {
+            throw Exception(RetrofitClient.parseError(response))
+        }
+    }
+
     suspend fun eliminarMedicamento(id: String) {
         val response = apiService.eliminarMedicamento(id)
         if (!response.isSuccessful) {
