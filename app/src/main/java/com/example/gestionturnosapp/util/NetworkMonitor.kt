@@ -15,7 +15,7 @@ import javax.inject.Singleton
 
 @Singleton
 class NetworkMonitor @Inject constructor(
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
 ) {
 
     private val connectivityManager =
@@ -24,11 +24,11 @@ class NetworkMonitor @Inject constructor(
     val isOnline: Flow<Boolean> = callbackFlow {
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                trySend(true)
+                trySend(element = true)
             }
 
             override fun onLost(network: Network) {
-                trySend(false)
+                trySend(element = false)
             }
         }
 

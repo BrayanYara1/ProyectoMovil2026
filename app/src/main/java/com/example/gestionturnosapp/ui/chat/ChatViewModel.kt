@@ -16,7 +16,7 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val repository: ChatRepository,
     private val turnoRepository: TurnoRepository,
-    private val medRepository: MedicamentoRepository
+    private val medRepository: MedicamentoRepository,
 ) : ViewModel() {
 
     private val _mensajes = MutableLiveData<Resource<List<Mensaje>>>()
@@ -25,7 +25,7 @@ class ChatViewModel @Inject constructor(
     private val _mensajeEnviado = MutableLiveData<Resource<Mensaje>>()
     val mensajeEnviado: LiveData<Resource<Mensaje>> = _mensajeEnviado
 
-    private val _isDoctorTyping = MutableLiveData<Boolean>(false)
+    private val _isDoctorTyping = MutableLiveData(false)
     val isDoctorTyping: LiveData<Boolean> = _isDoctorTyping
 
     // Modo Asistente IA (Por defecto activado para Help)

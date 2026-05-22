@@ -58,7 +58,7 @@ object RetrofitClient {
             } else {
                 "Error ${response.code()}: ${response.message()}"
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             "Error ${response.code()}"
         }
     }

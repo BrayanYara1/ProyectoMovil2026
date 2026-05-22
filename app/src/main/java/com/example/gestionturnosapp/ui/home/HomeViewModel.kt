@@ -22,7 +22,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     application: Application,
     private val turnoRepository: TurnoRepository,
-    private val medRepository: MedicamentoRepository
+    private val medRepository: MedicamentoRepository,
 ) : AndroidViewModel(application) {
 
     private val _turnosCount = MutableLiveData<Int>()
@@ -83,14 +83,14 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 if (refreshJob?.isActive == true) {
                     val msg = e.localizedMessage ?: ""
-                    _errorMessage.value = if (msg.contains("resolve host", true) || msg.contains("connect", true)) {
+                    _errorMessage.value = if (msg.contains(other = "resolve host", ignoreCase = true) || msg.contains(other = "connect", ignoreCase = true)) {
                         getApplication<Application>().getString(R.string.msg_no_connection)
                     } else {
                         msg.ifBlank { getApplication<Application>().getString(R.string.msg_error_unknown) }
                     }
                     
                     // Si falló el servidor, nos aseguramos de que al menos la caché sea visible
-                    if (_nextTurno.value == null && _medicamentos.value.isNullOrEmpty()) {
+                    if ((_nextTurno.value == null) && _medicamentos.value.isNullOrEmpty()) {
                         loadFromCache()
                     }
                 }
@@ -102,9 +102,8 @@ class HomeViewModel @Inject constructor(
 
     private fun updateTurnosUI(turnos: List<Turno>) {
         _turnosCount.value = turnos.size
-        _nextTurno.value = turnos.filter { it.estado.lowercase() in listOf("pendiente", "pending") }
-            .sortedBy { "${it.fecha} ${it.hora}" }
-            .firstOrNull()
+        _nextTurno.value = turnos.asSequence().filter { it.estado.lowercase() in listOf("pendiente", "pending") }
+            .minByOrNull { "${it.fecha} ${it.hora}" }
     }
 
     fun syncAll() {
@@ -157,7 +156,7 @@ class HomeViewModel @Inject constructor(
             R.string.tip_health_10
         )
         // Usamos el día del año para que la recomendación sea realmente "del día"
-        val dayOfYear = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
+        val dayOfYear = Calendar.getInstance()[Calendar.DAY_OF_YEAR]
         _healthTipResId.value = tips[dayOfYear % tips.size]
     }
 }

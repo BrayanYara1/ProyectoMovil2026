@@ -97,10 +97,16 @@ class MedicamentosFragment : Fragment() {
         }
 
         binding.etMedNext.setOnClickListener {
-            val c = java.util.Calendar.getInstance()
-            android.app.TimePickerDialog(requireContext(), { _, hour, minute ->
-                binding.etMedNext.setText(String.format(java.util.Locale.getDefault(), "%02d:%02d", hour, minute))
-            }, c.get(java.util.Calendar.HOUR_OF_DAY), c.get(java.util.Calendar.MINUTE), true).show()
+            val c = Calendar.getInstance()
+            android.app.TimePickerDialog(
+                requireContext(),
+                { _, hour, minute ->
+                    binding.etMedNext.setText(String.format(java.util.Locale.getDefault(), "%02d:%02d", hour, minute))
+                },
+                c[Calendar.HOUR_OF_DAY],
+                c[Calendar.MINUTE],
+                true
+            ).show()
         }
     }
 
@@ -115,7 +121,7 @@ class MedicamentosFragment : Fragment() {
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
                     val msg = resource.message
-                    if (msg.contains("401") || msg.contains("token", true)) {
+                    if (msg.contains("401") || msg.contains(other = "token", ignoreCase = true)) {
                         handleSessionExpired()
                     } else {
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -180,7 +186,7 @@ class MedicamentosFragment : Fragment() {
                 PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) && !alarmManager.canScheduleExactAlarms()) {
                 alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
             } else {
                 alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)

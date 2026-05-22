@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MedicamentosViewModel @Inject constructor(
     application: Application,
-    private val repository: MedicamentoRepository
+    private val repository: MedicamentoRepository,
 ) : AndroidViewModel(application) {
 
     private val _medicamentosResource = MutableLiveData<Resource<List<Medicamento>>>()
@@ -98,7 +98,7 @@ class MedicamentosViewModel @Inject constructor(
                 try {
                     repository.agregarMedicamento(med)
                     synced.add(med)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     return@forEach
                 }
             }

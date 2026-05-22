@@ -52,7 +52,7 @@ class GestionTurnosFCMService : FirebaseMessagingService() {
             title = title,
             body = body,
             channelId = channelId,
-            data = remoteMessage.data
+            data = remoteMessage.data,
         )
     }
 

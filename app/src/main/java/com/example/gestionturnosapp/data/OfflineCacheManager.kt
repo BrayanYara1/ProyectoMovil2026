@@ -1,6 +1,7 @@
 package com.example.gestionturnosapp.data
 
 import android.content.Context
+import androidx.core.content.edit
 import com.example.gestionturnosapp.data.local.AppDatabase
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -57,7 +58,7 @@ object OfflineCacheManager {
         val pending = getPendingTurnos(context).toMutableList()
         pending.add(request)
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_PENDING_TURNOS, gson.toJson(pending)).apply()
+        prefs.edit { putString(KEY_PENDING_TURNOS, gson.toJson(pending)) }
     }
 
     fun getPendingTurnos(context: Context): List<NuevoTurnoRequest> {
@@ -66,7 +67,7 @@ object OfflineCacheManager {
         return try {
             val type = object : TypeToken<List<NuevoTurnoRequest>>() {}.type
             gson.fromJson(json, type)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -76,9 +77,9 @@ object OfflineCacheManager {
         current.removeAll(synced)
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         if (current.isEmpty()) {
-            prefs.edit().remove(KEY_PENDING_TURNOS).apply()
+            prefs.edit { remove(KEY_PENDING_TURNOS) }
         } else {
-            prefs.edit().putString(KEY_PENDING_TURNOS, gson.toJson(current)).apply()
+            prefs.edit { putString(KEY_PENDING_TURNOS, gson.toJson(current)) }
         }
     }
 
@@ -86,7 +87,7 @@ object OfflineCacheManager {
         val pending = getPendingMeds(context).toMutableList()
         pending.add(med)
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_PENDING_MEDS, gson.toJson(pending)).apply()
+        prefs.edit { putString(KEY_PENDING_MEDS, gson.toJson(pending)) }
     }
 
     fun getPendingMeds(context: Context): List<Medicamento> {
@@ -95,7 +96,7 @@ object OfflineCacheManager {
         return try {
             val type = object : TypeToken<List<Medicamento>>() {}.type
             gson.fromJson(json, type)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -105,9 +106,9 @@ object OfflineCacheManager {
         current.removeAll(synced)
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         if (current.isEmpty()) {
-            prefs.edit().remove(KEY_PENDING_MEDS).apply()
+            prefs.edit { remove(KEY_PENDING_MEDS) }
         } else {
-            prefs.edit().putString(KEY_PENDING_MEDS, gson.toJson(current)).apply()
+            prefs.edit { putString(KEY_PENDING_MEDS, gson.toJson(current)) }
         }
     }
 
@@ -115,7 +116,7 @@ object OfflineCacheManager {
         val pending = getPendingEstudios(context).toMutableList()
         pending.add(estudio)
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString(KEY_PENDING_ESTUDIOS, gson.toJson(pending)).apply()
+        prefs.edit { putString(KEY_PENDING_ESTUDIOS, gson.toJson(pending)) }
     }
 
     fun getPendingEstudios(context: Context): List<EstudioMedico> {
@@ -124,7 +125,7 @@ object OfflineCacheManager {
         return try {
             val type = object : TypeToken<List<EstudioMedico>>() {}.type
             gson.fromJson(json, type)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -134,9 +135,9 @@ object OfflineCacheManager {
         current.removeAll(synced)
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         if (current.isEmpty()) {
-            prefs.edit().remove(KEY_PENDING_ESTUDIOS).apply()
+            prefs.edit { remove(KEY_PENDING_ESTUDIOS) }
         } else {
-            prefs.edit().putString(KEY_PENDING_ESTUDIOS, gson.toJson(current)).apply()
+            prefs.edit { putString(KEY_PENDING_ESTUDIOS, gson.toJson(current)) }
         }
     }
 
@@ -149,8 +150,8 @@ object OfflineCacheManager {
 
     fun isNetworkError(e: Exception): Boolean {
         val msg = e.localizedMessage ?: ""
-        return msg.contains("Unable to resolve host", true) || 
-               msg.contains("timeout", true) || 
-               msg.contains("Failed to connect", true)
+        return msg.contains(other = "Unable to resolve host", ignoreCase = true) || 
+               msg.contains(other = "timeout", ignoreCase = true) || 
+               msg.contains(other = "Failed to connect", ignoreCase = true)
     }
 }

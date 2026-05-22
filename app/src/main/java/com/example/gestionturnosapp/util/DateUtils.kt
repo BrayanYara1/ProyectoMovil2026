@@ -25,7 +25,7 @@ object DateUtils {
                 sdf.isLenient = false
                 val date = sdf.parse(cleanTime)
                 if (date != null) return date
-            } catch (e: Exception) {}
+            } catch (_: Exception) {}
         }
 
         for (fmt in inputFormats) {
@@ -34,7 +34,7 @@ object DateUtils {
                 sdf.isLenient = false
                 val date = sdf.parse(cleanTime)
                 if (date != null) return date
-            } catch (e: Exception) {}
+            } catch (_: Exception) {}
         }
         
         return null
@@ -81,9 +81,9 @@ object DateUtils {
 
             val calendar = Calendar.getInstance()
             calendar.time = dateObj
-            calendar.set(Calendar.HOUR_OF_DAY, hourInt)
-            calendar.set(Calendar.MINUTE, minuteInt)
-            calendar.set(Calendar.SECOND, 0)
+            calendar[Calendar.HOUR_OF_DAY] = hourInt
+            calendar[Calendar.MINUTE] = minuteInt
+            calendar[Calendar.SECOND] = 0
             
             calendar.time.before(Date())
         } catch (e: Exception) {
@@ -101,7 +101,7 @@ object DateUtils {
             val cleanTime = time.uppercase().replace("A. M.", "AM").replace("P. M.", "PM")
             val isPM = cleanTime.contains("PM")
             val isAM = cleanTime.contains("AM")
-            val digits = cleanTime.filter { it.isDigit() || it == ':' }.split(":")
+            val digits = cleanTime.filter { (it.isDigit() || it == ':') }.split(":")
             
             if (digits.size >= 2) {
                 var h = digits[0].toIntOrNull() ?: 0

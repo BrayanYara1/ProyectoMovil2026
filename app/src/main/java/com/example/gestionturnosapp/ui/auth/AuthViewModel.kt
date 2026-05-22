@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     application: Application,
-    private val repository: AuthRepository
+    private val repository: AuthRepository,
 ) : AndroidViewModel(application) {
     
     private val _authState = MutableLiveData<Resource<Usuario>>(Resource.Idle)
@@ -30,7 +30,7 @@ class AuthViewModel @Inject constructor(
         val observer = { _: String? ->
             val email = loginEmail.value ?: ""
             val pass = loginPassword.value ?: ""
-            value = Patterns.EMAIL_ADDRESS.matcher(email).matches() && pass.length >= 6
+            value = (Patterns.EMAIL_ADDRESS.matcher(email).matches() && pass.length >= 6)
         }
         addSource(loginEmail, observer)
         addSource(loginPassword, observer)
@@ -78,8 +78,7 @@ class AuthViewModel @Inject constructor(
                         _authState.value = Resource.Error(getApplication<Application>().getString(R.string.msg_user_not_found))
                     }
                 } else {
-                    val code = response.code()
-                    val errorMsg = when (code) {
+                    val errorMsg = when (response.code()) {
                         401 -> getApplication<Application>().getString(R.string.msg_login_error)
                         404 -> getApplication<Application>().getString(R.string.msg_user_not_found)
                         else -> repository.getErrorMessage(response)
@@ -109,8 +108,8 @@ class AuthViewModel @Inject constructor(
                 } else {
                     val errorMsg = repository.getErrorMessage(response)
                     val displayMsg = when {
-                        errorMsg.contains("email", true) || errorMsg.contains("correo", true) -> getApplication<Application>().getString(R.string.msg_email_already_registered)
-                        errorMsg.contains("password", true) || errorMsg.contains("contraseña", true) -> getApplication<Application>().getString(R.string.msg_password_weak)
+                        errorMsg.contains(other = "email", ignoreCase = true) || errorMsg.contains(other = "correo", ignoreCase = true) -> getApplication<Application>().getString(R.string.msg_email_already_registered)
+                        errorMsg.contains(other = "password", ignoreCase = true) || errorMsg.contains(other = "contraseña", ignoreCase = true) -> getApplication<Application>().getString(R.string.msg_password_weak)
                         else -> errorMsg
                     }
                     _authState.value = Resource.Error(displayMsg)

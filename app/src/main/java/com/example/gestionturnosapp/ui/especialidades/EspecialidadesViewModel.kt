@@ -14,10 +14,10 @@ import javax.inject.Inject
 @HiltViewModel
 class EspecialidadesViewModel @Inject constructor(
     application: Application,
-    private val repository: EspecialidadRepository
+    private val repository: EspecialidadRepository,
 ) : AndroidViewModel(application) {
     private val _allEspecialidades = MutableLiveData<List<Especialidad>>()
-    private val _searchQuery = MutableLiveData<String>("")
+    private val _searchQuery = MutableLiveData("")
     private val _localeTrigger = MutableLiveData<Long>(System.currentTimeMillis())
 
     val filteredEspecialidades = MediatorLiveData<List<Especialidad>>().apply {
@@ -25,12 +25,12 @@ class EspecialidadesViewModel @Inject constructor(
             val list = _allEspecialidades.value ?: emptyList()
             val query = _searchQuery.value?.lowercase(Locale.getDefault()) ?: ""
             
-            if (query.isEmpty()) {
-                value = list
+            value = if (query.isEmpty()) {
+                list
             } else {
                 // Usamos el locale actual para las comparaciones de texto
                 val context = getApplication<Application>().applicationContext
-                value = list.filter { especialidad ->
+                list.filter { especialidad ->
                     val name = context.getString(especialidad.nombreRes).lowercase(Locale.getDefault())
                     val desc = context.getString(especialidad.descripcionRes).lowercase(Locale.getDefault())
                     

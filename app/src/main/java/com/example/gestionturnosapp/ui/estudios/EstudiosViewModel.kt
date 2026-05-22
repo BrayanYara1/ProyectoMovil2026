@@ -17,15 +17,13 @@ import javax.inject.Inject
 @HiltViewModel
 class EstudiosViewModel @Inject constructor(
     application: Application,
-    private val repository: EstudioRepository
+    private val repository: EstudioRepository,
 ) : AndroidViewModel(application) {
-
-    private val context = application.applicationContext
 
     private val _allEstudios = MutableLiveData<List<EstudioMedico>>(emptyList())
     private val _startDate = MutableLiveData<String?>(null)
     private val _endDate = MutableLiveData<String?>(null)
-    private val _searchQuery = MutableLiveData<String>("")
+    private val _searchQuery = MutableLiveData("")
 
     private val _estudiosResource = MediatorLiveData<Resource<List<EstudioMedico>>>().apply {
         val observer = { _: Any? ->
@@ -35,7 +33,7 @@ class EstudiosViewModel @Inject constructor(
             val query = _searchQuery.value?.lowercase() ?: ""
 
             val filtered = list.filter { estudio ->
-                val matchesDate = (start == null || estudio.fecha >= start) && (end == null || estudio.fecha <= end)
+                val matchesDate = ((start == null || estudio.fecha >= start) && (end == null || estudio.fecha <= end))
                 val matchesQuery = query.isEmpty() || 
                                   estudio.titulo.lowercase().contains(query) || 
                                   estudio.tipo.lowercase().contains(query)
@@ -128,7 +126,7 @@ class EstudiosViewModel @Inject constructor(
                 try {
                     repository.agregarEstudio(estudio)
                     synced.add(estudio)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     return@forEach
                 }
             }

@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    application: Application
+    application: Application,
 ) : AndroidViewModel(application) {
 
     private val _user = MutableLiveData<Usuario?>()
@@ -61,7 +61,7 @@ class ProfileViewModel @Inject constructor(
                         _updateStatus.value = Resource.Error(msg)
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Offline fallback
                 UserManager.saveUser(getApplication(), nuevoUsuario)
                 _user.value = nuevoUsuario

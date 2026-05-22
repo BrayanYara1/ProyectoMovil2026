@@ -77,7 +77,9 @@ class SettingsFragment : Fragment() {
                 .setTitle(getString(R.string.label_language))
                 .setItems(options) { _, which ->
                     val langTag = if (which == 0) "es" else "en"
-                    PreferenceManager.setLocale(requireContext(), langTag)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        PreferenceManager.setLocale(requireContext(), langTag)
+                    }
                 }
                 .show()
         }

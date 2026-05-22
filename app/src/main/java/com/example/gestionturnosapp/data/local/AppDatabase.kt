@@ -28,7 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    "gestion_turnos_db"
+                    "gestion_turnos_db",
                 )
                 .openHelperFactory(factory)
                 .build()

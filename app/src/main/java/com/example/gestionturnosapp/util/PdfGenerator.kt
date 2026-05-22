@@ -20,7 +20,7 @@ object PdfGenerator {
         context: Context,
         usuario: Usuario?,
         turnos: List<Turno>,
-        meds: List<Medicamento>
+        meds: List<Medicamento>,
     ): Uri? {
         val pdfDocument = PdfDocument()
         val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create() // A4 Size
@@ -82,7 +82,7 @@ object PdfGenerator {
                 y += 18f
                 paint.isFakeBoldText = false
                 val displayDate = DateUtils.formatDisplayDate(context, turno.fecha)
-                canvas.drawText("${displayDate} a las ${turno.hora}", margin + 10f, y, paint)
+                canvas.drawText("$displayDate a las ${turno.hora}", margin + 10f, y, paint)
                 y += 25f
             }
         }

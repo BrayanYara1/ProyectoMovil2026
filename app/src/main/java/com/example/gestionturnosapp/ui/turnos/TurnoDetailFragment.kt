@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -67,12 +68,12 @@ class TurnoDetailFragment : Fragment() {
                 val sdfInput = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US)
                 val date = sdfInput.parse(fecha)
                 if (date != null) {
-                    val cal = java.util.Calendar.getInstance()
+                    val cal = Calendar.getInstance()
                     cal.time = date
                     tvDetailDia.text = cal.get(java.util.Calendar.DAY_OF_MONTH).toString()
                     tvDetailMes.text = java.text.SimpleDateFormat("MMM", java.util.Locale.getDefault()).format(date).uppercase()
                 }
-            } catch (e: Exception) {}
+            } catch (_: Exception) {}
 
             // Formatear hora para mostrar AM/PM siempre (Resiliente)
             val displayTime = DateUtils.formatDisplayTime(hora)
@@ -247,7 +248,7 @@ class TurnoDetailFragment : Fragment() {
                 "${getString(R.string.label_share_patient, paciente)}\n" +
                 "${getString(R.string.label_share_date, fecha)}\n" +
                 "${getString(R.string.label_share_time, hora)}\n" +
-                "${getString(R.string.label_share_reason, motivo)}"
+                getString(R.string.label_share_reason, motivo)
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, message)
@@ -256,7 +257,7 @@ class TurnoDetailFragment : Fragment() {
     }
 
     private fun openMap() {
-        val intent = Intent(Intent.ACTION_VIEW, android.net.Uri.parse("geo:0,0?q=Clinica+Salud+Activa"))
+        val intent = Intent(Intent.ACTION_VIEW, "geo:0,0?q=Clinica+Salud+Activa".toUri())
         intent.setPackage("com.google.android.apps.maps")
         try { startActivity(intent) } catch (e: Exception) { 
             com.google.android.material.snackbar.Snackbar.make(

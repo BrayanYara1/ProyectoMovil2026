@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var networkMonitor: NetworkMonitor
 
     private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
+        ActivityResultContracts.RequestPermission(),
     ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {

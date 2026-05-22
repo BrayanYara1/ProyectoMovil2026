@@ -2,6 +2,7 @@ package com.example.gestionturnosapp.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
@@ -30,10 +31,10 @@ object UserManager {
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Si hay un error de cifrado (común al cambiar versiones o Keystore), 
             // borramos las preferencias corruptas para que la app no crashee.
-            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+            context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit { clear() }
             // Intentamos crear de nuevo
             EncryptedSharedPreferences.create(
                 context.applicationContext,
@@ -49,19 +50,18 @@ object UserManager {
         this.appContext = context.applicationContext
         usuarioActual = usuario
         val prefs = getEncryptedPrefs(appContext!!)
-        prefs.edit().apply {
+        prefs.edit {
             putString(KEY_USER, Gson().toJson(usuario))
             if (authToken != null) {
                 token = authToken
                 putString(KEY_TOKEN, authToken)
             }
-            apply()
         }
     }
 
     fun getToken(context: Context? = null): String? {
         val targetContext = context?.applicationContext ?: appContext
-        if (token == null && targetContext != null) {
+        if (token == null && (targetContext != null)) {
             val prefs = getEncryptedPrefs(targetContext)
             token = prefs.getString(KEY_TOKEN, null)
         }
@@ -84,7 +84,7 @@ object UserManager {
                 usuarioActual = Gson().fromJson(json, Usuario::class.java)
             } catch (_: Exception) {
                 usuarioActual = null
-                prefs.edit().remove(KEY_USER).apply()
+                prefs.edit { remove(KEY_USER) }
             }
         }
         token = prefs.getString(KEY_TOKEN, null)
@@ -93,7 +93,10 @@ object UserManager {
 
     fun saveFcmToken(context: Context, fcmToken: String) {
         val prefs = getEncryptedPrefs(context)
-        prefs.edit().putString(KEY_FCM_TOKEN, fcmToken).putBoolean(KEY_FCM_SYNCED, false).apply()
+        prefs.edit { 
+            putString(KEY_FCM_TOKEN, fcmToken)
+            putBoolean(KEY_FCM_SYNCED, false)
+        }
     }
 
     fun getFcmToken(context: Context): String? {
@@ -101,7 +104,7 @@ object UserManager {
     }
 
     fun markFcmAsSynced(context: Context) {
-        getEncryptedPrefs(context).edit().putBoolean(KEY_FCM_SYNCED, true).apply()
+        getEncryptedPrefs(context).edit { putBoolean(KEY_FCM_SYNCED, true) }
     }
 
     fun isFcmSynced(context: Context): Boolean {
@@ -112,6 +115,6 @@ object UserManager {
         usuarioActual = null
         token = null
         val prefs = getEncryptedPrefs(context)
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
     }
 }

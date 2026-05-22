@@ -11,7 +11,7 @@ object BiometricHelper {
     fun isBiometricAvailable(context: Context): Boolean {
         val biometricManager = BiometricManager.from(context)
         return biometricManager.canAuthenticate(
-            BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL,
         ) == BiometricManager.BIOMETRIC_SUCCESS
     }
 
@@ -23,7 +23,9 @@ object BiometricHelper {
         onError: (String) -> Unit
     ) {
         val executor = ContextCompat.getMainExecutor(activity)
-        val biometricPrompt = BiometricPrompt(activity, executor,
+        val biometricPrompt = BiometricPrompt(
+            activity,
+            executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
@@ -33,10 +35,6 @@ object BiometricHelper {
                 override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                     super.onAuthenticationError(errorCode, errString)
                     onError(errString.toString())
-                }
-
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
                 }
             })
 

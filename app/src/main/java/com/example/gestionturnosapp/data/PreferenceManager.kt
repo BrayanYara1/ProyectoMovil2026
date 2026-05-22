@@ -2,6 +2,7 @@ package com.example.gestionturnosapp.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.appcompat.app.AppCompatDelegate
 
 object PreferenceManager {
@@ -19,8 +20,8 @@ object PreferenceManager {
         return getPrefs(context).getString(KEY_LOCALE, "es") ?: "es"
     }
 
-    fun setLocale(context: Context, localeTag: String) {
-        getPrefs(context).edit().putString(KEY_LOCALE, localeTag).apply()
+    suspend fun setLocale(context: Context, localeTag: String) {
+        getPrefs(context).edit { putString(KEY_LOCALE, localeTag) }
         
         // Limpiamos el caché para que los datos del servidor se recarguen en el nuevo idioma
         OfflineCacheManager.clearCache(context)
@@ -34,7 +35,7 @@ object PreferenceManager {
     }
 
     fun setDarkMode(context: Context, enabled: Boolean) {
-        getPrefs(context).edit().putBoolean(KEY_DARK_MODE, enabled).apply()
+        getPrefs(context).edit { putBoolean(KEY_DARK_MODE, enabled) }
         applyTheme(enabled)
     }
 
@@ -51,7 +52,7 @@ object PreferenceManager {
     }
 
     fun setNotificationsEnabled(context: Context, enabled: Boolean) {
-        getPrefs(context).edit().putBoolean(KEY_NOTIFICATIONS, enabled).apply()
+        getPrefs(context).edit { putBoolean(KEY_NOTIFICATIONS, enabled) }
     }
 
     fun isBiometricEnabled(context: Context): Boolean {
@@ -59,6 +60,6 @@ object PreferenceManager {
     }
 
     fun setBiometricEnabled(context: Context, enabled: Boolean) {
-        getPrefs(context).edit().putBoolean(KEY_BIOMETRIC, enabled).apply()
+        getPrefs(context).edit { putBoolean(KEY_BIOMETRIC, enabled) }
     }
 }

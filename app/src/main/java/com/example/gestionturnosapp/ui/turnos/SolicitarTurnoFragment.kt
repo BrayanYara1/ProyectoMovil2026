@@ -92,7 +92,7 @@ class SolicitarTurnoFragment : Fragment() {
     }
 
     private fun setupOnBackPressed() {
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(enabled = true) {
             override fun handleOnBackPressed() {
                 if (hayCambiosSinGuardar()) {
                     showDiscardDialog()
@@ -111,7 +111,7 @@ class SolicitarTurnoFragment : Fragment() {
         val motivo = binding.etMotivo.text.toString()
         val especialidadArg = arguments?.getString("especialidadNombre")
         val motivoDefault = if (especialidadArg != null) getString(R.string.reason_consultation_for, especialidadArg) else ""
-        return (nombre.isNotEmpty() && nombre != UserManager.usuarioActual?.nombre) || fecha.isNotEmpty() || hora.isNotEmpty() || (motivo.isNotEmpty() && motivo != motivoDefault)
+        return ((nombre.isNotEmpty() && nombre != UserManager.usuarioActual?.nombre) || fecha.isNotEmpty() || hora.isNotEmpty() || (motivo.isNotEmpty() && motivo != motivoDefault))
     }
 
     private fun showDiscardDialog() {
@@ -132,7 +132,7 @@ class SolicitarTurnoFragment : Fragment() {
                 val formattedDate = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day)
                 binding.etFecha.setText(formattedDate)
                 binding.tilFecha.error = null
-            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).apply {
+            }, c[Calendar.YEAR], c[Calendar.MONTH], c[Calendar.DAY_OF_MONTH]).apply {
                 datePicker.minDate = System.currentTimeMillis() - 1000
             }.show()
         }
@@ -141,8 +141,8 @@ class SolicitarTurnoFragment : Fragment() {
             val c = Calendar.getInstance()
             TimePickerDialog(requireContext(), { _, hour, minute ->
                 val calendar = Calendar.getInstance()
-                calendar.set(Calendar.HOUR_OF_DAY, hour)
-                calendar.set(Calendar.MINUTE, minute)
+                calendar[Calendar.HOUR_OF_DAY] = hour
+                calendar[Calendar.MINUTE] = minute
                 
                 val sdf = java.text.SimpleDateFormat("hh:mm a", Locale.getDefault())
                 val formattedTime = sdf.format(calendar.time)
@@ -186,7 +186,7 @@ class SolicitarTurnoFragment : Fragment() {
     private fun validarDebounced() {
         availabilityCheckJob?.cancel()
         availabilityCheckJob = viewLifecycleOwner.lifecycleScope.launch {
-            kotlinx.coroutines.delay(500)
+            delay(500)
             val fecha = viewModel.formFecha.value ?: ""
             val hora = viewModel.formHora.value ?: ""
             if (fecha.isNotEmpty() && hora.isNotEmpty()) {

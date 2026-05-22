@@ -103,6 +103,10 @@
     <string name="label_notifications">Appointment Notifications</string>
     <string name="label_dark_mode">Dark Mode</string>
     <string name="label_language">Language: English</string>
+    <string name="label_biometric">Biometric Authentication</string>
+    <string name="title_biometric_auth">Unlock App</string>
+    <string name="subtitle_biometric_auth">Use your fingerprint or face to continue</string>
+    <string name="error_biometric_auth">Biometric authentication failed</string>
     <string name="label_about">About Salud Activa</string>
     <string name="btn_logout">LOG OUT</string>
     <string name="msg_logout_confirm">Are you sure you want to exit?</string>
@@ -192,6 +196,7 @@
     <string name="label_doctor_reply">Doctor\'s Reply</string>
     <string name="msg_chat_welcome">Welcome to the medical assistance chat. How can we help you?</string>
     <string name="status_pending_offline">Pending (Offline)</string>
+    <string name="msg_no_internet_banner">No internet connection</string>
 
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
