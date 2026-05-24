@@ -5,9 +5,19 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.example.gestionturnosapp.data.model.Usuario
 import com.google.gson.Gson
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
 import javax.inject.Singleton
+
+@EntryPoint
+@InstallIn(SingletonComponent::class)
+interface UserManagerEntryPoint {
+    fun userManager(): UserManager
+}
 
 @Singleton
 class UserManager @Inject constructor(
@@ -103,5 +113,52 @@ class UserManager @Inject constructor(
         private const val KEY_TOKEN = "auth_token"
         private const val KEY_FCM_TOKEN = "fcm_token"
         private const val KEY_FCM_SYNCED = "fcm_synced"
+
+        /**
+         * Método puente para acceder a UserManager desde clases que no soportan inyección (legacy).
+         */
+        fun getUser(context: Context): Usuario? {
+            val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, UserManagerEntryPoint::class.java)
+            return entryPoint.userManager().getUser()
+        }
+
+        /**
+         * Método puente para obtener el token desde clases legacy.
+         */
+        fun getToken(context: Context): String? {
+            val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, UserManagerEntryPoint::class.java)
+            return entryPoint.userManager().token
+        }
+
+        /**
+         * Versión sin parámetros para RetrofitClient legacy.
+         */
+        fun getToken(): String? {
+            return try {
+                val context = com.example.gestionturnosapp.GestionTurnosApp.instance
+                getToken(context)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        /**
+         * Cierra la sesión (legacy).
+         */
+        fun logout(context: Context) {
+            val entryPoint = EntryPointAccessors.fromApplication(context.applicationContext, UserManagerEntryPoint::class.java)
+            entryPoint.userManager().logout()
+        }
+
+        /**
+         * Usuario actual para compatibilidad legacy.
+         */
+        val usuarioActual: Usuario?
+            get() = try {
+                val context = com.example.gestionturnosapp.GestionTurnosApp.instance
+                getUser(context)
+            } catch (e: Exception) {
+                null
+            }
     }
 }
