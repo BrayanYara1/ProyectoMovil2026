@@ -21,18 +21,24 @@ class TurnoRepository @Inject constructor(
      * Si falla la red, devuelve los datos de la caché local.
      */
     suspend fun getTurnos(): List<Turno> {
-        return try {
-            val response = apiService.getTurnos()
-            if (response.isSuccessful) {
-                val turnos = response.body() ?: emptyList()
-                OfflineCacheManager.saveTurnos(context, turnos)
-                turnos
-            } else {
-                // Si el servidor responde error (ej 500), usamos cache
-                OfflineCacheManager.getCachedTurnos(context)
-            }
+        val response = try {
+            apiService.getTurnos()
         } catch (e: Exception) {
-            // Error de conexión: Usar cache
+            // Error de conexión física: Devolver cache silenciosamente
+            return OfflineCacheManager.getCachedTurnos(context)
+        }
+
+        return if (response.isSuccessful) {
+            val turnos = response.body() ?: emptyList()
+            OfflineCacheManager.saveTurnos(context, turnos)
+            turnos
+        } else {
+            val code = response.code()
+            if (code == 401 || code == 403) {
+                // ERROR DE AUTORIZACIÓN: No usar cache, lanzar para que el ViewModel/UI lo maneje
+                throw Exception("SESSION_EXPIRED: $code")
+            }
+            // Otros errores (500, etc): Usar cache
             OfflineCacheManager.getCachedTurnos(context)
         }
     }
@@ -42,15 +48,19 @@ class TurnoRepository @Inject constructor(
     }
 
     suspend fun checkAvailability(fecha: String, hora: String): Boolean {
-        return try {
-            val response = apiService.checkAvailability(fecha, hora)
-            if (response.isSuccessful) {
-                val body = response.body()
-                body?.get("disponible") ?: body?.get("available") ?: true
-            } else {
-                true 
-            }
+        val response = try {
+            apiService.checkAvailability(fecha, hora)
         } catch (e: Exception) {
+            return true
+        }
+
+        return if (response.isSuccessful) {
+            val body = response.body()
+            body?.get("disponible") ?: body?.get("available") ?: true
+        } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             true
         }
     }

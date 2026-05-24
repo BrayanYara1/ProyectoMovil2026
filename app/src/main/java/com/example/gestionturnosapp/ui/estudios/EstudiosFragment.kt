@@ -193,7 +193,9 @@ class EstudiosFragment : Fragment() {
                 }
                 is Resource.Error -> {
                     val msg = resource.message
-                    if (msg.contains("401") || msg.contains("token", true)) {
+                    if (msg.contains("401") || 
+                        msg.contains("token", true) ||
+                        msg.contains("SESSION_EXPIRED")) {
                         handleSessionExpired()
                     } else {
                         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
@@ -219,6 +221,8 @@ class EstudiosFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
+        if (com.example.gestionturnosapp.data.UserManager.getToken(requireContext()) == null) return
+
         com.example.gestionturnosapp.data.UserManager.logout(requireContext())
         Toast.makeText(requireContext(), getString(R.string.msg_session_expired), Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()

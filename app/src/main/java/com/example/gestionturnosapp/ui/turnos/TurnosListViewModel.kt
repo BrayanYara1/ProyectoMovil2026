@@ -30,7 +30,10 @@ class TurnosListViewModel @Inject constructor(
     val turnosResource: LiveData<Resource<List<Turno>>> = _turnosResource
     
     private val _searchQuery = MutableLiveData("")
+    val searchQuery: LiveData<String> = _searchQuery
+
     private val _filterStatus = MutableLiveData<String>("TODOS")
+    val filterStatus: LiveData<String> = _filterStatus
 
     val filteredTurnos = MediatorLiveData<List<Turno>>().apply {
         addSource(_turnos) { value = applyFilters() }
@@ -137,9 +140,9 @@ class TurnosListViewModel @Inject constructor(
                 _turnosResource.value = Resource.Success<List<Turno>>(combined)
                 
             } catch (e: Exception) {
-                if (_turnos.value.isNullOrEmpty()) {
-                    _turnosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
-                }
+                // Siempre notificamos el error, independientemente de si hay datos previos o no.
+                // Si hay datos previos, el Fragment decidirá si mostrar un Snackbar o una pantalla de error.
+                _turnosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
             } finally {
                 _isLoading.value = false
             }

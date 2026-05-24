@@ -46,9 +46,8 @@ class MedicamentosViewModel @Inject constructor(
                 val combined = (list + pending).distinctBy { it.nombre.lowercase().trim() }
                 _medicamentosResource.value = Resource.Success(combined)
             } catch (e: Exception) {
-                if (_medicamentosResource.value !is Resource.Success<*>) {
-                    _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
-                }
+                // Siempre emitimos el error para que la UI pueda manejarlo (ej. logout en 401)
+                _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
             } finally {
                 _isLoading.value = false
             }

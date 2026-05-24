@@ -16,16 +16,20 @@ class EstudioRepository @Inject constructor(
 ) {
 
     suspend fun getEstudios(): List<EstudioMedico> {
-        return try {
-            val response = apiService.getEstudios()
-            if (response.isSuccessful) {
-                val estudios = response.body() ?: emptyList()
-                OfflineCacheManager.saveEstudios(context, estudios)
-                estudios
-            } else {
-                OfflineCacheManager.getCachedEstudios(context)
-            }
+        val response = try {
+            apiService.getEstudios()
         } catch (e: Exception) {
+            return OfflineCacheManager.getCachedEstudios(context)
+        }
+
+        return if (response.isSuccessful) {
+            val estudios = response.body() ?: emptyList()
+            OfflineCacheManager.saveEstudios(context, estudios)
+            estudios
+        } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             OfflineCacheManager.getCachedEstudios(context)
         }
     }

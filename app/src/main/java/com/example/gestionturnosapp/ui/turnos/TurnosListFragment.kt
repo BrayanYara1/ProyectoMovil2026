@@ -64,6 +64,13 @@ class TurnosListFragment : Fragment() {
     }
 
     private fun setupFilters() {
+        // Restaurar estado del filtro
+        when (viewModel.filterStatus.value) {
+            "PENDIENTE" -> binding.chipPending.isChecked = true
+            "COMPLETADO" -> binding.chipCompleted.isChecked = true
+            else -> binding.chipAll.isChecked = true
+        }
+
         binding.chipGroupFilters.setOnCheckedStateChangeListener { group, _ ->
             val status = when (group.checkedChipId) {
                 R.id.chipPending -> "PENDIENTE"
@@ -75,6 +82,13 @@ class TurnosListFragment : Fragment() {
     }
 
     private fun setupSearchView() {
+        // Restaurar estado si ya había una búsqueda en el ViewModel (compartido)
+        val currentQuery = viewModel.searchQuery.value
+        if (!currentQuery.isNullOrEmpty()) {
+            binding.searchView.setQuery(currentQuery, false)
+            binding.searchView.isIconified = false
+        }
+
         binding.searchView.setOnQueryTextListener(object : androidx.appcompat.widget.SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean = false
             override fun onQueryTextChange(newText: String?): Boolean {
@@ -201,7 +215,9 @@ class TurnosListFragment : Fragment() {
                     binding.swipeRefresh.isRefreshing = false
                     
                     val errorMessage = resource.message
-                    if (errorMessage.contains("401") || errorMessage.contains("token", true)) {
+                    if (errorMessage.contains("401") || 
+                        errorMessage.contains("token", true) || 
+                        errorMessage.contains("SESSION_EXPIRED")) {
                         handleSessionExpired()
                         return@observe
                     }
@@ -227,13 +243,19 @@ class TurnosListFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
+        if (userManager.token == null) return // Ya se está procesando el logout
+
         viewLifecycleOwner.lifecycleScope.launch {
-            OfflineCacheManager.clearCache(requireContext())
-            userManager.logout()
-            Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
-                .setPopUpTo(R.id.nav_graph, true)
-                .build())
+            try {
+                OfflineCacheManager.clearCache(requireContext())
+                userManager.logout()
+                Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(R.id.nav_graph, true)
+                    .build())
+            } catch (e: Exception) {
+                // Navegación fallida o contexto perdido, al menos el usuario ya está deslogueado
+            }
         }
     }
 

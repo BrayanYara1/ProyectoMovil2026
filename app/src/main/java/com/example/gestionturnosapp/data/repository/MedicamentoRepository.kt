@@ -17,16 +17,20 @@ class MedicamentoRepository @Inject constructor(
 ) {
 
     suspend fun getMedicamentos(): List<Medicamento> {
-        return try {
-            val response = apiService.getMedicamentos()
-            if (response.isSuccessful) {
-                val meds = response.body() ?: emptyList()
-                OfflineCacheManager.saveMedicamentos(context, meds)
-                meds
-            } else {
-                OfflineCacheManager.getCachedMedicamentos(context)
-            }
+        val response = try {
+            apiService.getMedicamentos()
         } catch (e: Exception) {
+            return OfflineCacheManager.getCachedMedicamentos(context)
+        }
+
+        return if (response.isSuccessful) {
+            val meds = response.body() ?: emptyList()
+            OfflineCacheManager.saveMedicamentos(context, meds)
+            meds
+        } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             OfflineCacheManager.getCachedMedicamentos(context)
         }
     }
