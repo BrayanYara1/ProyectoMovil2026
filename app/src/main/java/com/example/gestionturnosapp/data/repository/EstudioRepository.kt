@@ -34,13 +34,19 @@ class EstudioRepository @Inject constructor(
         return try {
             val response = apiService.agregarEstudio(estudio)
             if (response.isSuccessful) {
-                response.body()
+                val result = response.body()
+                // Si se sincronizó con éxito y era un pendiente, el llamador debería encargarse de borrarlo,
+                // o podríamos hacerlo aquí si tuviéramos acceso a la lógica de borrado.
+                result
             } else {
                 throw Exception(RetrofitClient.parseError(response))
             }
         } catch (e: Exception) {
             if (OfflineCacheManager.isNetworkError(e)) {
-                OfflineCacheManager.addPendingEstudio(context, estudio)
+                // Solo agregar a pendientes si no viene ya de ahí (id no empieza con pending_)
+                if (!estudio.id.startsWith("pending_")) {
+                    OfflineCacheManager.addPendingEstudio(context, estudio)
+                }
                 estudio
             } else {
                 throw e

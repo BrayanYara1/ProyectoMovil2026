@@ -26,7 +26,7 @@ class EstudiosViewModel @Inject constructor(
     private val _searchQuery = MutableLiveData("")
 
     private val _estudiosResource = MediatorLiveData<Resource<List<EstudioMedico>>>().apply {
-        val observer = { _: Any? ->
+        val update = { _: Any? ->
             val list = _allEstudios.value ?: emptyList()
             val start = _startDate.value
             val end = _endDate.value
@@ -42,10 +42,10 @@ class EstudiosViewModel @Inject constructor(
             }
             this.value = Resource.Success(filtered)
         }
-        addSource(_allEstudios, observer)
-        addSource(_startDate, observer)
-        addSource(_endDate, observer)
-        addSource(_searchQuery, observer)
+        addSource(_allEstudios, update)
+        addSource(_startDate, update)
+        addSource(_endDate, update)
+        addSource(_searchQuery, update)
     }
     val estudios: LiveData<Resource<List<EstudioMedico>>> = _estudiosResource
 
@@ -75,12 +75,17 @@ class EstudiosViewModel @Inject constructor(
                 
                 // Mezclar con pendientes
                 val pending = OfflineCacheManager.getPendingEstudios(getApplication())
-                val combined = (list + pending).distinctBy { "${it.titulo}_${it.fecha}" }
+                val combined = (list + pending).distinctBy { it.id }
                 
                 _allEstudios.value = combined
             } catch (e: Exception) {
-                if (_allEstudios.value.isNullOrEmpty()) {
-                    _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al cargar")
+                val current = _allEstudios.value ?: emptyList()
+                if (current.isEmpty()) {
+                    _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al cargar estudios")
+                } else {
+                    // Si ya hay datos, forzamos la actualización del Resource para quitar el Loading
+                    // y mostrar lo que tenemos (el update observer se encargará)
+                    _allEstudios.value = current
                 }
             }
         }
@@ -89,19 +94,25 @@ class EstudiosViewModel @Inject constructor(
     fun agregarEstudio(titulo: String, fecha: String, tipo: String, resultado: String, photoUrl: String? = null) {
         viewModelScope.launch {
             _createResource.value = Resource.Loading
-            // Generar un ID local único
+            
             val localId = "pending_${System.currentTimeMillis()}"
-            val nuevo = EstudioMedico(localId, titulo, fecha, tipo, resultado, urlDocumento = photoUrl)
+            val nuevo = EstudioMedico(
+                id = localId,
+                titulo = titulo,
+                fecha = fecha,
+                tipo = tipo,
+                resultadoBreve = resultado,
+                urlDocumento = photoUrl
+            )
+            
             try {
-                // El repo maneja la lógica de crear o guardar como pendiente
                 val result = repository.agregarEstudio(nuevo)
-                
-                if (result != null) {
-                    _createResource.value = Resource.Success(result)
-                    loadEstudios()
-                }
+                // Si el result es el mismo 'nuevo', se guardó como pendiente (ID empieza con pending_)
+                // Si es distinto, vino del servidor. En ambos casos es un Success para la UI de creación.
+                _createResource.value = Resource.Success(result ?: nuevo)
+                loadEstudios()
             } catch (e: Exception) {
-                _createResource.value = Resource.Error(e.localizedMessage ?: "Error")
+                _createResource.value = Resource.Error(e.localizedMessage ?: "Error al guardar estudio")
             }
         }
     }
@@ -114,10 +125,13 @@ class EstudiosViewModel @Inject constructor(
             val synced = mutableListOf<EstudioMedico>()
             pending.forEach { estudio ->
                 try {
-                    repository.agregarEstudio(estudio)
-                    synced.add(estudio)
+                    val result = repository.agregarEstudio(estudio)
+                    // Consideramos sincronizado si el servidor devolvió un ID real
+                    if (result != null && result.id != estudio.id) {
+                        synced.add(estudio)
+                    }
                 } catch (_: Exception) {
-                    return@forEach
+                    // Si falla uno crítico, saltamos al siguiente
                 }
             }
             if (synced.isNotEmpty()) {
@@ -129,12 +143,16 @@ class EstudiosViewModel @Inject constructor(
 
     fun eliminarEstudio(id: String) {
         viewModelScope.launch {
-            _estudiosResource.value = Resource.Loading
+            // No cambiamos _estudiosResource a Loading aquí para evitar parpadeos de toda la lista
+            // Una mejor opción sería un estado de "eliminando" específico o solo el feedback tras el resultado
             try {
                 repository.eliminarEstudio(id)
                 loadEstudios()
             } catch (e: Exception) {
+                // Si falla, notificamos el error sin borrar lo que hay en pantalla
                 _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al eliminar")
+                // Intentamos recuperar el estado anterior disparando el observer
+                _allEstudios.value = _allEstudios.value
             }
         }
     }
