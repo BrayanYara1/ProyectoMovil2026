@@ -145,8 +145,9 @@ class TurnosListFragment : Fragment() {
                 binding.rvTurnos.scheduleLayoutAnimation()
             }
             
-            val isInitialListEmpty = (viewModel.turnosResource.value as? Resource.Success<*>)?.data?.let { (it as List<*>).isEmpty() } == true
-            val noResultsFound = turnos.isEmpty() && !isInitialListEmpty && viewModel.turnosResource.value is Resource.Success<*>
+            val turnosResource = viewModel.turnosResource.value
+            val isInitialListEmpty = turnosResource is Resource.Success && turnosResource.data.isEmpty()
+            val noResultsFound = turnos.isEmpty() && !isInitialListEmpty && turnosResource is Resource.Success
             
             binding.layoutEmpty.isVisible = (turnos.isEmpty() && isInitialListEmpty)
             

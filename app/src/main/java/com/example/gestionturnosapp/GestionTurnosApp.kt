@@ -12,8 +12,8 @@ class GestionTurnosApp : Application() {
     }
 
     override fun onCreate() {
-        super.onCreate()
         instance = this
+        super.onCreate()
         
         // Crear canales de notificación
         com.example.gestionturnosapp.notifications.NotificationHelper.createNotificationChannels(this)

@@ -215,7 +215,7 @@ class SolicitarTurnoFragment : Fragment() {
                     binding.btnConfirmarTurno.isEnabled = false
                     binding.btnConfirmarTurno.text = getString(R.string.btn_processing)
                 }
-                is Resource.Success<*> -> {
+                is Resource.Success -> {
                     Snackbar.make(binding.root, getString(R.string.msg_appointment_success), Snackbar.LENGTH_LONG).show()
                     viewModel.resetNavegacion()
                     findNavController().popBackStack()

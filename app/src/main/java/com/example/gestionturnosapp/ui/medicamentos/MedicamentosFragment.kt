@@ -133,10 +133,11 @@ class MedicamentosFragment : Fragment() {
     private fun setupObservers() {
         viewModel.medicamentosResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Success<*> -> {
-                    adapter.submitList(resource.data as List<Medicamento>)
+                is Resource.Success -> {
+                    val list = resource.data
+                    adapter.submitList(list)
                     binding.progressBar.isVisible = false
-                    binding.layoutEmptyMeds.isVisible = (resource.data as List<*>).isEmpty()
+                    binding.layoutEmptyMeds.isVisible = list.isEmpty()
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
@@ -160,10 +161,10 @@ class MedicamentosFragment : Fragment() {
 
         viewModel.operationResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Success<*> -> {
+                is Resource.Success -> {
                     Toast.makeText(context, getString(R.string.msg_medication_saved), Toast.LENGTH_SHORT).show()
                     // PROGRAMAR ALERTA: Programamos una notificación para la próxima toma
-                    scheduleMedicationAlarm(resource.data as Medicamento)
+                    scheduleMedicationAlarm(resource.data)
                     clearFields()
                     viewModel.resetOperationState()
                 }

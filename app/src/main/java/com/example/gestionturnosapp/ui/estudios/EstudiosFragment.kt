@@ -186,8 +186,8 @@ class EstudiosFragment : Fragment() {
             binding.swipeRefresh.isRefreshing = resource is Resource.Loading
             
             when (resource) {
-                is Resource.Success<*> -> {
-                    val list = resource.data as List<EstudioMedico>
+                is Resource.Success -> {
+                    val list = resource.data
                     adapter.submitList(list)
                     binding.layoutEmpty.isVisible = list.isEmpty()
                 }
@@ -205,7 +205,7 @@ class EstudiosFragment : Fragment() {
 
         viewModel.createResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Success<*> -> {
+                is Resource.Success -> {
                     Toast.makeText(context, getString(R.string.msg_study_saved), Toast.LENGTH_SHORT).show()
                     viewModel.resetCreateState()
                 }

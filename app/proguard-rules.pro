@@ -44,5 +44,21 @@
 -keep public class com.google.firebase.provider.FirebaseInitProvider
 -keep class com.google.firebase.** { *; }
 
-# 6. Seguridad (EncryptedSharedPreferences)
+# 6. Seguridad (SQLCipher y EncryptedSharedPreferences)
 -keep class androidx.security.crypto.** { *; }
+-keep class net.zetetic.database.** { *; }
+-keep class net.sqlcipher.** { *; }
+-keep class net.sqlcipher.database.** { *; }
+-dontwarn net.sqlcipher.**
+
+# 7. Hilt / Dagger
+-keep class **_HiltModules* { *; }
+-keep class **_HiltAndroidApp* { *; }
+-keep class **_HiltActivity* { *; }
+-keep class **_HiltFragment* { *; }
+-keep class **_HiltViewModel* { *; }
+-keep @dagger.hilt.android.lifecycle.HiltViewModel class *
+
+# 8. Splash Screen
+-keep class androidx.core.splashscreen.** { *; }
+-dontwarn androidx.core.splashscreen.**

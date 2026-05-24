@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
         
-        if (navHostFragment != null) {
+        if (navHostFragment != null && ::binding.isInitialized) {
             val controller = navHostFragment.navController
             navController = controller
 
@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigation.setupWithNavController(controller)
 
             controller.addOnDestinationChangedListener { _, destination, _ ->
+                if (!::binding.isInitialized) return@addOnDestinationChangedListener
                 when (destination.id) {
                     R.id.homeFragment, R.id.turnosListFragment, R.id.userProfileFragment, R.id.especialidadesFragment -> {
                         binding.bottomNavigation.visibility = View.VISIBLE
