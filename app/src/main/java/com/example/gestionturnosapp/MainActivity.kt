@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         
         // Desactivar funciones secundarias para probar estabilidad
         // sincronizarFcmToken()
-        // observeNetworkStatus()
+        observeNetworkStatus()
     }
 
     private fun observeNetworkStatus() {

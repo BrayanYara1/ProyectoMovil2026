@@ -69,17 +69,24 @@ class AuthViewModel @Inject constructor(
         val email = loginEmail.value?.trim() ?: return
         val pass = loginPassword.value ?: return
         
+        android.util.Log.d("AuthViewModel", "Iniciando login para: $email")
+        
         viewModelScope.launch {
             _authState.value = Resource.Loading
             try {
                 val response = repository.login(LoginRequest(email, pass))
+                android.util.Log.d("AuthViewModel", "Respuesta recibida: ${response.code()}")
+                
                 if (response.isSuccessful) {
                     val authResponse = response.body()
+                    android.util.Log.d("AuthViewModel", "AuthResponse: ${authResponse?.mensaje}")
                     val usuario = authResponse?.usuario
                     if (usuario != null) {
                         userManager.saveUser(usuario, authResponse.token)
+                        android.util.Log.d("AuthViewModel", "Usuario guardado, navegando...")
                         _authState.value = Resource.Success(usuario)
                     } else {
+                        android.util.Log.e("AuthViewModel", "Error: Usuario es null en la respuesta")
                         _authState.value = Resource.Error(getApplication<Application>().getString(R.string.msg_user_not_found))
                     }
                 } else {
@@ -88,9 +95,11 @@ class AuthViewModel @Inject constructor(
                         404 -> getApplication<Application>().getString(R.string.msg_user_not_found)
                         else -> repository.getErrorMessage(response)
                     }
+                    android.util.Log.e("AuthViewModel", "Error de login: $errorMsg")
                     _authState.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
+                android.util.Log.e("AuthViewModel", "Excepción en login", e)
                 _authState.value = Resource.Error(handleException(e))
             }
         }
@@ -131,8 +140,8 @@ class AuthViewModel @Inject constructor(
         return when {
             errorMsg.contains("resolve host", true) || errorMsg.contains("connect", true) -> 
                 getApplication<Application>().getString(R.string.msg_no_connection)
-            errorMsg.contains("timeout", true) -> 
-                getApplication<Application>().getString(R.string.msg_timeout)
+            errorMsg.contains("timeout", true) || errorMsg.contains("time out", true) -> 
+                "El servidor está tardando en responder (posible inicio en frío). Por favor, intenta de nuevo en unos segundos."
             else -> getApplication<Application>().getString(R.string.msg_server_error, errorMsg.ifBlank { "Error desconocido" })
         }
     }
