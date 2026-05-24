@@ -94,8 +94,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
         
-        // Desactivar funciones secundarias para probar estabilidad
-        // sincronizarFcmToken()
+        // Sincronizar FCM y pedir permisos
+        sincronizarFcmToken()
+        pedirPermisoNotificaciones()
         observeNetworkStatus()
     }
 
@@ -125,15 +126,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sincronizarFcmToken() {
-        if (!userManager.isFcmSynced()) {
-            val token = userManager.getFcmToken()
-            token?.let {
-                lifecycleScope.launch {
-                    try {
-                        apiService.updateFcmToken(mapOf("token" to it))
-                        userManager.markFcmAsSynced()
-                    } catch (e: Exception) {
-                        Log.e("FCM", "Sync error", e)
+        // Solo sincronizar si el usuario está logueado
+        if (userManager.getUser() == null) return
+
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                userManager.saveFcmToken(token)
+                
+                if (!userManager.isFcmSynced()) {
+                    lifecycleScope.launch {
+                        try {
+                            apiService.updateFcmToken(mapOf("token" to token))
+                            userManager.markFcmAsSynced()
+                            Log.d("FCM", "Token synced successfully")
+                        } catch (e: Exception) {
+                            Log.e("FCM", "Sync error", e)
+                        }
                     }
                 }
             }

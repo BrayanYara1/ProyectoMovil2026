@@ -55,7 +55,11 @@ router.post('/', authenticateToken, async (req, res) => {
                 "✅ Turno Confirmado",
                 `Tu cita para el ${fecha} a las ${hora} ha sido agendada con éxito.`,
                 { turnoId: nuevoTurno._id.toString(), type: "TURNO_CONFIRMADO" }
-            );
+            ).then(result => {
+                if (result && result.error === 'NotRegistered') {
+                    User.findByIdAndUpdate(req.userId, { fcmToken: null }).exec();
+                }
+            });
         }
 
         res.status(201).json(nuevoTurno);
@@ -80,7 +84,11 @@ router.delete('/:id', authenticateToken, async (req, res) => {
                 "⚠️ Turno Cancelado",
                 `Has cancelado tu turno del día ${turno.fecha}.`,
                 { type: "TURNO_CANCELADO" }
-            );
+            ).then(result => {
+                if (result && result.error === 'NotRegistered') {
+                    User.findByIdAndUpdate(req.userId, { fcmToken: null }).exec();
+                }
+            });
         }
 
         res.status(200).send();

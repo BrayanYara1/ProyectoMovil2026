@@ -83,9 +83,12 @@ class UserManager @Inject constructor(
     }
 
     fun saveFcmToken(fcmToken: String) {
-        prefs.edit { 
-            putString(KEY_FCM_TOKEN, fcmToken)
-            putBoolean(KEY_FCM_SYNCED, false)
+        val current = getFcmToken()
+        if (current != fcmToken) {
+            prefs.edit { 
+                putString(KEY_FCM_TOKEN, fcmToken)
+                putBoolean(KEY_FCM_SYNCED, false)
+            }
         }
     }
 

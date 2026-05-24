@@ -47,9 +47,14 @@ const sendPushNotification = async (fcmToken, title, body, data = {}) => {
         try {
             const response = await admin.messaging().send(message);
             console.log(`🚀 Notificación enviada: ${response}`);
-            return response;
+            return { success: true, response };
         } catch (error) {
             console.error("❌ Error enviando Push:", error);
+            if (error.code === 'messaging/registration-token-not-registered' ||
+                error.code === 'messaging/invalid-registration-token') {
+                return { success: false, error: 'NotRegistered' };
+            }
+            return { success: false, error: error.message };
         }
     } else {
         console.log(`[SIMULACIÓN PUSH] Para: ${fcmToken} | Título: ${title} | Body: ${body}`);

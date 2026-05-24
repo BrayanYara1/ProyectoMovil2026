@@ -21,7 +21,8 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     application: Application,
     private val repository: AuthRepository,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val apiService: com.example.gestionturnosapp.data.remote.ApiService
 ) : AndroidViewModel(application) {
     
     private val _authState = MutableLiveData<Resource<Usuario>>(Resource.Idle)
@@ -83,6 +84,10 @@ class AuthViewModel @Inject constructor(
                     val usuario = authResponse?.usuario
                     if (usuario != null) {
                         userManager.saveUser(usuario, authResponse.token)
+                        
+                        // Sincronizar FCM inmediatamente después del login
+                        syncFcmToken()
+
                         android.util.Log.d("AuthViewModel", "Usuario guardado, navegando...")
                         _authState.value = Resource.Success(usuario)
                     } else {
@@ -130,6 +135,23 @@ class AuthViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _authState.value = Resource.Error(handleException(e))
+            }
+        }
+    }
+
+    private fun syncFcmToken() {
+        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                userManager.saveFcmToken(token)
+                viewModelScope.launch {
+                    try {
+                        apiService.updateFcmToken(mapOf("token" to token))
+                        userManager.markFcmAsSynced()
+                    } catch (e: Exception) {
+                        android.util.Log.e("AuthViewModel", "FCM Sync error", e)
+                    }
+                }
             }
         }
     }

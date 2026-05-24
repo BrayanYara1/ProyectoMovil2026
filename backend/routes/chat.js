@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
+const User = require('../models/User');
 const authenticateToken = require('../middleware/auth');
 const { sendPushNotification } = require('../middleware/notification');
 
@@ -43,7 +44,11 @@ router.post('/', authenticateToken, async (req, res) => {
                     req.user.fcmToken,
                     "👨‍⚕️ Respuesta Médica",
                     "Tienes un nuevo mensaje de tu doctor."
-                );
+                ).then(result => {
+                    if (result && result.error === 'NotRegistered') {
+                        User.findByIdAndUpdate(req.userId, { fcmToken: null }).exec();
+                    }
+                });
             }
         }, 2000);
 
