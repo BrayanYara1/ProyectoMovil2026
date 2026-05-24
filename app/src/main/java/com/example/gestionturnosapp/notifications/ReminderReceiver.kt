@@ -19,8 +19,12 @@ class ReminderReceiver : BroadcastReceiver() {
         }
 
         val data = mutableMapOf<String, String>()
-        intent.extras?.keySet()?.forEach { key ->
-            intent.getExtra(key)?.toString()?.let { data[key] = it }
+        intent.extras?.let { extras ->
+            for (key in extras.keySet()) {
+                @Suppress("DEPRECATION")
+                val value = extras.get(key)
+                value?.toString()?.let { data[key] = it }
+            }
         }
 
         NotificationHelper.showNotification(
@@ -31,9 +35,5 @@ class ReminderReceiver : BroadcastReceiver() {
             notificationId = notificationId,
             data = data
         )
-    }
-
-    private fun Intent.getExtra(key: String): Any? {
-        return try { extras?.get(key) } catch (e: Exception) { null }
     }
 }
