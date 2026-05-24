@@ -19,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.gestionturnosapp.data.local.PreferenceManager
 import com.example.gestionturnosapp.data.UserManager
+import com.example.gestionturnosapp.data.remote.ApiService
 import com.example.gestionturnosapp.databinding.ActivityMainBinding
 import com.example.gestionturnosapp.data.remote.RetrofitClient
 import com.example.gestionturnosapp.notifications.NotificationHelper
@@ -39,6 +40,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var userManager: UserManager
+
+    @Inject
+    lateinit var apiService: ApiService
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -124,7 +128,7 @@ class MainActivity : AppCompatActivity() {
             token?.let {
                 lifecycleScope.launch {
                     try {
-                        RetrofitClient.instance.updateFcmToken(mapOf("token" to it))
+                        apiService.updateFcmToken(mapOf("token" to it))
                         userManager.markFcmAsSynced()
                     } catch (e: Exception) {
                         Log.e("FCM", "Sync error", e)

@@ -18,21 +18,25 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+    /**
+     * URL de producción en Render.
+     */
     private const val BASE_URL = "https://saludactiva-backend.onrender.com/"
 
     @Provides
     @Singleton
     fun provideOkHttpClient(userManager: UserManager): OkHttpClient {
         return OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(90, TimeUnit.SECONDS)
+            .readTimeout(90, TimeUnit.SECONDS)
+            .writeTimeout(90, TimeUnit.SECONDS)
             .addInterceptor { chain ->
-                val builder = chain.request().newBuilder()
+                val request = chain.request()
+                // LOG DE DIAGNÓSTICO: Veremos qué URL se está llamando exactamente
+                android.util.Log.d("NetworkDebug", "Llamando a: ${request.url}")
                 
-                // Obtenemos el token del UserManager inyectado
+                val builder = request.newBuilder()
                 val token = userManager.token
-
                 token?.let {
                     builder.addHeader("Authorization", "Bearer $it")
                 }

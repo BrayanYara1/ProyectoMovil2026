@@ -20,6 +20,7 @@ import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.data.model.Usuario
 import com.example.gestionturnosapp.databinding.FragmentUserProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class UserProfileFragment : Fragment() {
@@ -27,11 +28,14 @@ class UserProfileFragment : Fragment() {
     private var _binding: FragmentUserProfileBinding? = null
     private val binding get() = _binding!!
 
+    @Inject
+    lateinit var userManager: UserManager
+
     private val viewModel: ProfileViewModel by viewModels()
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
-            val userId = UserManager.usuarioActual?.id ?: "unknown"
+            val userId = userManager.usuarioActual?.id ?: "unknown"
             val savedPath = ImageStorageManager.saveProfileImage(requireContext(), userId, it)
             
             if (savedPath != null) {
@@ -186,7 +190,7 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
-        UserManager.logout(requireContext())
+        userManager.logout()
         Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)

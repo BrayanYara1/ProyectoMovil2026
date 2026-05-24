@@ -9,6 +9,7 @@ import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.data.model.Usuario
+import com.example.gestionturnosapp.data.remote.ApiService
 import com.example.gestionturnosapp.data.remote.RetrofitClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     application: Application,
-    private val userManager: UserManager
+    private val userManager: UserManager,
+    private val apiService: ApiService
 ) : AndroidViewModel(application) {
 
     private val _user = MutableLiveData<Usuario?>()
@@ -38,7 +40,7 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _updateStatus.value = Resource.Loading
             try {
-                val response = RetrofitClient.instance.updateProfile(nuevoUsuario)
+                val response = apiService.updateProfile(nuevoUsuario)
                 if (response.isSuccessful) {
                     val usuarioActualizado = response.body() ?: nuevoUsuario
                     userManager.saveUser(usuarioActualizado)

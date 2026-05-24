@@ -135,14 +135,18 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun handleException(e: Exception): String {
-        android.util.Log.e("AuthViewModel", "Error en autenticación", e)
+        android.util.Log.e("AuthViewModel", "Error detallado en autenticación", e)
         val errorMsg = e.localizedMessage ?: ""
+        val exceptionName = e.javaClass.simpleName
+        
         return when {
-            errorMsg.contains("resolve host", true) || errorMsg.contains("connect", true) -> 
-                getApplication<Application>().getString(R.string.msg_no_connection)
+            e is java.net.UnknownHostException -> 
+                "Error de DNS: No se encontró el servidor. Revisa la URL o tu conexión."
+            e is java.net.ConnectException -> 
+                "Conexión rechazada: El servidor está fuera de línea o la dirección es incorrecta."
             errorMsg.contains("timeout", true) || errorMsg.contains("time out", true) -> 
-                "El servidor está tardando en responder (posible inicio en frío). Por favor, intenta de nuevo en unos segundos."
-            else -> getApplication<Application>().getString(R.string.msg_server_error, errorMsg.ifBlank { "Error desconocido" })
+                "El servidor tardó demasiado en responder (inicio en frío). Reintenta ahora."
+            else -> "Error ($exceptionName): ${errorMsg.ifBlank { "Sin internet" }}"
         }
     }
 
