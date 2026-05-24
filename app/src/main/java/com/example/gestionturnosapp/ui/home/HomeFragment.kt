@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -237,12 +238,17 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
+        if (userManager.token == null) return
+
         viewLifecycleOwner.lifecycleScope.launch {
-            OfflineCacheManager.clearCache(requireContext())
-            userManager.logout()
-            findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
-                .setPopUpTo(R.id.nav_graph, true)
-                .build())
+            try {
+                OfflineCacheManager.clearCache(requireContext())
+                userManager.logout()
+                Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+                    .setPopUpTo(R.id.nav_graph, true)
+                    .build())
+            } catch (_: Exception) { }
         }
     }
 

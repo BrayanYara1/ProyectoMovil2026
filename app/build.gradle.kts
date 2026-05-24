@@ -22,6 +22,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            enableUnitTestCoverage = true
+        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true

@@ -36,16 +36,10 @@ class MedicamentoRepository @Inject constructor(
     }
 
     suspend fun agregarMedicamento(request: NuevoMedicamentoRequest): Medicamento? {
-        return try {
-            val response = apiService.agregarMedicamento(request)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                throw Exception(RetrofitClient.parseError(response))
-            }
+        val response = try {
+            apiService.agregarMedicamento(request)
         } catch (e: Exception) {
             if (OfflineCacheManager.isNetworkError(e)) {
-                // Crear objeto temporal para cache
                 val tempMed = Medicamento(
                     id = "local_${System.currentTimeMillis()}",
                     nombre = request.nombre,
@@ -55,18 +49,29 @@ class MedicamentoRepository @Inject constructor(
                     notas = request.notas
                 )
                 OfflineCacheManager.addPendingMed(context, tempMed)
-                tempMed
-            } else {
-                throw e
+                return tempMed
             }
+            throw e
+        }
+
+        if (response.isSuccessful) {
+            return response.body()
+        } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
+            throw Exception(RetrofitClient.parseError(response))
         }
     }
 
     suspend fun updateMedicamento(id: String, med: Medicamento): Medicamento? {
         val response = apiService.updateMedicamento(id, med)
-        return if (response.isSuccessful) {
-            response.body()
+        if (response.isSuccessful) {
+            return response.body()
         } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             throw Exception(RetrofitClient.parseError(response))
         }
     }
@@ -74,6 +79,9 @@ class MedicamentoRepository @Inject constructor(
     suspend fun eliminarMedicamento(id: String) {
         val response = apiService.eliminarMedicamento(id)
         if (!response.isSuccessful) {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             throw Exception(RetrofitClient.parseError(response))
         }
     }

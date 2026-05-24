@@ -66,26 +66,32 @@ class TurnoRepository @Inject constructor(
     }
 
     suspend fun crearTurno(request: NuevoTurnoRequest): Turno? {
-        return try {
-            val response = apiService.crearTurno(request)
-            if (response.isSuccessful) {
-                response.body()
-            } else {
-                throw Exception(RetrofitClient.parseError(response))
-            }
+        val response = try {
+            apiService.crearTurno(request)
         } catch (e: Exception) {
             if (OfflineCacheManager.isNetworkError(e)) {
                 OfflineCacheManager.addPendingTurno(context, request)
-                null
-            } else {
-                throw e
+                return null
             }
+            throw e
+        }
+
+        if (response.isSuccessful) {
+            return response.body()
+        } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
+            throw Exception(RetrofitClient.parseError(response))
         }
     }
 
     suspend fun eliminarTurno(id: String) {
         val response = apiService.eliminarTurno(id)
         if (!response.isSuccessful) {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             throw Exception(RetrofitClient.parseError(response))
         }
     }

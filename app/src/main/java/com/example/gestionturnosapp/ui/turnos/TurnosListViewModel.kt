@@ -32,7 +32,7 @@ class TurnosListViewModel @Inject constructor(
     private val _searchQuery = MutableLiveData("")
     val searchQuery: LiveData<String> = _searchQuery
 
-    private val _filterStatus = MutableLiveData<String>("TODOS")
+    private val _filterStatus = MutableLiveData("TODOS")
     val filterStatus: LiveData<String> = _filterStatus
 
     val filteredTurnos = MediatorLiveData<List<Turno>>().apply {
@@ -69,11 +69,11 @@ class TurnosListViewModel @Inject constructor(
             val motivo = formMotivo.value ?: ""
             val disponible = isSlotAvailable.value
             
-            value = nombre.isNotBlank() && 
+            value = (nombre.isNotBlank() && 
                     fecha.isNotBlank() && 
                     hora.isNotBlank() && 
                     motivo.isNotBlank() &&
-                    disponible != false // Si es null (no verificado) o true (disponible), es válido
+                    disponible != false) // Si es null (no verificado) o true (disponible), es válido
         }
         addSource(formPacienteNombre, observer)
         addSource(formFecha, observer)
@@ -168,7 +168,7 @@ class TurnosListViewModel @Inject constructor(
                 horaNormalizada, 
                 motivo, 
                 especialidad ?: "General", 
-                doctor ?: "Dr. Asignado"
+                doctor ?: "Dr. Asignado",
             )
             try {
                 // El Repo maneja la creación o el encolado offline
@@ -241,7 +241,7 @@ class TurnosListViewModel @Inject constructor(
                 // Verificar disponibilidad REAL contra el servidor (todos los usuarios)
                 val disponible = repository.checkAvailability(fLimpia, hLimpia)
                 _isSlotAvailable.value = disponible
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 if (_isSlotAvailable.value == null) _isSlotAvailable.value = true
             }
         }

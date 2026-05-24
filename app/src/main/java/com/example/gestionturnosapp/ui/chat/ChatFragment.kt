@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.data.model.Mensaje
 import com.example.gestionturnosapp.databinding.FragmentChatBinding
@@ -67,11 +68,21 @@ class ChatFragment : Fragment() {
         viewModel.mensajes.observe(viewLifecycleOwner) { resource ->
             binding.progressBar.isVisible = resource is Resource.Loading && adapter.currentList.isEmpty()
             
-            if (resource is Resource.Success<List<Mensaje>>) {
-                adapter.submitList(resource.data) {
-                    binding.rvChat.scrollToPosition(adapter.itemCount - 1)
+            when (resource) {
+                is Resource.Success<List<Mensaje>> -> {
+                    adapter.submitList(resource.data) {
+                        binding.rvChat.scrollToPosition(adapter.itemCount - 1)
+                    }
+                    binding.layoutEmptyChat.isVisible = resource.data.isEmpty()
                 }
-                binding.layoutEmptyChat.isVisible = resource.data.isEmpty()
+                is Resource.Error -> {
+                    if (resource.message == "SESSION_EXPIRED") {
+                        handleSessionExpired()
+                    } else {
+                        Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+                else -> {}
             }
         }
 
@@ -84,9 +95,21 @@ class ChatFragment : Fragment() {
 
         viewModel.mensajeEnviado.observe(viewLifecycleOwner) { resource ->
             if (resource is Resource.Error) {
-                Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                if (resource.message == "SESSION_EXPIRED") {
+                    handleSessionExpired()
+                } else {
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
+    }
+
+    private fun handleSessionExpired() {
+        com.example.gestionturnosapp.data.UserManager.logout(requireContext())
+        Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
+        findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
+            .setPopUpTo(R.id.nav_graph, true)
+            .build())
     }
 
     override fun onDestroyView() {

@@ -253,7 +253,7 @@ class TurnosListFragment : Fragment() {
                 findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
                     .setPopUpTo(R.id.nav_graph, true)
                     .build())
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Navegación fallida o contexto perdido, al menos el usuario ya está deslogueado
             }
         }

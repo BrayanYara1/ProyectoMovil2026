@@ -35,32 +35,34 @@ class EstudioRepository @Inject constructor(
     }
 
     suspend fun agregarEstudio(estudio: EstudioMedico): EstudioMedico? {
-        return try {
-            val response = apiService.agregarEstudio(estudio)
-            if (response.isSuccessful) {
-                val result = response.body()
-                // Si se sincronizó con éxito y era un pendiente, el llamador debería encargarse de borrarlo,
-                // o podríamos hacerlo aquí si tuviéramos acceso a la lógica de borrado.
-                result
-            } else {
-                throw Exception(RetrofitClient.parseError(response))
-            }
+        val response = try {
+            apiService.agregarEstudio(estudio)
         } catch (e: Exception) {
             if (OfflineCacheManager.isNetworkError(e)) {
-                // Solo agregar a pendientes si no viene ya de ahí (id no empieza con pending_)
                 if (!estudio.id.startsWith("pending_")) {
                     OfflineCacheManager.addPendingEstudio(context, estudio)
                 }
-                estudio
-            } else {
-                throw e
+                return estudio
             }
+            throw e
+        }
+
+        if (response.isSuccessful) {
+            return response.body()
+        } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
+            throw Exception(RetrofitClient.parseError(response))
         }
     }
 
     suspend fun eliminarEstudio(id: String) {
         val response = apiService.eliminarEstudio(id)
         if (!response.isSuccessful) {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             throw Exception(RetrofitClient.parseError(response))
         }
     }

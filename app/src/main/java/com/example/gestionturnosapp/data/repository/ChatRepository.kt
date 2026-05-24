@@ -35,6 +35,9 @@ class ChatRepository @Inject constructor(
         if (response.isSuccessful) {
             return response.body() ?: emptyList()
         } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             throw Exception(parseError(response))
         }
     }
@@ -44,6 +47,9 @@ class ChatRepository @Inject constructor(
         if (response.isSuccessful) {
             return response.body()
         } else {
+            if (response.code() == 401 || response.code() == 403) {
+                throw Exception("SESSION_EXPIRED")
+            }
             throw Exception(parseError(response))
         }
     }
