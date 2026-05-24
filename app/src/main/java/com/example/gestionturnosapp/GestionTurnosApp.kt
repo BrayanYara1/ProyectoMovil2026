@@ -21,9 +21,9 @@ class GestionTurnosApp : Application() {
 
         // Inicializar SQLCipher libs lo antes posible
         try {
-            net.sqlcipher.database.SQLiteDatabase.loadLibs(this)
+            System.loadLibrary("sqlcipher")
         } catch (e: Exception) {
-            android.util.Log.e("GestionTurnosApp", "Error loading SQLCipher libs", e)
+            android.util.Log.e("GestionTurnosApp", "Error loading SQLCipher native library", e)
         }
 
         // Crear canales de notificación

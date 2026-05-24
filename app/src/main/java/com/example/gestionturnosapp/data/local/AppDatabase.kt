@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 import com.example.gestionturnosapp.data.model.*
 import java.util.concurrent.Executors
 
@@ -54,8 +54,9 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
-            val passphrase = net.sqlcipher.database.SQLiteDatabase.getBytes("SaludActiva_Secret_Key_2024".toCharArray())
-            val factory = SupportFactory(passphrase)
+            // Con la nueva versión, convertimos el passphrase manualmente si getBytes no es accesible
+            val passphrase = "SaludActiva_Secret_Key_2024".toByteArray()
+            val factory = SupportOpenHelperFactory(passphrase)
 
             return Room.databaseBuilder(
                 context.applicationContext,

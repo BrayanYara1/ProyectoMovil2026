@@ -47,6 +47,7 @@
 # 6. Seguridad (SQLCipher y EncryptedSharedPreferences)
 -keep class androidx.security.crypto.** { *; }
 -keep class net.zetetic.database.** { *; }
+-dontwarn net.zetetic.**
 -keep class net.sqlcipher.** { *; }
 -keep class net.sqlcipher.database.** { *; }
 -dontwarn net.sqlcipher.**
