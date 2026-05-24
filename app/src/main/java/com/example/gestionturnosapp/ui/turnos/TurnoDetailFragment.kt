@@ -107,6 +107,10 @@ class TurnoDetailFragment : Fragment() {
                 View.GONE
             }
 
+            binding.toolbar.setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+
             btnVolver.setOnClickListener {
                 findNavController().popBackStack()
             }
@@ -296,7 +300,16 @@ class TurnoDetailFragment : Fragment() {
                     .putExtra(android.provider.CalendarContract.Events.TITLE, getString(R.string.label_calendar_event_title, paciente))
                     .putExtra(android.provider.CalendarContract.Events.DESCRIPTION, getString(R.string.label_calendar_event_desc, motivo))
                     .putExtra(android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME, cal.timeInMillis)
-                startActivity(intent)
+                
+                try {
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    com.google.android.material.snackbar.Snackbar.make(
+                        binding.root,
+                        "No se encontró una aplicación de calendario instalada",
+                        com.google.android.material.snackbar.Snackbar.LENGTH_LONG
+                    ).show()
+                }
             }
         } catch (e: Exception) {}
     }

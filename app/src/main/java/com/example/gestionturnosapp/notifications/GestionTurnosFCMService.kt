@@ -44,6 +44,7 @@ class GestionTurnosFCMService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+        android.util.Log.d("FCM", "Mensaje recibido de: ${remoteMessage.from}")
         
         val title = remoteMessage.notification?.title ?: remoteMessage.data["title"] ?: "Salud Activa"
         val body = remoteMessage.notification?.body ?: remoteMessage.data["body"] ?: "Tienes una nueva actualización"

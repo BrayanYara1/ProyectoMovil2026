@@ -2,6 +2,7 @@ package com.example.gestionturnosapp.ui.turnos
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -50,18 +51,7 @@ class SolicitarTurnoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userManager.usuarioActual?.let {
-            viewModel.formPacienteNombre.value = it.nombre
-            binding.etPacienteNombre.setText(it.nombre)
-        }
-
-        val especialidadArg = arguments?.getString("especialidadNombre")
-        especialidadArg?.let { esp ->
-            val motivo = getString(R.string.reason_consultation_for, esp)
-            viewModel.formMotivo.value = motivo
-            binding.etMotivo.setText(motivo)
-        }
-
+        setupInitialData()
         setupObservers()
         setupValidationListeners()
         setupPickers()
@@ -71,7 +61,7 @@ class SolicitarTurnoFragment : Fragment() {
         binding.etHora.isFocusable = false
 
         binding.btnConfirmarTurno.setOnClickListener {
-            view.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             
             val fecha = viewModel.formFecha.value ?: ""
             val hora = viewModel.formHora.value ?: ""
@@ -81,10 +71,14 @@ class SolicitarTurnoFragment : Fragment() {
                 return@setOnClickListener
             }
             
+            val displayFecha = DateUtils.formatDisplayDate(requireContext(), fecha)
+            val displayHora = DateUtils.formatDisplayTime(hora)
+
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(R.string.msg_confirm_booking_title)
-                .setMessage(getString(R.string.msg_confirm_booking_body, fecha, hora))
+                .setMessage(getString(R.string.msg_confirm_booking_body, displayFecha, displayHora))
                 .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                    val especialidadArg = arguments?.getString("especialidadNombre")
                     viewModel.crearNuevoTurno(
                         especialidad = especialidadArg,
                         doctor = getString(R.string.label_assigned_doctor)
@@ -93,6 +87,34 @@ class SolicitarTurnoFragment : Fragment() {
                 .setNegativeButton(R.string.btn_cancel, null)
                 .show()
         }
+
+        binding.toolbar.setNavigationOnClickListener {
+            activity?.onBackPressedDispatcher?.onBackPressed()
+        }
+    }
+
+    private fun setupInitialData() {
+        val currentUser = userManager.getUser()
+        if (viewModel.formPacienteNombre.value.isNullOrBlank()) {
+            currentUser?.let {
+                viewModel.formPacienteNombre.value = it.nombre
+                binding.etPacienteNombre.setText(it.nombre)
+            }
+        } else {
+            binding.etPacienteNombre.setText(viewModel.formPacienteNombre.value)
+        }
+
+        val especialidadArg = arguments?.getString("especialidadNombre")
+        if (especialidadArg != null && viewModel.formMotivo.value.isNullOrBlank()) {
+            val motivo = getString(R.string.reason_consultation_for, especialidadArg)
+            viewModel.formMotivo.value = motivo
+            binding.etMotivo.setText(motivo)
+        } else {
+            binding.etMotivo.setText(viewModel.formMotivo.value)
+        }
+
+        binding.etFecha.setText(viewModel.formFecha.value)
+        binding.etHora.setText(viewModel.formHora.value)
     }
 
     private fun setupOnBackPressed() {
@@ -109,13 +131,19 @@ class SolicitarTurnoFragment : Fragment() {
     }
 
     private fun hayCambiosSinGuardar(): Boolean {
-        val nombre = binding.etPacienteNombre.text.toString()
-        val fecha = binding.etFecha.text.toString()
-        val hora = binding.etHora.text.toString()
-        val motivo = binding.etMotivo.text.toString()
+        val nombre = binding.etPacienteNombre.text.toString().trim()
+        val fecha = binding.etFecha.text.toString().trim()
+        val hora = binding.etHora.text.toString().trim()
+        val motivo = binding.etMotivo.text.toString().trim()
+        
+        val user = userManager.getUser()
         val especialidadArg = arguments?.getString("especialidadNombre")
         val motivoDefault = if (especialidadArg != null) getString(R.string.reason_consultation_for, especialidadArg) else ""
-        return ((nombre.isNotEmpty() && nombre != userManager.usuarioActual?.nombre) || fecha.isNotEmpty() || hora.isNotEmpty() || (motivo.isNotEmpty() && motivo != motivoDefault))
+        
+        return (nombre != (user?.nombre ?: "").trim() && nombre.isNotEmpty()) || 
+               fecha.isNotEmpty() || 
+               hora.isNotEmpty() || 
+               (motivo != motivoDefault.trim() && motivo.isNotEmpty())
     }
 
     private fun showDiscardDialog() {
@@ -124,6 +152,7 @@ class SolicitarTurnoFragment : Fragment() {
             .setMessage(R.string.msg_discard_message)
             .setNegativeButton(R.string.btn_keep_editing, null)
             .setPositiveButton(R.string.btn_discard) { _, _ ->
+                viewModel.resetNavegacion() // Limpiar VM al descartar
                 findNavController().popBackStack()
             }
             .show()
@@ -132,6 +161,16 @@ class SolicitarTurnoFragment : Fragment() {
     private fun setupPickers() {
         binding.etFecha.setOnClickListener {
             val c = Calendar.getInstance()
+            // Intentar usar la fecha ya seleccionada si existe
+            viewModel.formFecha.value?.takeIf { it.isNotBlank() }?.let { currentFecha ->
+                try {
+                    val parts = currentFecha.split("-")
+                    if (parts.size == 3) {
+                        c.set(parts[0].toInt(), parts[1].toInt() - 1, parts[2].toInt())
+                    }
+                } catch (_: Exception) {}
+            }
+
             DatePickerDialog(requireContext(), { _, year, month, day ->
                 val formattedDate = String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day)
                 binding.etFecha.setText(formattedDate)
@@ -143,6 +182,13 @@ class SolicitarTurnoFragment : Fragment() {
 
         binding.etHora.setOnClickListener {
             val c = Calendar.getInstance()
+            // Intentar usar la hora ya seleccionada
+            viewModel.formHora.value?.takeIf { it.isNotBlank() }?.let { currentHora ->
+                DateUtils.parseTime(currentHora)?.let { date ->
+                    c.time = date
+                }
+            }
+
             TimePickerDialog(requireContext(), { _, hour, minute ->
                 val calendar = Calendar.getInstance()
                 calendar[Calendar.HOUR_OF_DAY] = hour
@@ -190,7 +236,7 @@ class SolicitarTurnoFragment : Fragment() {
     private fun validarDebounced() {
         availabilityCheckJob?.cancel()
         availabilityCheckJob = viewLifecycleOwner.lifecycleScope.launch {
-            delay(500)
+            delay(400)
             val fecha = viewModel.formFecha.value ?: ""
             val hora = viewModel.formHora.value ?: ""
             if (fecha.isNotEmpty() && hora.isNotEmpty()) {
@@ -202,11 +248,11 @@ class SolicitarTurnoFragment : Fragment() {
     private fun setupObservers() {
         viewModel.isFormValid.observe(viewLifecycleOwner) { isValid ->
             binding.btnConfirmarTurno.isEnabled = isValid
-            binding.btnConfirmarTurno.alpha = if (isValid) 1.0f else 0.5f
+            binding.btnConfirmarTurno.alpha = if (isValid) 1.0f else 0.6f
         }
 
         viewModel.isSlotAvailable.observe(viewLifecycleOwner) { disponible ->
-            actualizarEstadoBotonDisponibilidad(disponible)
+            if (isAdded) actualizarEstadoBotonDisponibilidad(disponible)
         }
 
         viewModel.createTurnoResource.observe(viewLifecycleOwner) { resource ->
@@ -243,20 +289,21 @@ class SolicitarTurnoFragment : Fragment() {
     }
 
     private fun actualizarEstadoBotonDisponibilidad(disponible: Boolean?) {
+        val context = context ?: return
         when (disponible) {
             true -> {
                 binding.btnConfirmarTurno.isEnabled = true
-                binding.btnConfirmarTurno.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                binding.btnConfirmarTurno.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.primary))
                 binding.btnConfirmarTurno.text = getString(R.string.msg_slot_available)
             }
             false -> {
                 binding.btnConfirmarTurno.isEnabled = false
-                binding.btnConfirmarTurno.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.error))
+                binding.btnConfirmarTurno.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.error))
                 binding.btnConfirmarTurno.text = getString(R.string.msg_slot_occupied)
             }
             else -> {
-                binding.btnConfirmarTurno.isEnabled = true
-                binding.btnConfirmarTurno.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.primary))
+                binding.btnConfirmarTurno.isEnabled = false // Deshabilitado hasta que verifique
+                binding.btnConfirmarTurno.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.primary))
                 binding.btnConfirmarTurno.text = getString(R.string.btn_confirm_appointment)
             }
         }

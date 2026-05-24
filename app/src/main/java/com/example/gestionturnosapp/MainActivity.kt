@@ -82,17 +82,27 @@ class MainActivity : AppCompatActivity() {
 
             controller.addOnDestinationChangedListener { _, destination, _ ->
                 if (!::binding.isInitialized) return@addOnDestinationChangedListener
+                
+                // Configuración de visibilidad centralizada
                 when (destination.id) {
-                    R.id.homeFragment, R.id.turnosListFragment, R.id.userProfileFragment, R.id.especialidadesFragment -> {
+                    R.id.homeFragment -> {
                         binding.bottomNavigation.visibility = View.VISIBLE
                         binding.toolbar.visibility = View.VISIBLE
+                    }
+                    R.id.turnosListFragment, R.id.userProfileFragment -> {
+                        binding.bottomNavigation.visibility = View.VISIBLE
+                        binding.toolbar.visibility = View.GONE // Usan su propia UI o Toolbar
+                    }
+                    R.id.especialidadesFragment, R.id.solicitarTurnoFragment, R.id.settingsFragment, R.id.turnoDetailFragment -> {
+                        binding.bottomNavigation.visibility = View.GONE
+                        binding.toolbar.visibility = View.GONE // Usan su propio Toolbar interno
                     }
                     R.id.welcomeFragment, R.id.loginFragment, R.id.registerFragment -> {
                         binding.bottomNavigation.visibility = View.GONE
                         binding.toolbar.visibility = View.GONE
                     }
                     else -> {
-                        binding.bottomNavigation.visibility = View.GONE
+                        binding.bottomNavigation.visibility = View.VISIBLE
                         binding.toolbar.visibility = View.VISIBLE
                     }
                 }
@@ -103,6 +113,7 @@ class MainActivity : AppCompatActivity() {
         sincronizarFcmToken()
         pedirPermisoNotificaciones()
         observeNetworkStatus()
+        handleIntent(intent)
     }
 
     private fun observeNetworkStatus() {

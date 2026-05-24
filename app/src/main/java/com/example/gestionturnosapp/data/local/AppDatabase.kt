@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import net.sqlcipher.database.SupportFactory
 import com.example.gestionturnosapp.data.model.*
+import java.util.concurrent.Executors
 
 @Database(entities = [Turno::class, Medicamento::class, EstudioMedico::class, Mensaje::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
@@ -24,36 +25,35 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = try {
-                    buildDatabase(context)
-                } catch (t: Throwable) {
-                    android.util.Log.e("AppDatabase", "Error building secure database, attempting recover", t)
+                val currentInstance = INSTANCE
+                if (currentInstance != null) return currentInstance
+
+                try {
+                    val instance = buildDatabase(context)
+                    INSTANCE = instance
+                    instance
+                } catch (e: Exception) {
+                    android.util.Log.e("AppDatabase", "Error opening database, attempting recovery", e)
                     try {
-                        // Si falla (ej: contraseña incorrecta o cambio de esquema radical), borramos y recreamos
                         context.deleteDatabase(DB_NAME)
-                        buildDatabase(context)
-                    } catch (t2: Throwable) {
-                        // Último recurso: base de datos sin cifrado para evitar crash persistente
-                        Room.databaseBuilder(
+                        val instance = buildDatabase(context)
+                        INSTANCE = instance
+                        instance
+                    } catch (e2: Exception) {
+                        // Fallback extremo
+                        val instance = Room.databaseBuilder(
                             context.applicationContext,
                             AppDatabase::class.java,
-                            "${DB_NAME}_unencrypted"
+                            "${DB_NAME}_emergency"
                         ).fallbackToDestructiveMigration().build()
+                        INSTANCE = instance
+                        instance
                     }
                 }
-                INSTANCE = instance
-                instance
             }
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
-            // Intentamos cargar librerías nativas explícitamente antes de build
-            try {
-                net.sqlcipher.database.SQLiteDatabase.loadLibs(context)
-            } catch (e: Exception) {
-                android.util.Log.e("AppDatabase", "Error loading SQLCipher libs", e)
-            }
-
             val passphrase = net.sqlcipher.database.SQLiteDatabase.getBytes("SaludActiva_Secret_Key_2024".toCharArray())
             val factory = SupportFactory(passphrase)
 
@@ -63,6 +63,10 @@ abstract class AppDatabase : RoomDatabase() {
                 DB_NAME
             )
             .openHelperFactory(factory)
+            // Forzamos un solo hilo para evitar 'database is locked' en SQLCipher con múltiples corrutinas
+            .setQueryExecutor(Executors.newSingleThreadExecutor())
+            .setTransactionExecutor(Executors.newSingleThreadExecutor())
+            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
             .fallbackToDestructiveMigration()
             .build()
         }

@@ -60,6 +60,7 @@ class UserProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
         setupObservers()
 
         binding.ivProfileAvatar.setOnClickListener {
@@ -75,6 +76,12 @@ class UserProfileFragment : Fragment() {
         binding.btnEditProfile.setOnClickListener {
             it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             mostrarDialogoEdicion()
+        }
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
         }
     }
 

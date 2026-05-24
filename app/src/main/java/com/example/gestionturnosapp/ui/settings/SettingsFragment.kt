@@ -67,7 +67,7 @@ class SettingsFragment : Fragment() {
             binding.switchBiometric.isChecked = PreferenceManager.isBiometricEnabled(context)
             binding.switchBiometric.setOnCheckedChangeListener { _, isChecked ->
                 PreferenceManager.setBiometricEnabled(context, isChecked)
-                val msg = if (isChecked) getString(R.string.msg_reminder_set) else getString(R.string.btn_discard) // Reusando strings si no hay específicos
+                val msg = if (isChecked) getString(R.string.msg_biometric_enabled) else getString(R.string.msg_biometric_disabled)
                 Snackbar.make(binding.root, msg, Snackbar.LENGTH_SHORT).show()
             }
         }

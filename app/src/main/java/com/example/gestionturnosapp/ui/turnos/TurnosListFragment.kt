@@ -45,6 +45,7 @@ class TurnosListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setupToolbar()
         setupRecyclerView()
         setupSwipeRefresh()
         setupSearchView()
@@ -54,6 +55,12 @@ class TurnosListFragment : Fragment() {
         
         viewModel.syncPendingTurnos()
         viewModel.fetchTurnos()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     private fun setupFilters() {

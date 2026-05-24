@@ -113,7 +113,7 @@
     <string name="msg_logout_confirm">Are you sure you want to exit?</string>
     <string name="btn_yes">Yes, exit</string>
     <string name="btn_cancel">Cancel</string>
-    <string name="version_info">Salud Activa v1.0.2</string>
+    <string name="version_info">Salud Activa v1.0.3 Premium</string>
     <string name="loading_user">Loading user…</string>
     <string name="btn_upload_study">UPLOAD STUDY</string>
     <string name="msg_no_studies">You have no registered studies</string>
@@ -297,4 +297,6 @@
     <string name="desc_dermatology">Skin and hair</string>
     <string name="name_neurology">Neurology</string>
     <string name="desc_neurology">Nervous system</string>
+    <string name="msg_biometric_enabled">Biometric authentication enabled</string>
+    <string name="msg_biometric_disabled">Biometric authentication disabled</string>
 </resources>

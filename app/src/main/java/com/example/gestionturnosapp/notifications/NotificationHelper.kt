@@ -6,11 +6,14 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.gestionturnosapp.MainActivity
 import com.example.gestionturnosapp.R
 
 object NotificationHelper {
+
+    private const val TAG = "NotificationHelper"
 
     const val CHANNEL_GENERAL = "general_channel"
     const val CHANNEL_REMINDERS = "reminders_channel"
@@ -26,13 +29,16 @@ object NotificationHelper {
                     CHANNEL_GENERAL,
                     context.getString(R.string.label_general_channel),
                     NotificationManager.IMPORTANCE_DEFAULT
-                ),
+                ).apply {
+                    description = "Notificaciones generales de la aplicación"
+                },
                 NotificationChannel(
                     CHANNEL_REMINDERS,
                     context.getString(R.string.label_reminders_channel),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     enableVibration(true)
+                    description = "Recordatorios de citas médicas"
                 },
                 NotificationChannel(
                     CHANNEL_MEDICATION,
@@ -41,6 +47,7 @@ object NotificationHelper {
                 ).apply {
                     enableVibration(true)
                     vibrationPattern = longArrayOf(0, 500, 200, 500)
+                    description = "Avisos para toma de medicamentos"
                 },
                 NotificationChannel(
                     CHANNEL_CHAT,
@@ -48,9 +55,11 @@ object NotificationHelper {
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
                     enableVibration(true)
+                    description = "Mensajes del asistente médico"
                 }
             )
             notificationManager.createNotificationChannels(channels)
+            Log.d(TAG, "Canales de notificación creados")
         }
     }
 
@@ -62,7 +71,10 @@ object NotificationHelper {
         notificationId: Int = (System.currentTimeMillis() % 10000).toInt(),
         data: Map<String, String>? = null
     ) {
+        Log.d(TAG, "Intentando mostrar notificación: $title - Channel: $channelId")
+
         if (!com.example.gestionturnosapp.data.local.PreferenceManager.areNotificationsEnabled(context)) {
+            Log.w(TAG, "Notificaciones desactivadas en ajustes de la app")
             return
         }
 
@@ -78,6 +90,7 @@ object NotificationHelper {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        // Usar un icono del sistema resiliente como fallback
         val icon = when (channelId) {
             CHANNEL_MEDICATION -> android.R.drawable.ic_dialog_alert
             CHANNEL_CHAT -> android.R.drawable.stat_notify_chat
@@ -95,9 +108,20 @@ object NotificationHelper {
                 else NotificationCompat.PRIORITY_HIGH
             )
             .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        
+        // Verificar permiso en runtime (Opcional aquí, pero ayuda al diagnóstico)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                Log.e(TAG, "No hay permiso POST_NOTIFICATIONS concedido")
+                // No podemos hacer mucho aquí más que loguear
+            }
+        }
+
         notificationManager.notify(notificationId, builder.build())
+        Log.d(TAG, "Notificación enviada al sistema")
     }
 }

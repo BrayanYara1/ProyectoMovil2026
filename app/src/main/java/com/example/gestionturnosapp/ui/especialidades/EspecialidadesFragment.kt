@@ -34,9 +34,16 @@ class EspecialidadesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.refreshForLocale()
+        setupToolbar()
         setupRecyclerView()
         setupSearchView()
         setupObservers()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     private fun setupRecyclerView() {

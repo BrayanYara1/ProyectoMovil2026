@@ -113,7 +113,7 @@
     <string name="msg_logout_confirm">¿Estás seguro de que quieres salir?</string>
     <string name="btn_yes">Sí, salir</string>
     <string name="btn_cancel">Cancelar</string>
-    <string name="version_info">Salud Activa v1.0.2</string>
+    <string name="version_info">Salud Activa v1.0.3 Premium</string>
     <string name="loading_user">Cargando usuario…</string>
     <string name="btn_upload_study">SUBIR ESTUDIO</string>
     <string name="msg_no_studies">No tienes estudios registrados</string>
@@ -321,4 +321,6 @@
     <string name="ai_term_presion">La presión arterial es la fuerza de su sangre al empujar contra las paredes de sus arterias.</string>
     <string name="ai_term_diabetes">La diabetes es una enfermedad en la que los niveles de glucosa (azúcar) de la sangre están muy altos.</string>
     <string name="ai_term_generic">Ese es un término técnico importante. Por seguridad, te sugiero consultarlo directamente con tu médico en tu próxima cita para que te explique cómo aplica a tu caso particular.</string>
+    <string name="msg_biometric_enabled">Autenticación biométrica activada</string>
+    <string name="msg_biometric_disabled">Autenticación biométrica desactivada</string>
 </resources>

@@ -7,6 +7,7 @@ import com.example.gestionturnosapp.R
 
 class ReminderReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
+        android.util.Log.d("ReminderReceiver", "Broadcast recibido")
         val title = intent.getStringExtra("TITLE") ?: context.getString(R.string.welcome)
         val message = intent.getStringExtra("MESSAGE") ?: context.getString(R.string.no_upcoming_appointments)
         val notificationId = intent.getIntExtra("NOTIFICATION_ID", 1001)
