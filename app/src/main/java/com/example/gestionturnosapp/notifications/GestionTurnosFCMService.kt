@@ -1,31 +1,40 @@
 package com.example.gestionturnosapp.notifications
 
 import com.example.gestionturnosapp.data.UserManager
-import com.example.gestionturnosapp.data.remote.RetrofitClient
+import com.example.gestionturnosapp.data.remote.ApiService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class GestionTurnosFCMService : FirebaseMessagingService() {
+
+    @Inject
+    lateinit var userManager: UserManager
+
+    @Inject
+    lateinit var apiService: ApiService
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        UserManager.saveFcmToken(applicationContext, token)
+        userManager.saveFcmToken(token)
         syncTokenToServer(token)
     }
 
     private fun syncTokenToServer(fcmToken: String) {
         scope.launch {
             try {
-                val response = RetrofitClient.instance.updateFcmToken(mapOf("token" to fcmToken))
+                val response = apiService.updateFcmToken(mapOf("token" to fcmToken))
                 if (response.isSuccessful) {
-                    UserManager.markFcmAsSynced(applicationContext)
+                    userManager.markFcmAsSynced()
                 }
             } catch (e: Exception) {
                 android.util.Log.e("FCM", "Error syncing token", e)

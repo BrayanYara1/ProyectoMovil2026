@@ -103,38 +103,5 @@ class UserManager @Inject constructor(
         private const val KEY_TOKEN = "auth_token"
         private const val KEY_FCM_TOKEN = "fcm_token"
         private const val KEY_FCM_SYNCED = "fcm_synced"
-
-        private var instance: UserManager? = null
-        
-        fun init(manager: UserManager) {
-            instance = manager
-        }
-
-        @Deprecated("Usar inyección de dependencias")
-        val token: String? get() = instance?.token
-
-        @Deprecated("Usar inyección de dependencias")
-        fun getUser(context: Context): Usuario? = instance?.getUser()
-
-        @Deprecated("Usar inyección de dependencias")
-        fun logout(context: Context) = instance?.logout()
-
-        @Deprecated("Usar inyección de dependencias")
-        fun getToken(context: Context? = null): String? = instance?.token
-
-        @Deprecated("Usar inyección de dependencias")
-        val usuarioActual: Usuario? get() = instance?.usuarioActual
-
-        @Deprecated("Usar inyección de dependencias")
-        fun isFcmSynced(context: Context): Boolean = instance?.isFcmSynced() ?: false
-
-        @Deprecated("Usar inyección de dependencias")
-        fun getFcmToken(context: Context): String? = instance?.getFcmToken()
-
-        @Deprecated("Usar inyección de dependencias")
-        fun saveFcmToken(context: Context, fcmToken: String) = instance?.saveFcmToken(fcmToken)
-
-        @Deprecated("Usar inyección de dependencias")
-        fun markFcmAsSynced(context: Context) = instance?.markFcmAsSynced()
     }
 }
