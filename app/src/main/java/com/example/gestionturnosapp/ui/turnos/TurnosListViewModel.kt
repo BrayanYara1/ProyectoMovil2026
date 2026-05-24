@@ -121,24 +121,22 @@ class TurnosListViewModel @Inject constructor(
             _turnosResource.value = Resource.Loading
             _isLoading.value = true
             
-            // 1. Cargar de caché primero para respuesta instantánea (Offline Pro)
-            val cached = OfflineCacheManager.getCachedTurnos(getApplication())
-            if (cached.isNotEmpty()) {
-                _turnos.value = cached
-                _turnosResource.value = Resource.Success<List<Turno>>(cached)
-            }
-
             try {
+                // El Repo maneja Server -> Cache
                 val turnosList = repository.getTurnos()
-                _turnos.value = turnosList
-                _turnosResource.value = Resource.Success<List<Turno>>(turnosList)
                 
-                // 2. Guardar en caché para uso offline
-                OfflineCacheManager.saveTurnos(getApplication(), turnosList)
+                // Mezclar con pendientes locales si los hubiera
+                val pendingRequests = OfflineCacheManager.getPendingTurnos(getApplication())
+                val pendingTurnos = pendingRequests.map { req ->
+                    Turno("pending_${req.fecha}_${req.hora}", req.nombre, req.fecha, req.hora, req.motivo, getApplication<Application>().getString(R.string.status_pending_offline), req.especialidad, req.doctor)
+                }
+                
+                val combined = (turnosList + pendingTurnos).distinctBy { "${it.fecha}_${it.hora}" }
+                
+                _turnos.value = combined
+                _turnosResource.value = Resource.Success<List<Turno>>(combined)
                 
             } catch (e: Exception) {
-                android.util.Log.e("TurnosListViewModel", "Error fetchTurnos", e)
-                // Si ya tenemos datos del caché, no mostramos error crítico, solo log
                 if (_turnos.value.isNullOrEmpty()) {
                     _turnosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
                 }
@@ -170,23 +168,19 @@ class TurnosListViewModel @Inject constructor(
                 doctor ?: "Dr. Asignado"
             )
             try {
+                // El Repo maneja la creación o el encolado offline
                 val nuevoTurno = repository.crearTurno(request)
+                
                 if (nuevoTurno != null) {
                     _createTurnoResource.value = Resource.Success<Turno>(nuevoTurno)
-                    fetchTurnos()
                 } else {
-                    _createTurnoResource.value = Resource.Error("Error")
-                }
-            } catch (e: Exception) {
-                if (OfflineCacheManager.isNetworkError(e)) {
-                    // MODO OFFLINE: Guardar para sincronizar después
-                    OfflineCacheManager.addPendingTurno(getApplication(), request)
+                    // Si es null pero no lanzó excepción, el repo lo guardó como pendiente
                     val pendingTurno = Turno("pending", nombre, fechaNormalizada, horaNormalizada, motivo, getApplication<Application>().getString(R.string.status_pending_offline), especialidad, doctor)
                     _createTurnoResource.value = Resource.Success<Turno>(pendingTurno)
-                    fetchTurnos()
-                } else {
-                    _createTurnoResource.value = Resource.Error(e.localizedMessage ?: "Error")
                 }
+                fetchTurnos()
+            } catch (e: Exception) {
+                _createTurnoResource.value = Resource.Error(e.localizedMessage ?: "Error")
             } finally {
                 _isLoading.value = false
             }

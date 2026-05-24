@@ -1,39 +1,67 @@
 package com.example.gestionturnosapp.data.repository
 
+import android.content.Context
+import com.example.gestionturnosapp.data.local.OfflineCacheManager
 import com.example.gestionturnosapp.data.model.Medicamento
 import com.example.gestionturnosapp.data.remote.ApiService
 import com.example.gestionturnosapp.data.remote.RetrofitClient
 import com.example.gestionturnosapp.data.remote.dto.NuevoMedicamentoRequest
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class MedicamentoRepository @Inject constructor(
-    private val apiService: ApiService
+    private val apiService: ApiService,
+    @ApplicationContext private val context: Context
 ) {
 
     suspend fun getMedicamentos(): List<Medicamento> {
-        val response = apiService.getMedicamentos()
-        if (response.isSuccessful) {
-            return response.body() ?: emptyList()
-        } else {
-            throw Exception(RetrofitClient.parseError(response))
+        return try {
+            val response = apiService.getMedicamentos()
+            if (response.isSuccessful) {
+                val meds = response.body() ?: emptyList()
+                OfflineCacheManager.saveMedicamentos(context, meds)
+                meds
+            } else {
+                OfflineCacheManager.getCachedMedicamentos(context)
+            }
+        } catch (e: Exception) {
+            OfflineCacheManager.getCachedMedicamentos(context)
         }
     }
 
     suspend fun agregarMedicamento(request: NuevoMedicamentoRequest): Medicamento? {
-        val response = apiService.agregarMedicamento(request)
-        if (response.isSuccessful) {
-            return response.body()
-        } else {
-            throw Exception(RetrofitClient.parseError(response))
+        return try {
+            val response = apiService.agregarMedicamento(request)
+            if (response.isSuccessful) {
+                response.body()
+            } else {
+                throw Exception(RetrofitClient.parseError(response))
+            }
+        } catch (e: Exception) {
+            if (OfflineCacheManager.isNetworkError(e)) {
+                // Crear objeto temporal para cache
+                val tempMed = Medicamento(
+                    id = "local_${System.currentTimeMillis()}",
+                    nombre = request.nombre,
+                    dosis = request.dosis,
+                    frecuencia = request.frecuencia,
+                    proximaToma = request.proximaToma,
+                    notas = request.notas
+                )
+                OfflineCacheManager.addPendingMed(context, tempMed)
+                tempMed
+            } else {
+                throw e
+            }
         }
     }
 
     suspend fun updateMedicamento(id: String, med: Medicamento): Medicamento? {
         val response = apiService.updateMedicamento(id, med)
-        if (response.isSuccessful) {
-            return response.body()
+        return if (response.isSuccessful) {
+            response.body()
         } else {
             throw Exception(RetrofitClient.parseError(response))
         }
@@ -45,4 +73,7 @@ class MedicamentoRepository @Inject constructor(
             throw Exception(RetrofitClient.parseError(response))
         }
     }
+
+    suspend fun getPendingMeds() = OfflineCacheManager.getPendingMeds(context)
+    suspend fun removePendingMeds(synced: List<Medicamento>) = OfflineCacheManager.removePendingMeds(context, synced)
 }

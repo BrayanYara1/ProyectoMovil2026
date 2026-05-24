@@ -69,19 +69,15 @@ class EstudiosViewModel @Inject constructor(
         viewModelScope.launch {
             _estudiosResource.value = Resource.Loading
             
-            // Offline Cache First
-            val cached = OfflineCacheManager.getCachedEstudios(getApplication())
-            if (cached.isNotEmpty()) {
-                _allEstudios.value = cached
-                _estudiosResource.value = Resource.Success(cached)
-            }
-
             try {
+                // El repo maneja Server -> Cache
                 val list = repository.getEstudios()
-                _allEstudios.value = list
                 
-                // Save to Cache
-                OfflineCacheManager.saveEstudios(getApplication(), list)
+                // Mezclar con pendientes
+                val pending = OfflineCacheManager.getPendingEstudios(getApplication())
+                val combined = (list + pending).distinctBy { "${it.titulo}_${it.fecha}" }
+                
+                _allEstudios.value = combined
             } catch (e: Exception) {
                 if (_allEstudios.value.isNullOrEmpty()) {
                     _estudiosResource.value = Resource.Error(e.localizedMessage ?: "Error al cargar")
@@ -93,27 +89,19 @@ class EstudiosViewModel @Inject constructor(
     fun agregarEstudio(titulo: String, fecha: String, tipo: String, resultado: String, photoUrl: String? = null) {
         viewModelScope.launch {
             _createResource.value = Resource.Loading
-            // Generar un ID local único para evitar conflictos en el DiffUtil si hay varios pendientes
+            // Generar un ID local único
             val localId = "pending_${System.currentTimeMillis()}"
             val nuevo = EstudioMedico(localId, titulo, fecha, tipo, resultado, urlDocumento = photoUrl)
             try {
-                val response = repository.agregarEstudioConDetalle(nuevo.copy(id = "")) 
+                // El repo maneja la lógica de crear o guardar como pendiente
+                val result = repository.agregarEstudio(nuevo)
                 
-                if (response.isSuccessful && response.body() != null) {
-                    _createResource.value = Resource.Success(response.body()!!)
+                if (result != null) {
+                    _createResource.value = Resource.Success(result)
                     loadEstudios()
-                } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Error desconocido"
-                    _createResource.value = Resource.Error(errorMsg)
                 }
             } catch (e: Exception) {
-                if (OfflineCacheManager.isNetworkError(e)) {
-                    OfflineCacheManager.addPendingEstudio(getApplication(), nuevo)
-                    _createResource.value = Resource.Success(nuevo)
-                    loadEstudios()
-                } else {
-                    _createResource.value = Resource.Error(e.localizedMessage ?: "Error")
-                }
+                _createResource.value = Resource.Error(e.localizedMessage ?: "Error")
             }
         }
     }

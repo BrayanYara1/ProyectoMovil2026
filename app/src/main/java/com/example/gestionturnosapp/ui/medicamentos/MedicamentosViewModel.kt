@@ -34,13 +34,17 @@ class MedicamentosViewModel @Inject constructor(
             _medicamentosResource.value = Resource.Loading
             _isLoading.value = true
             
-            // Offline First: Combinar Room + Pendientes
+            // 1. Mostrar lo que tenemos localmente ya
             refreshLocalList()
 
             try {
+                // 2. El Repo intenta Server -> Cache
                 val list = repository.getMedicamentos()
-                OfflineCacheManager.saveMedicamentos(getApplication(), list)
-                refreshLocalList()
+                
+                // 3. Volver a mostrar incluyendo pendientes
+                val pending = repository.getPendingMeds()
+                val combined = (list + pending).distinctBy { it.nombre.lowercase().trim() }
+                _medicamentosResource.value = Resource.Success(combined)
             } catch (e: Exception) {
                 if (_medicamentosResource.value !is Resource.Success<*>) {
                     _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
@@ -52,11 +56,8 @@ class MedicamentosViewModel @Inject constructor(
     }
 
     private suspend fun refreshLocalList() {
-        val cached = OfflineCacheManager.getCachedMedicamentos(getApplication())
-        val pending = OfflineCacheManager.getPendingMeds(getApplication())
-        // Combinar y eliminar duplicados por nombre
-        val combined = (cached + pending).distinctBy { it.nombre.lowercase().trim() }
-        _medicamentosResource.postValue(Resource.Success(combined))
+        val cached = repository.getMedicamentos() // Esto ahora lee de cache si falla el repo
+        _medicamentosResource.postValue(Resource.Success(cached))
     }
 
     fun agregarMedicamento(nombre: String, dosis: String, frecuencia: String, proximaToma: String) {
@@ -64,45 +65,15 @@ class MedicamentosViewModel @Inject constructor(
             _operationResource.value = Resource.Loading
             _isLoading.value = true
             
-            // 1. Crear el objeto local con ID único
-            val tempId = "local_${System.currentTimeMillis()}"
-            val nuevoMed = Medicamento(
-                id = tempId, 
-                nombre = nombre,
-                dosis = dosis,
-                frecuencia = frecuencia,
-                proximaToma = proximaToma
-            )
-
             try {
-                // 2. Intentar guardar en el servidor usando un Request DTO (sin ID)
                 val request = NuevoMedicamentoRequest(nombre, dosis, frecuencia, proximaToma)
                 val result = repository.agregarMedicamento(request)
                 if (result != null) {
                     _operationResource.value = Resource.Success(result)
-                    
-                    // Actualizar lista local inmediatamente (Servidor ganó)
-                    val currentList = OfflineCacheManager.getCachedMedicamentos(getApplication()).toMutableList()
-                    currentList.add(0, result)
-                    _medicamentosResource.value = Resource.Success(currentList)
-                    OfflineCacheManager.saveMedicamentos(getApplication(), currentList)
-                } else {
-                    _operationResource.value = Resource.Error("Error de respuesta")
+                    loadMedicamentos()
                 }
             } catch (e: Exception) {
-                // 3. Fallo de red: Guardar como pendiente
-                if (OfflineCacheManager.isNetworkError(e)) {
-                    OfflineCacheManager.addPendingMed(getApplication(), nuevoMed)
-                    
-                    // Mostrar en la lista local de inmediato como "Success" local
-                    val currentList = OfflineCacheManager.getCachedMedicamentos(getApplication()).toMutableList()
-                    currentList.add(0, nuevoMed)
-                    _medicamentosResource.value = Resource.Success(currentList)
-                    
-                    _operationResource.value = Resource.Success(nuevoMed)
-                } else {
-                    _operationResource.value = Resource.Error(e.localizedMessage ?: "Error de conexión o validación")
-                }
+                _operationResource.value = Resource.Error(e.localizedMessage ?: "Error")
             } finally {
                 _isLoading.value = false
             }
@@ -110,22 +81,20 @@ class MedicamentosViewModel @Inject constructor(
     }
 
     fun syncPendingMeds() {
-        val pending = OfflineCacheManager.getPendingMeds(getApplication())
-        if (pending.isEmpty()) return
-
         viewModelScope.launch {
+            val pending = repository.getPendingMeds()
+            if (pending.isEmpty()) return@launch
+
             val synced = mutableListOf<Medicamento>()
             pending.forEach { med ->
                 try {
                     val request = NuevoMedicamentoRequest(med.nombre, med.dosis, med.frecuencia, med.proximaToma, med.notas)
                     repository.agregarMedicamento(request)
                     synced.add(med)
-                } catch (_: Exception) {
-                    return@forEach
-                }
+                } catch (_: Exception) {}
             }
             if (synced.isNotEmpty()) {
-                OfflineCacheManager.removePendingMeds(getApplication(), synced)
+                repository.removePendingMeds(synced)
                 loadMedicamentos()
             }
         }

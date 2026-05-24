@@ -20,34 +20,42 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        private const val DB_NAME = "gestion_turnos_db_secure"
+
         fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                try {
+                val instance = try {
                     buildDatabase(context)
                 } catch (t: Throwable) {
-                    android.util.Log.e("AppDatabase", "Error building database, attempting to recover", t)
+                    android.util.Log.e("AppDatabase", "Error building secure database, attempting recover", t)
                     try {
-                        context.deleteDatabase("gestion_turnos_db")
+                        // Si falla (ej: contraseña incorrecta o cambio de esquema radical), borramos y recreamos
+                        context.deleteDatabase(DB_NAME)
                         buildDatabase(context)
                     } catch (t2: Throwable) {
-                        // Último recurso: crear sin cifrado si SQLCipher falla catastróficamente
+                        // Último recurso: base de datos sin cifrado para evitar crash persistente
                         Room.databaseBuilder(
                             context.applicationContext,
                             AppDatabase::class.java,
-                            "gestion_turnos_db_unencrypted"
+                            "${DB_NAME}_unencrypted"
                         ).fallbackToDestructiveMigration().build()
                     }
                 }
-            }.also { INSTANCE = it }
+                INSTANCE = instance
+                instance
+            }
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
-            // TEMPORAL: Desactivar cifrado SQLCipher para diagnosticar el crash
+            val passphrase = net.sqlcipher.database.SQLiteDatabase.getBytes("SaludActiva_Secret_Key_2024".toCharArray())
+            val factory = SupportFactory(passphrase)
+
             return Room.databaseBuilder(
                 context.applicationContext,
                 AppDatabase::class.java,
-                "gestion_turnos_db_diag",
+                DB_NAME
             )
+            .openHelperFactory(factory)
             .fallbackToDestructiveMigration()
             .build()
         }

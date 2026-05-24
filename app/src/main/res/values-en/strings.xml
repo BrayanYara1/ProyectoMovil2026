@@ -38,6 +38,7 @@
     <string name="subtitle_share_health">Send a summary of your appointments and medications.</string>
     <string name="title_medical_recommendation">Medical Recommendation</string>
     <string name="title_today_medication">Today\'s Medication</string>
+    <string name="label_add_short">ADD</string>
     <string name="label_specialists">Specialists</string>
     <string name="label_studies_short">Studies</string>
     <string name="label_help_short">Help</string>

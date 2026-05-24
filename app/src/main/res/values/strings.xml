@@ -38,6 +38,7 @@
     <string name="subtitle_share_health">Envía un resumen de tus citas y medicamentos.</string>
     <string name="title_medical_recommendation">Recomendación Médica</string>
     <string name="title_today_medication">Medicación de Hoy</string>
+    <string name="label_add_short">AGREGAR</string>
     <string name="label_specialists">Especialistas</string>
     <string name="label_studies_short">Estudios</string>
     <string name="label_help_short">Ayuda</string>

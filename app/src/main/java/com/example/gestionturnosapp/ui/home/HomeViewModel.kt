@@ -78,30 +78,16 @@ class HomeViewModel @Inject constructor(
                 // Paso 1: Mostrar lo local de inmediato
                 refreshLocalData()
 
-                // Paso 2: Llamadas al servidor en paralelo
-                val turnosDef = async { try { turnoRepository.getTurnos() } catch (e: Exception) { null } }
-                val medsDef = async { try { medRepository.getMedicamentos() } catch (e: Exception) { null } }
+                // Paso 2: El repositorio ahora maneja la lógica de Server -> Cache -> Local
+                val serverTurnos = turnoRepository.getTurnos()
+                val serverMeds = medRepository.getMedicamentos()
 
-                val serverTurnos = turnosDef.await()
-                val serverMeds = medsDef.await()
-
-                // Paso 3: Actualizar con lo que venga del servidor
-                if (serverTurnos != null) {
-                    updateTurnosUI(serverTurnos)
-                    OfflineCacheManager.saveTurnos(getApplication(), serverTurnos)
-                }
-
-                if (serverMeds != null) {
-                    // Mezclar server con los pendientes actuales (que podrían haber cambiado durante la red)
-                    val currentPending = OfflineCacheManager.getPendingMeds(getApplication())
-                    val finalMeds = (serverMeds + currentPending).distinctBy { it.nombre.lowercase().trim() }
-                    _medicamentos.postValue(finalMeds)
-                    
-                    // Solo guardar en cache si hay algo real del servidor
-                    if (serverMeds.isNotEmpty()) {
-                        OfflineCacheManager.saveMedicamentos(getApplication(), serverMeds)
-                    }
-                }
+                // Paso 3: Actualizar UI
+                updateTurnosUI(serverTurnos)
+                
+                val currentPending = medRepository.getPendingMeds()
+                val finalMeds = (serverMeds + currentPending).distinctBy { it.nombre.lowercase().trim() }
+                _medicamentos.postValue(finalMeds)
 
             } catch (e: Exception) {
                 if (e !is kotlinx.coroutines.CancellationException) {
