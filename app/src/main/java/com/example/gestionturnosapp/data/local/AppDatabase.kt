@@ -47,6 +47,13 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
+            // Intentamos cargar librerías nativas explícitamente antes de build
+            try {
+                net.sqlcipher.database.SQLiteDatabase.loadLibs(context)
+            } catch (e: Exception) {
+                android.util.Log.e("AppDatabase", "Error loading SQLCipher libs", e)
+            }
+
             val passphrase = net.sqlcipher.database.SQLiteDatabase.getBytes("SaludActiva_Secret_Key_2024".toCharArray())
             val factory = SupportFactory(passphrase)
 

@@ -18,10 +18,6 @@ class GestionTurnosApp : Application() {
         // Crear canales de notificación
         com.example.gestionturnosapp.notifications.NotificationHelper.createNotificationChannels(this)
 
-        try {
-            net.sqlcipher.database.SQLiteDatabase.loadLibs(this)
-        } catch (t: Throwable) {
-            android.util.Log.e("App", "LoadLibs Error", t)
-        }
+        // Nota: loadLibs se movió a AppDatabase para carga perezosa y segura
     }
 }

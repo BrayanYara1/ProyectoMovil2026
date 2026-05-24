@@ -50,7 +50,11 @@ class MainActivity : AppCompatActivity() {
     ) { }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        try {
+            installSplashScreen()
+        } catch (e: Exception) {
+            android.util.Log.e("MainActivity", "SplashScreen error", e)
+        }
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         
