@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
@@ -14,9 +15,10 @@
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
+            android:layout_height="@dimen/header_height_compact"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:contentScrim="@color/primary">
+            app:contentScrim="@color/primary"
+            app:titleEnabled="false">
 
             <View
                 android:layout_width="match_parent"
@@ -27,13 +29,15 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin" />
+                app:layout_collapseMode="pin"
+                app:navigationIcon="@drawable/ic_back"
+                app:navigationIconTint="@color/white" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp"
+                android:padding="@dimen/spacing_large"
                 android:layout_gravity="bottom">
 
                 <TextView
@@ -41,7 +45,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/title_my_appointments"
                     android:textColor="@color/white"
-                    android:textSize="28sp"
+                    android:textSize="@dimen/text_size_headline"
                     android:textStyle="bold" />
 
                 <TextView
@@ -49,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/subtitle_appointments"
                     android:textColor="#E0E0E0"
-                    android:textSize="14sp" />
+                    android:textSize="@dimen/text_size_body" />
             </LinearLayout>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -65,8 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="16dp">
-            <include layout="@layout/item_turno_skeleton" />
+            android:paddingTop="@dimen/spacing_medium">
             <include layout="@layout/item_turno_skeleton" />
             <include layout="@layout/item_turno_skeleton" />
             <include layout="@layout/item_turno_skeleton" />
@@ -88,16 +91,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingTop="16dp">
+                android:paddingTop="@dimen/spacing_medium">
 
                 <!-- Barra de Búsqueda Premium -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.App.Card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginHorizontal="@dimen/spacing_medium"
                     android:layout_marginBottom="12dp"
-                    app:cardElevation="4dp">
+                    app:cardElevation="4dp"
+                    app:cardCornerRadius="16dp">
 
                     <androidx.appcompat.widget.SearchView
                         android:id="@+id/searchView"
@@ -114,9 +118,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbars="none"
-                    android:paddingHorizontal="16dp"
+                    android:paddingHorizontal="@dimen/spacing_medium"
                     android:clipToPadding="false"
-                    android:layout_marginBottom="8dp">
+                    android:layout_marginBottom="@dimen/spacing_small">
 
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/chipGroupFilters"
@@ -155,7 +159,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"
-                    android:paddingBottom="80dp"
+                    android:paddingBottom="100dp"
                     android:clipToPadding="false"
                     android:layoutAnimation="@anim/layout_animation_fall_down"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -173,7 +177,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="32dp"
+        android:padding="@dimen/spacing_xlarge"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:visibility="gone">
 
@@ -184,14 +188,14 @@
             android:text="@string/error_connection"
             android:textAlignment="center"
             android:textColor="@color/error"
-            android:textSize="16sp" />
+            android:textSize="@dimen/text_size_subtitle" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRetry"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:text="@string/btn_retry" />
     </LinearLayout>
 
@@ -203,14 +207,14 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="32dp"
+        android:padding="@dimen/spacing_xlarge"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:visibility="gone">
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/lottieEmpty"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             app:lottie_autoPlay="true"
             app:lottie_loop="true" />
 
@@ -218,28 +222,28 @@
             android:id="@+id/tvEmptyTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/spacing_medium"
             android:text="@string/no_appointments"
             android:textColor="@color/text_primary"
-            android:textSize="20sp"
+            android:textSize="@dimen/text_size_h3"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvEmptyMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_small"
             android:text="@string/msg_empty_appointments"
             android:textAlignment="center"
             android:textColor="@color/text_secondary"
-            android:textSize="14sp" />
+            android:textSize="@dimen/text_size_body" />
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/fabAddTurno"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
+        android:layout_margin="@dimen/spacing_large"
         android:layout_gravity="bottom|end"
         android:text="@string/btn_schedule_appointment"
         android:textColor="@color/white"
