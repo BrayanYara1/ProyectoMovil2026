@@ -16,8 +16,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Medicamento
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.model.Medicamento
+import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.databinding.FragmentMedicamentosBinding
 import com.example.gestionturnosapp.notifications.ReminderReceiver
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -133,10 +133,10 @@ class MedicamentosFragment : Fragment() {
     private fun setupObservers() {
         viewModel.medicamentosResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Success -> {
-                    adapter.submitList(resource.data)
+                is Resource.Success<*> -> {
+                    adapter.submitList(resource.data as List<Medicamento>)
                     binding.progressBar.isVisible = false
-                    binding.layoutEmptyMeds.isVisible = resource.data.isEmpty()
+                    binding.layoutEmptyMeds.isVisible = (resource.data as List<*>).isEmpty()
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
@@ -160,10 +160,10 @@ class MedicamentosFragment : Fragment() {
 
         viewModel.operationResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Success -> {
+                is Resource.Success<*> -> {
                     Toast.makeText(context, getString(R.string.msg_medication_saved), Toast.LENGTH_SHORT).show()
                     // PROGRAMAR ALERTA: Programamos una notificación para la próxima toma
-                    scheduleMedicationAlarm(resource.data)
+                    scheduleMedicationAlarm(resource.data as Medicamento)
                     clearFields()
                     viewModel.resetOperationState()
                 }

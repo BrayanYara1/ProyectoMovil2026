@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.example.gestionturnosapp.data.EstudioMedico
+import com.example.gestionturnosapp.data.model.EstudioMedico
 import com.example.gestionturnosapp.databinding.ItemEstudioBinding
 
 class EstudiosAdapter(

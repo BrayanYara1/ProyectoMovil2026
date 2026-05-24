@@ -1,6 +1,6 @@
 package com.example.gestionturnosapp
 
-import com.example.gestionturnosapp.data.Turno
+import com.example.gestionturnosapp.data.model.Turno
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

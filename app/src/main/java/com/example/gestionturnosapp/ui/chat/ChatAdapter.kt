@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gestionturnosapp.data.Mensaje
+import com.example.gestionturnosapp.data.model.Mensaje
 import com.example.gestionturnosapp.databinding.ItemChatMessageMeBinding
 import com.example.gestionturnosapp.databinding.ItemChatMessageOtherBinding
 import java.text.SimpleDateFormat

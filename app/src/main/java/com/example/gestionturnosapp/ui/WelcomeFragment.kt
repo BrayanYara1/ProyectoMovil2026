@@ -14,10 +14,11 @@ import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentWelcomeBinding
-import com.example.gestionturnosapp.data.PreferenceManager
+import com.example.gestionturnosapp.data.local.PreferenceManager
 import com.example.gestionturnosapp.util.BiometricHelper
 import android.widget.Toast
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -26,6 +27,9 @@ class WelcomeFragment : Fragment() {
 
     private var _binding: FragmentWelcomeBinding? = null
     private val binding get() = _binding!!
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -52,7 +56,7 @@ class WelcomeFragment : Fragment() {
     }
 
     private fun setupUI() {
-        val user = UserManager.getUser(requireContext())
+        val user = userManager.getUser()
         
         if (user != null) {
             // Usuario logueado

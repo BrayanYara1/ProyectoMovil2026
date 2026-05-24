@@ -5,7 +5,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.gestionturnosapp.data.*
+import com.example.gestionturnosapp.data.model.*
+import com.example.gestionturnosapp.data.repository.*
+import com.example.gestionturnosapp.data.local.*
+import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.util.SmartAssistant
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -41,7 +44,7 @@ class ChatViewModel @Inject constructor(
 
     fun fetchMensajes() {
         if (_isAiAssistantMode.value == true) {
-            if (_mensajes.value !is Resource.Success) {
+            if (_mensajes.value !is Resource.Success<*>) {
                 _mensajes.value = Resource.Success(emptyList())
             }
             return
@@ -79,7 +82,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             // Optimistic UI: Agregar mensaje localmente antes de la red
             val userMsg = Mensaje(id = "local_${System.currentTimeMillis()}", texto = texto, remitente = "PACIENTE", fecha = Date())
-            val currentList = (_mensajes.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+            val currentList = (_mensajes.value as? Resource.Success<List<Mensaje>>)?.data?.toMutableList() ?: mutableListOf()
             currentList.add(userMsg)
             _mensajes.value = Resource.Success(currentList)
 
@@ -107,7 +110,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             // 1. Agregar mensaje del usuario localmente
             val userMsg = Mensaje(id = "local_${System.currentTimeMillis()}", texto = texto, remitente = "PACIENTE", fecha = Date())
-            val currentList = (_mensajes.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+            val currentList = (_mensajes.value as? Resource.Success<List<Mensaje>>)?.data?.toMutableList() ?: mutableListOf()
             currentList.add(userMsg)
             _mensajes.value = Resource.Success(currentList)
             

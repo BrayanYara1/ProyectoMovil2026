@@ -17,17 +17,18 @@ import androidx.navigation.fragment.findNavController
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.ImageStorageManager
+import com.example.gestionturnosapp.data.local.ImageStorageManager
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentHomeBinding
 import com.example.gestionturnosapp.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.util.Calendar
-
+import javax.inject.Inject
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import com.example.gestionturnosapp.data.OfflineCacheManager
+import com.example.gestionturnosapp.data.local.OfflineCacheManager
+import com.example.gestionturnosapp.data.model.Medicamento
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -37,6 +38,9 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: HomeViewModel by viewModels()
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -102,8 +106,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateUI() {
-        val context = context ?: return
-        val user = UserManager.getUser(context)
+        val user = userManager.getUser()
         val rawName = user?.nombre ?: getString(R.string.label_anonymous)
         
         // Limpieza del nombre: Eliminar versión (vX.X.X), saltos de línea y espacios extra
@@ -236,7 +239,7 @@ class HomeFragment : Fragment() {
     private fun handleSessionExpired() {
         viewLifecycleOwner.lifecycleScope.launch {
             OfflineCacheManager.clearCache(requireContext())
-            UserManager.logout(requireContext())
+            userManager.logout()
             findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
                 .setPopUpTo(R.id.nav_graph, true)
                 .build())
@@ -257,7 +260,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun generateAndSharePdf() {
-        val user = UserManager.getUser(requireContext())
+        val user = userManager.getUser()
         val turnos = viewModel.allTurnos.value ?: emptyList()
         val meds = viewModel.medicamentos.value ?: emptyList()
         
@@ -280,7 +283,7 @@ class HomeFragment : Fragment() {
     private fun shareTextSummary() {
         val nextTurno = viewModel.nextTurno.value
         val meds = viewModel.medicamentos.value ?: emptyList()
-        val user = UserManager.getUser(requireContext())
+        val user = userManager.getUser()
         
         val summary = StringBuilder()
         summary.append(getString(R.string.label_share_appointment_header)).append("\n")
@@ -316,7 +319,7 @@ class HomeFragment : Fragment() {
         startActivity(Intent.createChooser(intent, getString(R.string.label_share_via)))
     }
 
-    private fun displayMedicamentos(meds: List<com.example.gestionturnosapp.data.Medicamento>) {
+    private fun displayMedicamentos(meds: List<Medicamento>) {
         val hasMeds = meds.isNotEmpty()
         binding.tvNoMeds.visibility = if (hasMeds) View.GONE else View.VISIBLE
         binding.lottieMeds.visibility = if (hasMeds) View.GONE else View.VISIBLE

@@ -17,10 +17,10 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
-import com.example.gestionturnosapp.data.PreferenceManager
+import com.example.gestionturnosapp.data.local.PreferenceManager
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.ActivityMainBinding
-import com.example.gestionturnosapp.network.RetrofitClient
+import com.example.gestionturnosapp.data.remote.RetrofitClient
 import com.example.gestionturnosapp.notifications.NotificationHelper
 import com.example.gestionturnosapp.util.NetworkMonitor
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +36,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var networkMonitor: NetworkMonitor
+
+    @Inject
+    lateinit var userManager: UserManager
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
@@ -107,7 +110,7 @@ class MainActivity : AppCompatActivity() {
         val type = intent.getStringExtra("type") ?: return
         
         // Solo navegar si el usuario ya está autenticado
-        if (UserManager.getUser(this) == null) return
+        if (userManager.getUser() == null) return
 
         when (type) {
             "chat" -> navController?.navigate(R.id.chatFragment)
@@ -116,13 +119,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sincronizarFcmToken() {
-        if (!UserManager.isFcmSynced(this)) {
-            val token = UserManager.getFcmToken(this)
+        if (!userManager.isFcmSynced()) {
+            val token = userManager.getFcmToken()
             token?.let {
                 lifecycleScope.launch {
                     try {
                         RetrofitClient.instance.updateFcmToken(mapOf("token" to it))
-                        UserManager.markFcmAsSynced(this@MainActivity)
+                        userManager.markFcmAsSynced()
                     } catch (e: Exception) {
                         Log.e("FCM", "Sync error", e)
                     }

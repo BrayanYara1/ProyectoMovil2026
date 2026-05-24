@@ -15,13 +15,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentSolicitarTurnoBinding
 import com.example.gestionturnosapp.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -35,6 +36,9 @@ class SolicitarTurnoFragment : Fragment() {
 
     private val viewModel: TurnosListViewModel by activityViewModels()
 
+    @Inject
+    lateinit var userManager: UserManager
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,7 +50,7 @@ class SolicitarTurnoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        UserManager.usuarioActual?.let {
+        userManager.usuarioActual?.let {
             viewModel.formPacienteNombre.value = it.nombre
             binding.etPacienteNombre.setText(it.nombre)
         }
@@ -111,7 +115,7 @@ class SolicitarTurnoFragment : Fragment() {
         val motivo = binding.etMotivo.text.toString()
         val especialidadArg = arguments?.getString("especialidadNombre")
         val motivoDefault = if (especialidadArg != null) getString(R.string.reason_consultation_for, especialidadArg) else ""
-        return ((nombre.isNotEmpty() && nombre != UserManager.usuarioActual?.nombre) || fecha.isNotEmpty() || hora.isNotEmpty() || (motivo.isNotEmpty() && motivo != motivoDefault))
+        return ((nombre.isNotEmpty() && nombre != userManager.usuarioActual?.nombre) || fecha.isNotEmpty() || hora.isNotEmpty() || (motivo.isNotEmpty() && motivo != motivoDefault))
     }
 
     private fun showDiscardDialog() {
@@ -211,8 +215,8 @@ class SolicitarTurnoFragment : Fragment() {
                     binding.btnConfirmarTurno.isEnabled = false
                     binding.btnConfirmarTurno.text = getString(R.string.btn_processing)
                 }
-                is Resource.Success -> {
-                    Snackbar.make(binding.root, R.string.msg_appointment_success, Snackbar.LENGTH_LONG).show()
+                is Resource.Success<*> -> {
+                    Snackbar.make(binding.root, getString(R.string.msg_appointment_success), Snackbar.LENGTH_LONG).show()
                     viewModel.resetNavegacion()
                     findNavController().popBackStack()
                 }
@@ -232,7 +236,7 @@ class SolicitarTurnoFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
-        UserManager.logout(requireContext())
+        userManager.logout()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)
             .build())

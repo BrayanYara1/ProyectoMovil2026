@@ -6,12 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Medicamento
-import com.example.gestionturnosapp.data.NuevoMedicamentoRequest
-import com.example.gestionturnosapp.data.MedicamentoRepository
-import com.example.gestionturnosapp.data.OfflineCacheManager
-import com.example.gestionturnosapp.data.Turno
-import com.example.gestionturnosapp.data.TurnoRepository
+import com.example.gestionturnosapp.data.model.*
+import com.example.gestionturnosapp.data.remote.dto.*
+import com.example.gestionturnosapp.data.repository.*
+import com.example.gestionturnosapp.data.local.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async

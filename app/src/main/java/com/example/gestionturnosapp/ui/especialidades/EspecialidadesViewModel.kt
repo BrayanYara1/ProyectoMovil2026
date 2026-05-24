@@ -5,8 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.gestionturnosapp.data.Especialidad
-import com.example.gestionturnosapp.data.EspecialidadRepository
+import com.example.gestionturnosapp.data.model.Especialidad
+import com.example.gestionturnosapp.data.repository.EspecialidadRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.Locale
 import javax.inject.Inject

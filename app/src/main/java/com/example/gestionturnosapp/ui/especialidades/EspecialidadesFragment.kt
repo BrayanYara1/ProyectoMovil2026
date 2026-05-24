@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.gestionturnosapp.R
+import com.example.gestionturnosapp.data.model.Especialidad
 import com.example.gestionturnosapp.databinding.FragmentEspecialidadesBinding
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -12,8 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.RegisterRequest
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.remote.dto.RegisterRequest
+import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.databinding.FragmentRegisterBinding
 import dagger.hilt.android.AndroidEntryPoint
 

@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.gestionturnosapp.data.Medicamento
+import com.example.gestionturnosapp.data.model.Medicamento
 
 @Dao
 interface MedicamentoDao {

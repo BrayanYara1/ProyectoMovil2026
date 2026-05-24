@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gestionturnosapp.data.Medicamento
+import com.example.gestionturnosapp.data.model.Medicamento
 import com.example.gestionturnosapp.databinding.ItemMedicationHomeBinding
 
 class MedicamentosAdapter(

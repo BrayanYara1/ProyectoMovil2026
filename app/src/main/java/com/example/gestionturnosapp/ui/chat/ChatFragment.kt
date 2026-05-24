@@ -9,7 +9,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.util.Resource
+import com.example.gestionturnosapp.data.model.Mensaje
 import com.example.gestionturnosapp.databinding.FragmentChatBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -66,7 +67,7 @@ class ChatFragment : Fragment() {
         viewModel.mensajes.observe(viewLifecycleOwner) { resource ->
             binding.progressBar.isVisible = resource is Resource.Loading && adapter.currentList.isEmpty()
             
-            if (resource is Resource.Success) {
+            if (resource is Resource.Success<List<Mensaje>>) {
                 adapter.submitList(resource.data) {
                     binding.rvChat.scrollToPosition(adapter.itemCount - 1)
                 }

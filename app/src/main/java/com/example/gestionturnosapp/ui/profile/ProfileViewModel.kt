@@ -6,10 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.data.UserManager
-import com.example.gestionturnosapp.data.Usuario
-import com.example.gestionturnosapp.network.RetrofitClient
+import com.example.gestionturnosapp.data.model.Usuario
+import com.example.gestionturnosapp.data.remote.RetrofitClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     application: Application,
+    private val userManager: UserManager
 ) : AndroidViewModel(application) {
 
     private val _user = MutableLiveData<Usuario?>()
@@ -30,7 +31,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun loadUser() {
-        _user.value = UserManager.loadUser(getApplication())
+        _user.value = userManager.getUser()
     }
 
     fun updateProfile(nuevoUsuario: Usuario) {
@@ -40,7 +41,7 @@ class ProfileViewModel @Inject constructor(
                 val response = RetrofitClient.instance.updateProfile(nuevoUsuario)
                 if (response.isSuccessful) {
                     val usuarioActualizado = response.body() ?: nuevoUsuario
-                    UserManager.saveUser(getApplication(), usuarioActualizado)
+                    userManager.saveUser(usuarioActualizado)
                     _user.value = usuarioActualizado
                     _updateStatus.value = Resource.Success(usuarioActualizado)
                 } else {
@@ -56,14 +57,14 @@ class ProfileViewModel @Inject constructor(
                             "${getApplication<Application>().getString(R.string.msg_generic_sync_error)} ($code)"
                         }
                         // Save locally anyway as fallback
-                        UserManager.saveUser(getApplication(), nuevoUsuario)
+                        userManager.saveUser(nuevoUsuario)
                         _user.value = nuevoUsuario
                         _updateStatus.value = Resource.Error(msg)
                     }
                 }
             } catch (_: Exception) {
                 // Offline fallback
-                UserManager.saveUser(getApplication(), nuevoUsuario)
+                userManager.saveUser(nuevoUsuario)
                 _user.value = nuevoUsuario
                 _updateStatus.value = Resource.Error("OFFLINE_SAVED")
             }

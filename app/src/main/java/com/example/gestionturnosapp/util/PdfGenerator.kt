@@ -6,9 +6,9 @@ import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import androidx.core.content.FileProvider
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Medicamento
-import com.example.gestionturnosapp.data.Turno
-import com.example.gestionturnosapp.data.Usuario
+import com.example.gestionturnosapp.data.model.Medicamento
+import com.example.gestionturnosapp.data.model.Turno
+import com.example.gestionturnosapp.data.model.Usuario
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat

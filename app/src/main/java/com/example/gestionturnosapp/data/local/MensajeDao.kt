@@ -1,7 +1,7 @@
 package com.example.gestionturnosapp.data.local
 
 import androidx.room.*
-import com.example.gestionturnosapp.data.Mensaje
+import com.example.gestionturnosapp.data.model.Mensaje
 
 @Dao
 interface MensajeDao {

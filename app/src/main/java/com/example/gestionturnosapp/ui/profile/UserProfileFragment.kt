@@ -14,10 +14,10 @@ import androidx.fragment.app.viewModels
 import coil.load
 import coil.transform.CircleCropTransformation
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.ImageStorageManager
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.local.ImageStorageManager
+import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.data.UserManager
-import com.example.gestionturnosapp.data.Usuario
+import com.example.gestionturnosapp.data.model.Usuario
 import com.example.gestionturnosapp.databinding.FragmentUserProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -91,7 +91,7 @@ class UserProfileFragment : Fragment() {
                 is Resource.Loading -> {
                     binding.btnEditProfile.isEnabled = false
                 }
-                is Resource.Success -> {
+                is Resource.Success<*> -> {
                     binding.btnEditProfile.isEnabled = true
                     Toast.makeText(context, R.string.msg_profile_update_success, Toast.LENGTH_SHORT).show()
                     viewModel.resetUpdateStatus()

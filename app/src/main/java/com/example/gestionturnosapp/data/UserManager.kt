@@ -3,42 +3,41 @@ package com.example.gestionturnosapp.data
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import com.example.gestionturnosapp.data.model.Usuario
 import com.google.gson.Gson
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object UserManager {
-    private const val PREF_NAME = "secure_user_prefs"
-    private const val KEY_USER = "current_user"
-    private const val KEY_TOKEN = "auth_token"
-    private const val KEY_FCM_TOKEN = "fcm_token"
-    private const val KEY_FCM_SYNCED = "fcm_synced"
-    
-    private var appContext: Context? = null
+@Singleton
+class UserManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val gson: Gson
+) {
+    private val prefs: SharedPreferences by lazy {
+        context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    }
+
     var usuarioActual: Usuario? = null
+        private set
+    
     var token: String? = null
+        get() {
+            if (field == null) {
+                field = prefs.getString(KEY_TOKEN, null)
+            }
+            return field
+        }
+        private set
 
-    private fun getEncryptedPrefs(context: Context): SharedPreferences {
-        // TEMPORAL: Usar SharedPreferences normales para diagnosticar el crash
-        return context.getSharedPreferences(PREF_NAME + "_diagnostics", Context.MODE_PRIVATE)
+    init {
+        loadUser()
     }
 
-    private fun createEncryptedPrefs(context: Context, masterKey: MasterKey): SharedPreferences {
-        return EncryptedSharedPreferences.create(
-            context.applicationContext,
-            PREF_NAME,
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
-    }
-
-    fun saveUser(context: Context, usuario: Usuario, authToken: String? = null) {
-        this.appContext = context.applicationContext
+    fun saveUser(usuario: Usuario, authToken: String? = null) {
         usuarioActual = usuario
-        val prefs = getEncryptedPrefs(appContext!!)
         prefs.edit {
-            putString(KEY_USER, Gson().toJson(usuario))
+            putString(KEY_USER, gson.toJson(usuario))
             if (authToken != null) {
                 token = authToken
                 putString(KEY_TOKEN, authToken)
@@ -46,62 +45,96 @@ object UserManager {
         }
     }
 
-    fun getToken(context: Context? = null): String? {
-        val targetContext = context?.applicationContext ?: appContext
-        if (token == null && (targetContext != null)) {
-            val prefs = getEncryptedPrefs(targetContext)
-            token = prefs.getString(KEY_TOKEN, null)
-        }
-        return token
-    }
-
-    fun getUser(context: Context): Usuario? {
+    fun getUser(): Usuario? {
         if (usuarioActual == null) {
-            loadUser(context)
+            val json = prefs.getString(KEY_USER, null)
+            if (json != null) {
+                try {
+                    usuarioActual = gson.fromJson(json, Usuario::class.java)
+                } catch (_: Exception) {
+                    usuarioActual = null
+                    prefs.edit { remove(KEY_USER) }
+                }
+            }
         }
         return usuarioActual
     }
 
-    fun loadUser(context: Context): Usuario? {
-        this.appContext = context.applicationContext
-        val prefs = getEncryptedPrefs(appContext!!)
+    private fun loadUser() {
         val json = prefs.getString(KEY_USER, null)
         if (json != null) {
             try {
-                usuarioActual = Gson().fromJson(json, Usuario::class.java)
+                usuarioActual = gson.fromJson(json, Usuario::class.java)
             } catch (_: Exception) {
                 usuarioActual = null
-                prefs.edit { remove(KEY_USER) }
             }
         }
         token = prefs.getString(KEY_TOKEN, null)
-        return usuarioActual
     }
 
-    fun saveFcmToken(context: Context, fcmToken: String) {
-        val prefs = getEncryptedPrefs(context)
+    fun saveFcmToken(fcmToken: String) {
         prefs.edit { 
             putString(KEY_FCM_TOKEN, fcmToken)
             putBoolean(KEY_FCM_SYNCED, false)
         }
     }
 
-    fun getFcmToken(context: Context): String? {
-        return getEncryptedPrefs(context).getString(KEY_FCM_TOKEN, null)
+    fun getFcmToken(): String? {
+        return prefs.getString(KEY_FCM_TOKEN, null)
     }
 
-    fun markFcmAsSynced(context: Context) {
-        getEncryptedPrefs(context).edit { putBoolean(KEY_FCM_SYNCED, true) }
+    fun markFcmAsSynced() {
+        prefs.edit { putBoolean(KEY_FCM_SYNCED, true) }
     }
 
-    fun isFcmSynced(context: Context): Boolean {
-        return getEncryptedPrefs(context).getBoolean(KEY_FCM_SYNCED, false)
+    fun isFcmSynced(): Boolean {
+        return prefs.getBoolean(KEY_FCM_SYNCED, false)
     }
 
-    fun logout(context: Context) {
+    fun logout() {
         usuarioActual = null
         token = null
-        val prefs = getEncryptedPrefs(context)
         prefs.edit { clear() }
+    }
+
+    companion object {
+        private const val PREF_NAME = "secure_user_prefs_diagnostics"
+        private const val KEY_USER = "current_user"
+        private const val KEY_TOKEN = "auth_token"
+        private const val KEY_FCM_TOKEN = "fcm_token"
+        private const val KEY_FCM_SYNCED = "fcm_synced"
+
+        private var instance: UserManager? = null
+        
+        fun init(manager: UserManager) {
+            instance = manager
+        }
+
+        @Deprecated("Usar inyección de dependencias")
+        val token: String? get() = instance?.token
+
+        @Deprecated("Usar inyección de dependencias")
+        fun getUser(context: Context): Usuario? = instance?.getUser()
+
+        @Deprecated("Usar inyección de dependencias")
+        fun logout(context: Context) = instance?.logout()
+
+        @Deprecated("Usar inyección de dependencias")
+        fun getToken(context: Context? = null): String? = instance?.token
+
+        @Deprecated("Usar inyección de dependencias")
+        val usuarioActual: Usuario? get() = instance?.usuarioActual
+
+        @Deprecated("Usar inyección de dependencias")
+        fun isFcmSynced(context: Context): Boolean = instance?.isFcmSynced() ?: false
+
+        @Deprecated("Usar inyección de dependencias")
+        fun getFcmToken(context: Context): String? = instance?.getFcmToken()
+
+        @Deprecated("Usar inyección de dependencias")
+        fun saveFcmToken(context: Context, fcmToken: String) = instance?.saveFcmToken(fcmToken)
+
+        @Deprecated("Usar inyección de dependencias")
+        fun markFcmAsSynced(context: Context) = instance?.markFcmAsSynced()
     }
 }

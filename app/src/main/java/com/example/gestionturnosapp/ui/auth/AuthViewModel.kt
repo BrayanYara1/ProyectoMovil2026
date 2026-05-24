@@ -8,7 +8,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.*
+import com.example.gestionturnosapp.data.UserManager
+import com.example.gestionturnosapp.data.model.*
+import com.example.gestionturnosapp.data.remote.dto.*
+import com.example.gestionturnosapp.data.repository.*
+import com.example.gestionturnosapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,6 +21,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     application: Application,
     private val repository: AuthRepository,
+    private val userManager: UserManager
 ) : AndroidViewModel(application) {
     
     private val _authState = MutableLiveData<Resource<Usuario>>(Resource.Idle)
@@ -72,7 +77,7 @@ class AuthViewModel @Inject constructor(
                     val authResponse = response.body()
                     val usuario = authResponse?.usuario
                     if (usuario != null) {
-                        UserManager.saveUser(getApplication(), usuario, authResponse.token)
+                        userManager.saveUser(usuario, authResponse.token)
                         _authState.value = Resource.Success(usuario)
                     } else {
                         _authState.value = Resource.Error(getApplication<Application>().getString(R.string.msg_user_not_found))

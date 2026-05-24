@@ -6,10 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.MediatorLiveData
-import com.example.gestionturnosapp.data.EstudioMedico
-import com.example.gestionturnosapp.data.EstudioRepository
-import com.example.gestionturnosapp.data.OfflineCacheManager
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.model.EstudioMedico
+import com.example.gestionturnosapp.data.repository.EstudioRepository
+import com.example.gestionturnosapp.data.local.OfflineCacheManager
+import com.example.gestionturnosapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,7 +40,7 @@ class EstudiosViewModel @Inject constructor(
                 
                 matchesDate && matchesQuery
             }
-            value = Resource.Success(filtered)
+            this.value = Resource.Success(filtered)
         }
         addSource(_allEstudios, observer)
         addSource(_startDate, observer)

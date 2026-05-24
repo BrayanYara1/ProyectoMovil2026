@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Turno
+import com.example.gestionturnosapp.data.model.Turno
 import com.example.gestionturnosapp.databinding.ItemTurnoBinding
 import com.example.gestionturnosapp.util.DateUtils
 import java.text.SimpleDateFormat

@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.util.Resource
 import com.example.gestionturnosapp.databinding.FragmentLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -71,7 +71,7 @@ class LoginFragment : Fragment() {
                     binding.progressBar.isVisible = true
                     binding.btnLogin.isEnabled = false
                 }
-                is Resource.Success -> {
+                is Resource.Success<*> -> {
                     binding.progressBar.isVisible = false
                     binding.btnLogin.isEnabled = true
                     viewModel.resetAuthState() // Limpiar estado para evitar re-navegación

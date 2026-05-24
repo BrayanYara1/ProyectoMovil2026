@@ -32,9 +32,9 @@
 -dontwarn okio.**
 
 # MANTENER INTERFACES DE API (Fundamental para Retrofit)
--keep interface com.example.gestionturnosapp.network.** { *; }
+-keep interface com.example.gestionturnosapp.data.remote.** { *; }
 # Mantener tipos genéricos en los métodos de la API
--keepclassmembers interface com.example.gestionturnosapp.network.** {
+-keepclassmembers interface com.example.gestionturnosapp.data.remote.** {
     <methods>;
 }
 

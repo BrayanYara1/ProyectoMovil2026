@@ -2,8 +2,8 @@ package com.example.gestionturnosapp.util
 
 import android.content.Context
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Medicamento
-import com.example.gestionturnosapp.data.Turno
+import com.example.gestionturnosapp.data.model.Medicamento
+import com.example.gestionturnosapp.data.model.Turno
 
 object SmartAssistant {
 

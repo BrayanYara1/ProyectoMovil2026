@@ -22,6 +22,7 @@ import com.example.gestionturnosapp.util.DateUtils
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TurnoDetailFragment : Fragment() {
@@ -30,6 +31,9 @@ class TurnoDetailFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: TurnosListViewModel by activityViewModels()
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -175,7 +179,7 @@ class TurnoDetailFragment : Fragment() {
     }
 
     private fun handleSessionExpired() {
-        UserManager.logout(requireContext())
+        userManager.logout()
         Toast.makeText(requireContext(), getString(R.string.msg_session_expired), Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
             .setPopUpTo(R.id.nav_graph, true)

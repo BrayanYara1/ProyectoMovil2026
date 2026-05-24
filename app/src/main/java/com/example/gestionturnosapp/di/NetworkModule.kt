@@ -1,10 +1,12 @@
 package com.example.gestionturnosapp.di
 
+import android.content.Context
 import com.example.gestionturnosapp.data.UserManager
-import com.example.gestionturnosapp.network.ApiService
+import com.example.gestionturnosapp.data.remote.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -20,14 +22,17 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(userManager: UserManager): OkHttpClient {
         return OkHttpClient.Builder()
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
             .writeTimeout(60, TimeUnit.SECONDS)
             .addInterceptor { chain ->
                 val builder = chain.request().newBuilder()
-                val token = UserManager.token ?: UserManager.getToken()
+                
+                // Obtenemos el token del UserManager inyectado
+                val token = userManager.token
+
                 token?.let {
                     builder.addHeader("Authorization", "Bearer $it")
                 }

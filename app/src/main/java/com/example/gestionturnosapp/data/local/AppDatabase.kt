@@ -6,10 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import net.sqlcipher.database.SupportFactory
-import com.example.gestionturnosapp.data.EstudioMedico
-import com.example.gestionturnosapp.data.Medicamento
-import com.example.gestionturnosapp.data.Turno
-import com.example.gestionturnosapp.data.Mensaje
+import com.example.gestionturnosapp.data.model.*
 
 @Database(entities = [Turno::class, Medicamento::class, EstudioMedico::class, Mensaje::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)

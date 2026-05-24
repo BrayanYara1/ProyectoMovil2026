@@ -62,7 +62,7 @@ object NotificationHelper {
         notificationId: Int = (System.currentTimeMillis() % 10000).toInt(),
         data: Map<String, String>? = null
     ) {
-        if (!com.example.gestionturnosapp.data.PreferenceManager.areNotificationsEnabled(context)) {
+        if (!com.example.gestionturnosapp.data.local.PreferenceManager.areNotificationsEnabled(context)) {
             return
         }
 

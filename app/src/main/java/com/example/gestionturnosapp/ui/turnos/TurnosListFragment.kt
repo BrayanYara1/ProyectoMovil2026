@@ -10,14 +10,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Resource
-import com.example.gestionturnosapp.data.Turno
+import com.example.gestionturnosapp.util.Resource
+import com.example.gestionturnosapp.data.model.Turno
 import com.example.gestionturnosapp.databinding.FragmentTurnosListBinding
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import com.example.gestionturnosapp.data.OfflineCacheManager
+import com.example.gestionturnosapp.data.local.OfflineCacheManager
+import com.example.gestionturnosapp.data.UserManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class TurnosListFragment : Fragment() {
@@ -27,6 +29,9 @@ class TurnosListFragment : Fragment() {
 
     private val viewModel: TurnosListViewModel by activityViewModels()
     private lateinit var adapter: TurnosAdapter
+
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -140,8 +145,8 @@ class TurnosListFragment : Fragment() {
                 binding.rvTurnos.scheduleLayoutAnimation()
             }
             
-            val isInitialListEmpty = (viewModel.turnosResource.value as? Resource.Success)?.data?.isEmpty() == true
-            val noResultsFound = turnos.isEmpty() && !isInitialListEmpty && viewModel.turnosResource.value is Resource.Success
+            val isInitialListEmpty = (viewModel.turnosResource.value as? Resource.Success<*>)?.data?.let { (it as List<*>).isEmpty() } == true
+            val noResultsFound = turnos.isEmpty() && !isInitialListEmpty && viewModel.turnosResource.value is Resource.Success<*>
             
             binding.layoutEmpty.isVisible = (turnos.isEmpty() && isInitialListEmpty)
             
@@ -177,11 +182,11 @@ class TurnosListFragment : Fragment() {
                     binding.layoutError.isVisible = false
                     binding.layoutEmpty.isVisible = false
                 }
-                is Resource.Success -> {
+                is Resource.Success<*> -> {
                     binding.progressBar.isVisible = false
                     binding.swipeRefresh.isRefreshing = false
                     binding.layoutError.isVisible = false
-                    binding.layoutEmpty.isVisible = resource.data.isEmpty()
+                    binding.layoutEmpty.isVisible = (resource.data as List<*>).isEmpty()
                 }
                 is Resource.Error -> {
                     binding.progressBar.isVisible = false
@@ -216,7 +221,7 @@ class TurnosListFragment : Fragment() {
     private fun handleSessionExpired() {
         viewLifecycleOwner.lifecycleScope.launch {
             OfflineCacheManager.clearCache(requireContext())
-            com.example.gestionturnosapp.data.UserManager.logout(requireContext())
+            userManager.logout()
             Toast.makeText(requireContext(), R.string.msg_session_expired, Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.loginFragment, null, androidx.navigation.NavOptions.Builder()
                 .setPopUpTo(R.id.nav_graph, true)

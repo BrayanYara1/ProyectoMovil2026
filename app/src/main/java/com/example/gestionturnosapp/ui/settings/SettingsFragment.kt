@@ -12,7 +12,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.PreferenceManager
+import com.example.gestionturnosapp.data.local.PreferenceManager
 import com.example.gestionturnosapp.data.UserManager
 import com.example.gestionturnosapp.databinding.FragmentSettingsBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -20,7 +20,7 @@ import com.google.android.material.snackbar.Snackbar
 
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
-import com.example.gestionturnosapp.data.OfflineCacheManager
+import com.example.gestionturnosapp.data.local.OfflineCacheManager
 import com.example.gestionturnosapp.util.BiometricHelper
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint

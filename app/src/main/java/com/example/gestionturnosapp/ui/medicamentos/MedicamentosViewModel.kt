@@ -5,11 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.gestionturnosapp.data.Medicamento
-import com.example.gestionturnosapp.data.NuevoMedicamentoRequest
-import com.example.gestionturnosapp.data.MedicamentoRepository
-import com.example.gestionturnosapp.data.OfflineCacheManager
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.data.model.Medicamento
+import com.example.gestionturnosapp.data.remote.dto.NuevoMedicamentoRequest
+import com.example.gestionturnosapp.data.repository.MedicamentoRepository
+import com.example.gestionturnosapp.data.local.OfflineCacheManager
+import com.example.gestionturnosapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -42,7 +42,7 @@ class MedicamentosViewModel @Inject constructor(
                 OfflineCacheManager.saveMedicamentos(getApplication(), list)
                 refreshLocalList()
             } catch (e: Exception) {
-                if (_medicamentosResource.value !is Resource.Success) {
+                if (_medicamentosResource.value !is Resource.Success<*>) {
                     _medicamentosResource.value = Resource.Error(e.localizedMessage ?: "Error desconocido")
                 }
             } finally {
@@ -142,7 +142,7 @@ class MedicamentosViewModel @Inject constructor(
                 repository.eliminarMedicamento(id)
                 
                 // Actualizar lista local inmediatamente
-                val currentList = (_medicamentosResource.value as? Resource.Success)?.data?.toMutableList() ?: mutableListOf()
+                val currentList = (_medicamentosResource.value as? Resource.Success<List<Medicamento>>)?.data?.toMutableList() ?: mutableListOf()
                 currentList.removeAll { it.id == id }
                 _medicamentosResource.value = Resource.Success(currentList)
                 

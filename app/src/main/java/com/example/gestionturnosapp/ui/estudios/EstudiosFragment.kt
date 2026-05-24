@@ -19,7 +19,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.example.gestionturnosapp.R
-import com.example.gestionturnosapp.data.Resource
+import com.example.gestionturnosapp.util.Resource
+import com.example.gestionturnosapp.data.model.EstudioMedico
+import com.example.gestionturnosapp.data.local.ImageStorageManager
 import com.example.gestionturnosapp.databinding.FragmentEstudiosBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
@@ -92,7 +94,7 @@ class EstudiosFragment : Fragment() {
         binding.rvEstudios.adapter = adapter
     }
 
-    private fun showEstudioDetailDialog(estudio: com.example.gestionturnosapp.data.EstudioMedico) {
+    private fun showEstudioDetailDialog(estudio: EstudioMedico) {
         val detailLayout = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_estudio_detail, null)
         val ivDetail = detailLayout.findViewById<ImageView>(R.id.ivEstudioDetail)
         val tvTitulo = detailLayout.findViewById<android.widget.TextView>(R.id.tvDetailTitulo)
@@ -184,8 +186,8 @@ class EstudiosFragment : Fragment() {
             binding.swipeRefresh.isRefreshing = resource is Resource.Loading
             
             when (resource) {
-                is Resource.Success -> {
-                    val list = resource.data
+                is Resource.Success<*> -> {
+                    val list = resource.data as List<EstudioMedico>
                     adapter.submitList(list)
                     binding.layoutEmpty.isVisible = list.isEmpty()
                 }
@@ -203,7 +205,7 @@ class EstudiosFragment : Fragment() {
 
         viewModel.createResource.observe(viewLifecycleOwner) { resource ->
             when (resource) {
-                is Resource.Success -> {
+                is Resource.Success<*> -> {
                     Toast.makeText(context, getString(R.string.msg_study_saved), Toast.LENGTH_SHORT).show()
                     viewModel.resetCreateState()
                 }
@@ -285,7 +287,7 @@ class EstudiosFragment : Fragment() {
                 // PERSISTENCIA DE IMAGEN: Copiar a almacenamiento interno antes de guardar
                 var finalPhotoPath: String? = null
                 selectedImageUri?.let { uri ->
-                    finalPhotoPath = com.example.gestionturnosapp.data.ImageStorageManager.saveStudyImage(requireContext(), uri)
+                    finalPhotoPath = ImageStorageManager.saveStudyImage(requireContext(), uri)
                 }
                 
                 viewModel.agregarEstudio(titulo, fecha, tipo, resultado, finalPhotoPath)

@@ -1,7 +1,7 @@
 package com.example.gestionturnosapp.notifications
 
 import com.example.gestionturnosapp.data.UserManager
-import com.example.gestionturnosapp.network.RetrofitClient
+import com.example.gestionturnosapp.data.remote.RetrofitClient
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
