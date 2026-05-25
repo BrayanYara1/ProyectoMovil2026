@@ -32,14 +32,15 @@ abstract class AppDatabase : RoomDatabase() {
                     val instance = buildDatabase(context)
                     INSTANCE = instance
                     instance
-                } catch (e: Exception) {
-                    android.util.Log.e("AppDatabase", "Error opening database, attempting recovery", e)
+                } catch (t: Throwable) {
+                    android.util.Log.e("AppDatabase", "Error opening database, attempting recovery", t)
                     try {
                         context.deleteDatabase(DB_NAME)
                         val instance = buildDatabase(context)
                         INSTANCE = instance
                         instance
-                    } catch (e2: Exception) {
+                    } catch (t2: Throwable) {
+                        android.util.Log.e("AppDatabase", "Fallback recovery failed", t2)
                         // Fallback extremo
                         val instance = Room.databaseBuilder(
                             context.applicationContext,
@@ -54,8 +55,8 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
-            // Con la nueva versión, convertimos el passphrase manualmente si getBytes no es accesible
-            val passphrase = "SaludActiva_Secret_Key_2024".toByteArray()
+            // Usamos un charset explícito para asegurar consistencia entre dispositivos
+            val passphrase = "SaludActiva_Secret_Key_2024".toByteArray(Charsets.UTF_8)
             val factory = SupportOpenHelperFactory(passphrase)
 
             return Room.databaseBuilder(

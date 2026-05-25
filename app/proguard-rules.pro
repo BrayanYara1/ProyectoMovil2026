@@ -47,10 +47,8 @@
 # 6. Seguridad (SQLCipher y EncryptedSharedPreferences)
 -keep class androidx.security.crypto.** { *; }
 -keep class net.zetetic.database.** { *; }
+-keep class net.zetetic.database.sqlcipher.** { *; }
 -dontwarn net.zetetic.**
--keep class net.sqlcipher.** { *; }
--keep class net.sqlcipher.database.** { *; }
--dontwarn net.sqlcipher.**
 
 # 7. Hilt / Dagger
 -keep class **_HiltModules* { *; }
@@ -59,7 +57,20 @@
 -keep class **_HiltFragment* { *; }
 -keep class **_HiltViewModel* { *; }
 -keep @dagger.hilt.android.lifecycle.HiltViewModel class *
+-keep @dagger.hilt.EntryPoint class *
+-keep class dagger.hilt.android.internal.managers.** { *; }
 
-# 8. Splash Screen
+# 8. Splash Screen y UI Libraries
 -keep class androidx.core.splashscreen.** { *; }
 -dontwarn androidx.core.splashscreen.**
+-keep class com.facebook.shimmer.** { *; }
+-keep class com.airbnb.lottie.** { *; }
+
+# 9. Room y SQLite
+-keep class * extends androidx.room.RoomDatabase
+-keep class * extends androidx.room.Entity
+-keep class * extends androidx.room.Dao
+-keep class androidx.sqlite.db.** { *; }
+-keep class androidx.room.paging.** { *; }
+-dontwarn androidx.room.**
+-dontwarn androidx.sqlite.db.**

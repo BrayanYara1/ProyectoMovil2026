@@ -119,7 +119,9 @@ class MainActivity : AppCompatActivity() {
     private fun observeNetworkStatus() {
         networkMonitor.isOnline
             .onEach { isOnline ->
-                binding.tvOfflineBanner.visibility = if (isOnline) View.GONE else View.VISIBLE
+                if (::binding.isInitialized) {
+                    binding.tvOfflineBanner.visibility = if (isOnline) View.GONE else View.VISIBLE
+                }
             }
             .launchIn(lifecycleScope)
     }
