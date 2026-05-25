@@ -29,3 +29,10 @@ build/
 backend/node_modules/
 backend/.env
 node_modules/
+
+# Binarios de Android
+*.apk
+*.ap_
+*.dex
+*.dm
+*.prof
