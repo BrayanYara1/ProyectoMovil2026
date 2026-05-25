@@ -33,6 +33,13 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Aseguramos compatibilidad total de firmas para otros dispositivos
+            signingConfig = signingConfigs.getByName("debug")
+            
+            // Desactivamos la subida de Crashlytics para compilación sin internet
+            configure<com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
         }
     }
 

@@ -61,18 +61,23 @@ class WelcomeFragment : Fragment() {
             val isBiometricAvailable = BiometricHelper.isBiometricAvailable(requireContext())
 
             if (isBiometricEnabled && isBiometricAvailable) {
-                // Solo mostrar si no estamos navegando ya
-                BiometricHelper.showBiometricPrompt(
-                    activity = requireActivity(),
-                    title = getString(R.string.title_biometric_auth),
-                    subtitle = getString(R.string.subtitle_biometric_auth),
-                    onSuccess = { safeNavigate(R.id.action_welcomeFragment_to_homeFragment) },
-                    onError = { error ->
-                        if (isAdded) {
-                            Toast.makeText(requireContext(), "${getString(R.string.error_biometric_auth)}: $error", Toast.LENGTH_SHORT).show()
-                        }
+                // Pequeño delay para asegurar que la vista está lista y evitar parpadeos
+                viewLifecycleOwner.lifecycleScope.launch {
+                    delay(500)
+                    if (isAdded && viewLifecycleOwner.lifecycle.currentState.isAtLeast(androidx.lifecycle.Lifecycle.State.STARTED)) {
+                        BiometricHelper.showBiometricPrompt(
+                            fragment = this@WelcomeFragment,
+                            title = getString(R.string.title_biometric_auth),
+                            subtitle = getString(R.string.subtitle_biometric_auth),
+                            onSuccess = { safeNavigate(R.id.action_welcomeFragment_to_homeFragment) },
+                            onError = { error ->
+                                if (isAdded) {
+                                    Toast.makeText(requireContext(), "${getString(R.string.error_biometric_auth)}: $error", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        )
                     }
-                )
+                }
             } else {
                 viewLifecycleOwner.lifecycleScope.launch {
                     delay(800) // Un poco más rápido para mejorar la sensación de fluidez
